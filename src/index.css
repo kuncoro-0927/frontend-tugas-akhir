@@ -1,0 +1,34 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.timeline-point {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+.timeline-item-custom {
+  margin-bottom: 0.3rem;
+}
+
+body {
+  @apply font-nunito text-base text-darkgray;
+}
+
+@keyframes pulsate {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.modal-loading {
+  animation: pulsate 1s ease-in-out infinite;
+}
