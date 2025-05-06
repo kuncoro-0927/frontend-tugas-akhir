@@ -101,7 +101,7 @@ const Profile = () => {
               helperText={
                 error.firstname
                   ? "Nama depan tidak boleh kosong"
-                  : "Contoh: Nabila Widya"
+                  : "Contoh: Budi"
               }
               value={formData.firstname}
               onChange={handleChange}
@@ -115,7 +115,7 @@ const Profile = () => {
               helperText={
                 error.lastname
                   ? "Nama belakang tidak boleh kosong"
-                  : "Contoh: Agustin"
+                  : "Contoh: Santoso"
               }
               value={formData.lastname}
               onChange={handleChange}

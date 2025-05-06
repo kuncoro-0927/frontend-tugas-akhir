@@ -98,15 +98,18 @@ const StatusModal = ({ open, onClose, data }) => {
 
         <div className="border-b pt-3 mx-5"></div>
 
-        <div className="px-5 pt-4 text-xs font-medium">
-          Progress Pengiriman:
-        </div>
-
-        <TimelinePengiriman
-          status={status}
-          createdAt={orderDate}
-          estimation={estimation}
-        />
+        {courierService !== "pickup" && (
+          <>
+            <div className="px-5 pt-4 text-xs font-medium">
+              Progress Pengiriman:
+            </div>
+            <TimelinePengiriman
+              status={status}
+              createdAt={orderDate}
+              estimation={estimation}
+            />
+          </>
+        )}
       </Box>
     </Modal>
   );

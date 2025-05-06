@@ -1,41 +1,33 @@
 import axios from "axios";
-import { showSnackbar } from "../components/CustomSnackbar";
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_APIURL,
-  timeout: 10000,
   withCredentials: true,
 });
 
-let isRefreshingUser = false; // Variabel khusus untuk user
-let failedUserQueue = []; // Queue untuk user
+instance.interceptors.request.use(
+  (config) => config,
+  (error) => Promise.reject(error)
+);
 
-const processUserQueue = (error) => {
-  failedUserQueue.forEach((prom) => {
-    if (error) prom.reject(error);
-    else prom.resolve();
-  });
-  failedUserQueue = [];
-};
+let isRefreshing = false;
+let failedRequestsQueue = [];
 
 instance.interceptors.response.use(
-  (res) => res,
-  async (err) => {
-    const originalRequest = err.config;
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
 
-    if (err.response?.status === 403 && !originalRequest._retry) {
+    if (error.response?.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      if (isRefreshingUser) {
+      if (isRefreshing) {
         return new Promise((resolve, reject) => {
-          failedUserQueue.push({
-            resolve: () => resolve(instance(originalRequest)),
-            reject,
-          });
-        });
+          failedRequestsQueue.push({ resolve, reject });
+        }).then(() => instance(originalRequest));
       }
 
-      isRefreshingUser = true;
+      isRefreshing = true;
 
       try {
         await axios.post(
@@ -43,21 +35,29 @@ instance.interceptors.response.use(
           {},
           { withCredentials: true }
         );
-        processUserQueue(null);
+
+        failedRequestsQueue.forEach(({ resolve }) => resolve());
+        failedRequestsQueue = [];
+
         return instance(originalRequest);
       } catch (refreshError) {
-        processUserQueue(refreshError);
-        showSnackbar(
-          "Sesi login Anda (user) berakhir, silakan login kembali.",
-          "error"
-        );
+        failedRequestsQueue.forEach(({ reject }) => reject(refreshError));
+        failedRequestsQueue = [];
+
+        document.cookie =
+          "user_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        document.cookie =
+          "user_refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+
+        alert("Session expired. Please login again.");
+
         return Promise.reject(refreshError);
       } finally {
-        isRefreshingUser = false;
+        isRefreshing = false;
       }
     }
 
-    return Promise.reject(err);
+    return Promise.reject(error);
   }
 );
 

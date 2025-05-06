@@ -3,7 +3,7 @@ import AdminNavBar from "../../../components/Admin/AdminNavBar";
 import SidebarAdmin from "../../../components/Admin/SidebarAdmin";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
 import FormInput from "../../../components/TextField";
-const DataUsers = () => {
+const DataPromoCodes = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]); // Data yang sudah difilter
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -20,20 +20,18 @@ const DataUsers = () => {
     setIsSidebarHovered(isHovered);
   };
 
-  // Fetch data pengguna
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await instanceAdmin.get("/all/users");
-        console.log("DATA USERS:", response.data);
-        setUsers(response.data);
-        setFilteredUsers(response.data); // Set users awal sebagai filtered
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      }
-    };
+  const fetchPromos = async () => {
+    try {
+      const response = await instanceAdmin.get("/all/promo");
+      setUsers(response.data);
+      setFilteredUsers(response.data);
+    } catch (error) {
+      console.error("Failed to fetch promos:", error);
+    }
+  };
 
-    fetchUsers();
+  useEffect(() => {
+    fetchPromos();
   }, []);
 
   // Filter pengguna berdasarkan search query
@@ -71,6 +69,15 @@ const DataUsers = () => {
       window.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  const handleToggle = async (id) => {
+    try {
+      await instanceAdmin.put(`/toggle/${id}`);
+      fetchPromos(); // Refresh data setelah toggle
+    } catch (error) {
+      console.error("Gagal toggle status:", error);
+    }
+  };
 
   return (
     <section className="flex gap-10">
@@ -122,12 +129,12 @@ const DataUsers = () => {
                     </div>
 
                     <input
-                      className="peer h-full w-full outline-none text-sm text-gray-500 pr-2"
+                      className="peer h-full w-full font-normal outline-none text-sm text-graytext pr-2"
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       id="search"
-                      placeholder="Cari data pengguna"
+                      placeholder="Cari Kode Promo"
                     />
                   </div>
                 </div>
@@ -139,11 +146,11 @@ const DataUsers = () => {
                 <thead>
                   <tr>
                     {[
-                      "Nama",
-                      "Role",
-                      "Kota / Provinsi",
-                      "Status",
-                      "Nomor Telepon",
+                      "Kode Promo",
+                      "Tipe Diskon",
+                      "Maks. Diskon",
+                      "Kontrol Status",
+                      "Tanggal Expired",
                       "Aksi",
                     ].map((header, index) => (
                       <th
@@ -162,57 +169,73 @@ const DataUsers = () => {
                     <tr key={user.id}>
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="flex items-center gap-3">
-                          <img
-                            src="https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg"
-                            alt="John Michael"
-                            className="inline-block relative object-cover object-center rounded-full w-9 h-9"
-                          />
-                          <div className="flex flex-col">
+                          <div className="">
                             <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                              {user.name}
-                            </p>
-                            <p className="block antialiased font-sans text-xs leading-normal text-blue-gray-900 font-normal opacity-70">
-                              {user.email}
+                              {user.code}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
                         <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                          {user.role_name}
+                          {user.discount_type === "fixed"
+                            ? "Rp (Potongan Tetap)"
+                            : user.discount_type === "percentage"
+                            ? "% (Diskon Persen)"
+                            : "Tidak diketahui"}
                         </p>
-                      </td>
-                      <td className="p-4 border-b border-blue-gray-50">
-                        <div className="flex flex-col">
-                          <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                            {user.city ? user.city : "Tidak ada data"}
-                          </p>
-                          <p className="block antialiased font-sans text-xs leading-normal text-blue-gray-900 font-normal opacity-70">
-                            {user.province ? user.province : "Tidak ada data"}
-                          </p>
-                        </div>
-                      </td>
-                      <td className="p-4 border-b border-blue-gray-50">
-                        <div className="w-max">
-                          <div
-                            className={`relative grid items-center font-sans font-bold whitespace-nowrap select-none ${
-                              user.isverified === 1
-                                ? "bg-green-500/20 text-green-600"
-                                : "bg-red-500/20 text-red-600"
-                            } py-1 px-2 text-xs rounded-md`}
-                          >
-                            <span>
-                              {user.isverified === 1
-                                ? "Terverifikasi"
-                                : "Belum Verifikasi"}
-                            </span>
-                          </div>
-                        </div>
                       </td>
 
                       <td className="p-4 border-b border-blue-gray-50">
-                        <p className="block antialiased font-sans text-xs leading-normal text-blue-gray-900 font-normal">
-                          {user.phone ? user.phone : "Tidak ada data"}
+                        <div className="flex flex-col">
+                          <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
+                            {user.discount_value
+                              ? user.discount_type === "percentage"
+                                ? `${user.discount_value}%${
+                                    user.max_discount
+                                      ? ` (max Rp${user.max_discount.toLocaleString(
+                                          "id-ID"
+                                        )})`
+                                      : ""
+                                  }`
+                                : `Rp${user.discount_value.toLocaleString(
+                                    "id-ID"
+                                  )}`
+                              : "Tidak ada data"}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="p-4 border-b border-blue-gray-50">
+                        <button
+                          onClick={() => handleToggle(user.id)}
+                          className={`w-12 h-6 flex items-center rounded-full p-1 duration-300 ease-in-out ${
+                            user.is_active === 1
+                              ? "bg-green-100 border border-green-400"
+                              : "bg-red-100 border border-red-400"
+                          }`}
+                        >
+                          <div
+                            className={`border  w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${
+                              user.is_active === 1
+                                ? "translate-x-6 bg-green-200 border-green-400"
+                                : "translate-x-0 bg-red-200 border-red-400"
+                            }`}
+                          ></div>
+                        </button>
+                      </td>
+
+                      <td className="p-4 border-b border-blue-gray-50">
+                        <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal opacity-70">
+                          {user.expiry_date
+                            ? new Date(user.expiry_date).toLocaleDateString(
+                                "id-ID",
+                                {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                }
+                              )
+                            : "Tidak ada data"}
                         </p>
                       </td>
 
@@ -271,4 +294,4 @@ const DataUsers = () => {
   );
 };
 
-export default DataUsers;
+export default DataPromoCodes;

@@ -204,24 +204,17 @@ const Cart = () => {
                   ? (calculateSubtotal() || 0).toLocaleString("id-ID")
                   : "0"}
               </div>
-              <div className="flex mt-2 justify-between">
-                <p>Biaya admin</p>
-                <p>{selectedItems.length > 0 ? "IDR 3.000" : "IDR 0"}</p>
-              </div>
-              <div className="flex mt-2 justify-between">
-                <p>Biaya pengiriman</p>
-                <p>IDR 0</p>
-              </div>
-              <p className="mt-10 text-xs text-gray-400/70">
-                Biaya pengiriman akan dihitung setelah memasukkan alamat di
-                halaman pembayaran.
+
+              <p className="mt-10 text-sm text-graytext">
+                Biaya pengiriman, biaya admin, promo akan dihitung di halaman
+                pembayaran.
               </p>
               <div className="border-b mt-5"></div>
               <div className="flex mt-5 justify-between">
                 <p>Total</p>
                 IDR{" "}
                 {selectedItems.length > 0
-                  ? ((calculateSubtotal() || 0) + 3000).toLocaleString("id-ID")
+                  ? (calculateSubtotal() || 0).toLocaleString("id-ID")
                   : "0"}
               </div>
               <button

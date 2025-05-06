@@ -9,7 +9,7 @@ const DataProducts = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true); // Sidebar collapsed by default
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Sidebar collapsed by default
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
 
   // Toggle sidebar state
@@ -74,7 +74,7 @@ const DataProducts = () => {
     <section className="flex gap-10">
       <div
         className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
-          isSidebarCollapsed ? "w-[100px]" : "w-[300px]"
+          isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
         }`}
       >
         <SidebarAdmin
@@ -86,9 +86,9 @@ const DataProducts = () => {
         className={`w-full transition-all duration-300 ${
           isSidebarCollapsed
             ? isSidebarHovered
-              ? "ml-[300px]"
+              ? "ml-[250px]"
               : "ml-[100px]"
-            : "ml-[300px]"
+            : "ml-[250px]"
         }`}
       >
         <AdminNavBar onToggleSidebar={toggleSidebar} />

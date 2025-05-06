@@ -17,7 +17,7 @@ import useSalesData from "./Sales";
 import useTodaySalesData from "./TodaySales";
 import { instanceAdmin } from "../../utils/axiosAdmin";
 const Dashboard = () => {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true); // Sidebar collapsed by default
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Sidebar collapsed by default
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
 
   // Toggle sidebar state
@@ -75,7 +75,7 @@ const Dashboard = () => {
       <section className="flex gap-10">
         <div
           className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
-            isSidebarCollapsed ? "w-[100px]" : "w-[300px]"
+            isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
           }`}
         >
           <SidebarAdmin
@@ -87,14 +87,14 @@ const Dashboard = () => {
           className={`w-full transition-all duration-300 ${
             isSidebarCollapsed
               ? isSidebarHovered
-                ? "ml-[300px]"
+                ? "ml-[250px]"
                 : "ml-[100px]"
-              : "ml-[300px]"
+              : "ml-[250px]"
           }`}
         >
           <AdminNavBar onToggleSidebar={toggleSidebar} />
 
-          <div className="mt-10 px-10 ">
+          <div className="mt-5 px-5 ">
             <div className="border shadow-sm  flex gap-10 items-center justify-between rounded-md py-8 px-5 mb-5">
               <div className="w-full ">
                 <div className="flex mb-10 gap-5">

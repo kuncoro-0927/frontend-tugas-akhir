@@ -10,7 +10,7 @@ import { IoInformation } from "react-icons/io5";
 import FormInput from "../components/TextField";
 import { showSnackbar } from "../components/CustomSnackbar";
 import { instance } from "../utils/axios";
-import PaymentSuccessModal from "../components/Modal/ModalPaymentSuccess";
+import { clearPromo } from "../redux/checkoutSlice";
 import CardImage from "../components/Card/CardImage";
 
 const Payment = () => {
@@ -21,12 +21,23 @@ const Payment = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [selectedService, setSelectedService] = useState(null);
-  const [isPaymentCompleted, setIsPaymentCompleted] = useState(false);
-
-  // Mengambil data checkout dari Redux store
-  const { shippingMethod, items, formData, shippingOptions } = useSelector(
-    (state) => state.checkout
-  );
+  const [promocode, setPromocode] = useState(null);
+  const [promoError, setPromoError] = useState("");
+  const {
+    shippingMethod,
+    orderDetails,
+    setOrderDetails,
+    orderItems,
+    items,
+    admin_fee,
+    promo,
+    formData,
+    shippingOptions,
+  } = useSelector((state) => state.checkout);
+  console.log("orderdetails", orderDetails);
+  console.log("setorderdetails", setOrderDetails);
+  const isPickup = shippingMethod && shippingMethod === "pickup";
+  const [promoCodeInput, setPromoCodeInput] = useState("");
 
   const handleServiceChange = (service) => {
     // Pastikan data dipassing ke Redux dengan benar
@@ -34,133 +45,106 @@ const Payment = () => {
       setCheckoutItems({
         shippingMethod,
         items,
+        orderDetails,
         formData,
         shippingOptions: shippingOptions.map((option) =>
           option.service === service.service
             ? { ...option, selected: true }
             : { ...option, selected: false }
         ),
+        admin_fee,
+        promo,
         selectedService: service, // Pilihan layanan pengiriman yang dipilih
       })
     );
   };
 
-  const handleConfirm = () => {
-    if (!selectedService)
-      return showSnackbar("Pilih salah satu layanan pengiriman!", "error");
-
-    // Melanjutkan ke halaman summary setelah konfirmasi
-    navigate(`/summary/${orderId}`);
-  };
-  // Hitung manual
   const subtotal = items.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
-  const adminFee = 2000;
-  const shippingFee = selectedService ? parseInt(selectedService.cost) : 0;
-  const total = subtotal + adminFee + shippingFee;
-  // const handlePayment = async () => {
-  //   try {
-  //     // 1. Simpan data pengiriman ke DB
-  //     await instance.post("/shipping/details", {
-  //       order_id: orderId,
-  //       firstName: formData.firstName,
-  //       lastName: formData.lastname,
-  //       phone: formData.phone,
-  //       address: formData.address,
-  //       province: formData.province,
-  //       city: formData.city,
-  //       postal_code: formData.postalCode,
-  //       shipping_method: formData.shippingMethod,
-  //       courier: selectedService.name,
-  //       etd: selectedService.etd,
-  //       shipping_cost: parseInt(selectedService.cost),
-  //     });
+  const discount = promo?.discount || promocode?.discount || 0;
+  const admin = Number(admin_fee) || 0;
+  const shipping = selectedService ? parseInt(selectedService.cost) : 0;
 
-  //     // 2. Proses pembayaran ke Midtrans
-  //     const response = await instance.post("/payment", {
-  //       order_id: orderId,
-  //       formData,
-  //       selectedService,
-  //       total_amount: total,
-  //       shipping_cost: parseInt(selectedService.cost),
-  //       customer: {
-  //         firstName: formData.firstName,
-  //         email: formData.email,
-  //         phone: formData.phone,
-  //       },
-  //     });
+  const finalTotal = subtotal - discount + admin + shipping;
 
-  //     const { snapToken } = response.data;
+  const handleApplyPromo = async () => {
+    console.log("Promo code:", promoCodeInput); // Log kode promo yang dimasukkan
+    console.log("Total:", finalTotal); // Log total harga untuk promo
 
-  //     // 3. Tampilkan Snap payment popup dan proses pembayaran
-  //     window.snap.pay(snapToken, {
-  //       onSuccess: async (result) => {
-  //         showSnackbar("Pembayaran berhasil!", "success");
+    try {
+      // Kirim request untuk mengecek promo ke backend
+      const response = await instance.post("/promo/check", {
+        code: promoCodeInput, // Gunakan input kode promo yang dimasukkan oleh pengguna
+        total: finalTotal, // Total harga yang diperhitungkan dengan promo
+      });
 
-  //         try {
-  //           // Update status order setelah pembayaran sukses
-  //           await instance.patch(`/order/${orderId}/status`, {
-  //             status: "paid",
-  //             shipping_fee: parseInt(selectedService.cost),
-  //             total_amount: total,
-  //           });
+      // Jika promo valid, simpan hasilnya ke state
+      setPromocode(response.data);
+      console.log("Promo response:", response.data);
+      setPromoError(""); // Reset error jika promo valid
+    } catch (error) {
+      // Jika terjadi error atau promo tidak valid
+      setPromoError(error.response?.data?.error || "Kode promo tidak valid");
+    }
+  };
 
-  //           // Jika perlu, bisa lakukan sesuatu dengan result dari Snap, seperti menampilkan detail lebih lanjut
-  //           console.log("Pembayaran berhasil:", result);
-  //         } catch (err) {
-  //           console.error("Gagal update status dan ongkir:", err);
-  //         }
-
-  //         setIsPaymentCompleted(true); // Menandai bahwa pembayaran sudah selesai
-  //       },
-
-  //       onPending: () => {
-  //         showSnackbar("Menunggu pembayaran.", "info");
-  //       },
-  //       onError: () => {
-  //         showSnackbar("Pembayaran gagal!", "error");
-  //       },
-  //       onClose: () => {
-  //         showSnackbar("Transaksi dibatalkan!", "error");
-  //       },
-  //     });
-  //   } catch (error) {
-  //     console.error("Gagal memproses pembayaran:", error);
-  //     showSnackbar("Terjadi kesalahan. Silakan coba lagi.", "error");
-  //   }
-  // };
+  const handleCancelPromo = () => {
+    dispatch(clearPromo(null));
+    setPromocode(null); // reset promo
+    setPromoCodeInput(""); // reset input kode promo
+    setPromoError(""); // reset error
+  };
 
   const handlePayment = async () => {
     try {
-      // 1. Simpan data pengiriman ke DB
+      // Siapkan default service jika metode pickup
+      const service =
+        formData.shippingMethod === "pickup"
+          ? {
+              name: "Ambil di tempat",
+              etd: "-",
+              cost: 0,
+            }
+          : selectedService;
+
+      // 1. Simpan data pengiriman ke DB (pickup tetap disimpan juga)
       await instance.post("/shipping/details", {
         order_id: orderId,
         firstName: formData.firstName,
         lastName: formData.lastname,
         phone: formData.phone,
-        address: formData.address,
-        province: formData.province,
-        city: formData.city,
-        postal_code: formData.postalCode,
+        address: formData.address || "-",
+        province: formData.province || "-",
+        city: formData.city || "-",
+        postal_code: formData.postalCode || "-",
         shipping_method: formData.shippingMethod,
-        courier: selectedService.name,
-        etd: selectedService.etd,
-        shipping_cost: parseInt(selectedService.cost),
+        courier: service.name,
+        etd: service.etd,
+        shipping_cost: parseInt(service.cost),
       });
 
       // 2. Proses pembayaran ke Midtrans
       const response = await instance.post("/payment", {
         order_id: orderId,
         formData,
-        selectedService,
-        total_amount: total,
-        shipping_cost: parseInt(selectedService.cost),
+        selectedService: service,
+        admin_fee: admin_fee,
+        promo: promo,
+        promocode: promocode,
+        total_amount: finalTotal,
+        shipping_cost: parseInt(service.cost),
         customer: {
           firstName: formData.firstName,
           email: formData.email,
           phone: formData.phone,
+          cartItems: items.map((item) => ({
+            productId: item.product_id,
+            productName: item.product_name,
+            price: item.price,
+            quantity: item.quantity,
+          })),
         },
       });
 
@@ -169,14 +153,14 @@ const Payment = () => {
         throw new Error("Redirect URL tidak diterima dari backend.");
       }
 
-      // 3. Update status order menjadi "pending"
+      // 3. Update status order menjadi pending
       await instance.patch(`/order/${orderId}/status`, {
-        status: "pending", // Status sementara sebelum pembayaran selesai
-        shipping_fee: parseInt(selectedService.cost),
-        total_amount: total,
+        status: "paid",
+        shipping_fee: parseInt(service.cost),
+        total_amount: response.data.grossAmount,
       });
 
-      // 4. Redirect user ke halaman pembayaran Midtrans
+      // 4. Redirect ke halaman pembayaran Midtrans
       window.location.href = redirectUrl;
     } catch (error) {
       console.error("Gagal memproses pembayaran:", error);
@@ -188,25 +172,32 @@ const Payment = () => {
     <>
       <section className=" space-x-20 flex justify-between mx-20">
         <div className="max-w-[700px] mt-10  w-full">
-          {/* <h1 className="font-extrabold text-3xl">Pembayaran</h1>
-          <p className="text-black mt-2">
-            Silakan pilih metode pengiriman dan selesaikan pembayaran untuk
-            memproses pesanan Anda.
-          </p> */}
-
           <div className="border-b pb-2 flex items-start justify-between border-gray-400 max-w-[700px]">
             <div>
-              <h1 className="font-bold text-2xl ">Layanan / Kurir</h1>
+              <h1 className="font-bold text-2xl ">
+                {" "}
+                {isPickup ? "Informasi Pengambilan" : "Layanan/Kurir"}
+              </h1>
               <div>
                 <p className="text-sm mt-3">
-                  <span className="font-bold text-sm">Pengiriman ke: </span>
+                  <span className="font-bold text-sm">
+                    {isPickup ? "Nama Pemesan: " : "Pengiriman ke: "}
+                  </span>
                   {formData?.firstName} / {formData?.lastname} /{" "}
-                  {formData?.address} / {formData?.postalCode} /{" "}
                   {formData?.phone}
                 </p>
-                {selectedService ? (
+
+                {isPickup ? (
+                  <p className="mt-3 text-sm text-blue-600">
+                    <span className="font-bold">Metode Pickup:</span> Silakan
+                    ambil pesanan di toko kami:
+                    <br />
+                    <span className="font-semibold">
+                      Jl. Contoh No.123, Pacitan, Jawa Timur
+                    </span>
+                  </p>
+                ) : selectedService ? (
                   <p className="text-sm mt-3">
-                    {" "}
                     <span className="mt-2 font-bold">Layanan:</span>{" "}
                     {selectedService.name} - {selectedService.service} /
                     Estimasi:{" "}
@@ -225,12 +216,14 @@ const Payment = () => {
                 )}
               </div>
             </div>
-            <button
-              onClick={handleOpen}
-              className="bg-black hover:-translate-y-1 duration-300 p-0.5 rounded-full w-fit"
-            >
-              <IoInformation className="text-white text-base" />
-            </button>
+            {!isPickup && (
+              <button
+                onClick={handleOpen}
+                className="bg-black hover:-translate-y-1 duration-300 p-0.5 rounded-full w-fit"
+              >
+                <IoInformation className="text-white text-base" />
+              </button>
+            )}
           </div>
 
           <div className="mt-10">
@@ -413,15 +406,28 @@ const Payment = () => {
           ))}
 
           <div className="flex w-full gap-5 items-center">
-            {" "}
             <FormInput
               type="text"
               label="Kode Promo"
               name="promoCode"
-              value={formData.promoCode || ""}
+              value={
+                promo ? promo.code : promocode ? promocode.code : promoCodeInput
+              }
+              onChange={(e) => setPromoCodeInput(e.target.value)}
+              disabled={promo || promocode} // tidak bisa diubah jika sudah klaim
             />
-            <button className="bg-black text-white py-3 px-4 rounded-md">
-              Klaim
+
+            <button
+              onClick={() => {
+                if (promo || promocode) {
+                  handleCancelPromo(); // batalkan keduanya
+                } else {
+                  handleApplyPromo(); // klaim
+                }
+              }}
+              className="bg-black text-white py-3 px-4 rounded-md"
+            >
+              {promo || promocode ? "Batalkan" : "Klaim"}
             </button>
           </div>
 
@@ -438,46 +444,77 @@ const Payment = () => {
                     : "Loading..."}
                 </span>
               </div>
+              {!isPickup && (
+                <div className="flex mt-2 justify-between">
+                  <p className="text-sm">Biaya admin</p>
+                  <span>
+                    {admin_fee && admin_fee != null
+                      ? `IDR ${Number(admin_fee).toLocaleString("id-ID", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`
+                      : "Loading..."}
+                  </span>
+                </div>
+              )}
+              {!isPickup && (
+                <div className="flex mt-2 justify-between">
+                  <p className="text-sm">Biaya pengiriman</p>
+                  <span>
+                    {selectedService
+                      ? `IDR ${Number(shipping).toLocaleString("id-ID", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}`
+                      : "Belum dipilih"}
+                  </span>
+                </div>
+              )}
 
-              <div className="flex mt-2 justify-between">
-                <p className="text-sm">Biaya admin</p>
-                <span>
-                  {adminFee && adminFee != null
-                    ? `IDR ${Number(adminFee).toLocaleString("id-ID", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}`
-                    : "Loading..."}
-                </span>
-              </div>
-
-              <div className="flex mt-2 justify-between">
-                <p className="text-sm">Biaya pengiriman</p>
-                <span>
-                  {selectedService
-                    ? `IDR ${Number(shippingFee).toLocaleString("id-ID", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}`
-                    : "Belum dipilih"}
-                </span>
-              </div>
-
+              {promoError && (
+                <p className="text-red-500 text-sm mt-1">{promoError}</p>
+              )}
+              {promo && (
+                <p className="text-green-600 flex items-center justify-between text-sm mt-1">
+                  <span>
+                    Promo <strong>{promo.code}</strong>
+                  </span>
+                  <strong>
+                    - IDR{" "}
+                    {Number(promo.discount).toLocaleString("id-ID", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </strong>
+                </p>
+              )}
+              {promoError && (
+                <p className="text-red-500 text-sm mt-1">{promoError}</p>
+              )}
+              {promocode && (
+                <p className="text-green-600 flex items-center justify-between text-sm mt-1">
+                  <span>
+                    Promo <strong>{promocode.code}</strong>
+                  </span>
+                  <strong>
+                    - IDR{" "}
+                    {Number(promocode.discount).toLocaleString("id-ID", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </strong>
+                </p>
+              )}
               <div className="border-b mt-5"></div>
 
               <div className="flex mt-5 justify-between font-semibold text-lg">
                 <p>Total</p>
-                {total && total != null ? (
-                  <span>
-                    IDR{" "}
-                    {Number(total).toLocaleString("id-ID", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
-                ) : (
-                  <span>Loading...</span>
-                )}
+                <span>
+                  IDR{" "}
+                  {Number(finalTotal).toLocaleString("id-ID", {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
               </div>
             </div>
           </div>

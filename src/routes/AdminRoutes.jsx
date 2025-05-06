@@ -8,6 +8,7 @@ import DataOrders from "../pages/admin/Orders/DataOrders";
 import DataOrderItems from "../pages/admin/Orders/DataOrderItems";
 import DataOrderShipping from "../pages/admin/Orders/DataOrderShipping";
 import DataTransactions from "../pages/admin/Orders/DataTransactions";
+import DataPromoCodes from "../pages/admin/Promo_Codes/DataPromoCodes";
 function AdminRoutes() {
   return (
     <>
@@ -20,6 +21,7 @@ function AdminRoutes() {
         <Route path="/data/order/items" element={<DataOrderItems />} />
         <Route path="/data/order/shipping" element={<DataOrderShipping />} />
         <Route path="/data/transactions" element={<DataTransactions />} />
+        <Route path="/data/promo/codes" element={<DataPromoCodes />} />
       </Routes>
     </>
   );

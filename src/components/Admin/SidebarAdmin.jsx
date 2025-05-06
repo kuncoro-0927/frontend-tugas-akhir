@@ -1,8 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { CiLogout } from "react-icons/ci";
+import { BsGrid } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
-import { BsBox } from "react-icons/bs";
-import { HiOutlineUserCircle } from "react-icons/hi2";
-import { AiOutlineAppstore } from "react-icons/ai";
+import {
+  BsBox,
+  BsCart,
+  BsCollection,
+  BsPercent,
+  BsPerson,
+} from "react-icons/bs";
 import { IoCartOutline, IoWalletOutline } from "react-icons/io5";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { useLocation } from "react-router-dom";
@@ -27,14 +33,28 @@ const SidebarAdmin = ({ onSidebarHover, isSidebarCollapsed }) => {
     onSidebarHover(isHovered); // Notify parent when sidebar is hovered
   }, [isHovered, onSidebarHover]);
 
+  const pesananRoutes = [
+    "/admin/data/orders",
+    "/admin/data/order/items",
+    "/admin/data/order/shipping",
+  ];
+
+  const isActivePesananRoute = pesananRoutes.includes(location.pathname);
+
+  useEffect(() => {
+    if (isActivePesananRoute) {
+      setIsPesananOpen(true);
+    }
+  }, [location.pathname]);
+
   return (
     <div
       className={`py-[20px]  overflow-y-auto scrollbar-hide px-5 bg-opacity-50 h-full border-r border-gray-200 transition-all duration-300 ${
         isSidebarCollapsed
           ? isHovered
-            ? "w-[300px]" // Collapsed tapi di-hover
+            ? "w-[250px]" // Collapsed tapi di-hover
             : "w-[100px]" // Collapsed dan tidak di-hover
-          : "w-[300px]" // Tidak collapsed, tetap 300px
+          : "w-[250px]" // Tidak collapsed, tetap 300px
       }
       `}
       onMouseEnter={() => setIsHovered(true)} // Hover untuk buka sidebar
@@ -45,11 +65,11 @@ const SidebarAdmin = ({ onSidebarHover, isSidebarCollapsed }) => {
       {/* MENU */}
       <div className="mt-7">
         <h1
-          className={`font-semibold text-gray-400/70 ${
+          className={`font-semibold text-graytext/40 text-sm ${
             isSidebarCollapsed
               ? isHovered
                 ? "" // Jika sidebar collapsed dan di-hover, tampilkan teks "Menu"
-                : "font-semibold text-black px-4  text-center" // Jika sidebar collapsed dan tidak di-hover, tampilkan tiga titik
+                : "font-semibold text-black px-4 mr-2  text-center" // Jika sidebar collapsed dan tidak di-hover, tampilkan tiga titik
               : "" // Jika sidebar tidak collapsed, tampilkan teks "Menu" secara normal
           }`}
         >
@@ -76,7 +96,7 @@ const SidebarAdmin = ({ onSidebarHover, isSidebarCollapsed }) => {
                     : "text-hitam hover:bg-gray-200 space-x-2 text-graytext hover:bg-opacity-40 px-4 py-2.5 font-semibold text-sm flex items-center" // Sidebar normal dan tidak aktif
               }
             >
-              <AiOutlineAppstore className="text-2xl " />{" "}
+              <BsGrid className="text-xl " />{" "}
               {isHovered || !isSidebarCollapsed ? (
                 <span className="flex-1">Dashboard</span>
               ) : (
@@ -88,19 +108,46 @@ const SidebarAdmin = ({ onSidebarHover, isSidebarCollapsed }) => {
       </div>
 
       {/* E COMMERCE */}
-      <div className="mt-7">
+      <div className="mt-3">
         <h1
-          className={`font-semibold text-gray-400/70 ${
+          className={`font-semibold text-graytext/40 text-sm ${
             isSidebarCollapsed
               ? isHovered
-                ? "" // Jika sidebar collapsed dan di-hover, tampilkan teks "Menu"
-                : "font-semibold text-black px-4  text-center" // Jika sidebar collapsed dan tidak di-hover, tampilkan tiga titik
-              : "" // Jika sidebar tidak collapsed, tampilkan teks "Menu" secara normal
+                ? ""
+                : "font-semibold text-black px-4 mr-2  text-center"
+              : ""
           }`}
         >
           {isSidebarCollapsed && !isHovered ? "..." : "E-Commerce"}
         </h1>
         <ul className="space-y-4">
+          {/* Categories */}
+          <li className="mt-5">
+            <NavLink
+              to="/admin/data/categories"
+              className={
+                ({ isActive }) =>
+                  isSidebarCollapsed
+                    ? isHovered
+                      ? isActive
+                        ? "text-blue-500 bg-blue-100/70 px-4 py-2.5 space-x-2 rounded-md font-semibold text-sm w-full flex items-center" // Sidebar collapsed, hover, dan aktif
+                        : "text-hitam hover:bg-gray-200 px-4 py-2.5  text-graytext hover:bg-opacity-40 w-full space-x-2 font-semibold text-sm flex items-center" // Sidebar collapsed, hover, dan tidak aktif
+                      : isActive
+                      ? "text-blue-500 px-4 py-2.5 rounded-md bg-blue-100/70 w-fit font-semibold text-sm flex items-center" // Sidebar collapsed, tidak hover, dan aktif
+                      : "text-hitam px-4 py-2.5 hover:bg-gray-200 text-graytext hover:bg-opacity-40 w-fit font-semibold text-sm flex items-center" // Sidebar collapsed, tidak hover, dan tidak aktif
+                    : isActive
+                    ? "text-blue-500 bg-blue-100/70 space-x-2  px-4 py-2.5 rounded-md font-semibold text-sm flex items-center" // Sidebar normal dan aktif
+                    : "text-hitam hover:bg-gray-200 space-x-2 text-graytext hover:bg-opacity-40 px-4 py-2.5 font-semibold text-sm flex items-center" // Sidebar normal dan tidak aktif
+              }
+            >
+              <BsCollection className="text-xl " />{" "}
+              {isHovered || !isSidebarCollapsed ? (
+                <span className="flex-1">Kategori</span> // Tampilkan teks saat hover atau sidebar normal
+              ) : (
+                <></>
+              )}
+            </NavLink>
+          </li>
           {/* Produk */}
           <li className="mt-5">
             <NavLink
@@ -134,24 +181,30 @@ const SidebarAdmin = ({ onSidebarHover, isSidebarCollapsed }) => {
             <button
               onClick={() => setIsPesananOpen(!isPesananOpen)}
               className={`w-full space-x-2 px-4 py-2 font-semibold text-sm flex items-center justify-between rounded-md
-              ${
-                isPesananOpen
-                  ? "text-blue-500 space-x-2 bg-blue-100/70"
-                  : "text-hitam space-x-2 hover:bg-gray-200 hover:bg-opacity-40 text-graytext"
-              }`}
+        ${
+          isPesananOpen
+            ? "text-blue-500 bg-blue-100/70"
+            : "text-hitam hover:bg-gray-200 hover:bg-opacity-40 text-graytext"
+        }`}
             >
               <span className="flex space-x-2 items-center">
-                <IoCartOutline className="text-2xl " />{" "}
-                {isHovered || !isSidebarCollapsed ? (
-                  <span className="">Pesanan</span>
-                ) : (
+                <BsCart className="text-xl" />
+                {!isSidebarCollapsed || isHovered ? (
+                  <span>Pesanan</span>
+                ) : isActivePesananRoute ? null : (
                   <></>
                 )}
               </span>
-              {isPesananOpen ? <FiChevronUp /> : <FiChevronDown />}
+              {!isSidebarCollapsed || isHovered ? (
+                isPesananOpen ? (
+                  <FiChevronUp />
+                ) : (
+                  <FiChevronDown />
+                )
+              ) : null}
             </button>
 
-            {isPesananOpen && (
+            {isPesananOpen && (!isSidebarCollapsed || isHovered) && (
               <ul className="ml-8 mt-2 space-y-2">
                 <li>
                   <NavLink
@@ -222,30 +275,87 @@ const SidebarAdmin = ({ onSidebarHover, isSidebarCollapsed }) => {
       </div>
 
       {/* Manajemen User */}
-      <div className="mt-7">
+      <div className="mt-3">
         <h1
-          className={`font-semibold text-gray-400/70 ${
-            isHovered || !isSidebarCollapsed ? "" : "hidden"
+          className={`font-semibold text-graytext/40 text-sm ${
+            isSidebarCollapsed
+              ? isHovered
+                ? ""
+                : "font-semibold text-black px-4 mr-2   text-center"
+              : ""
           }`}
         >
-          Manajemen Pengguna
+          {isSidebarCollapsed && !isHovered ? "..." : "Manajemen Pengguna"}
         </h1>
         <ul className="space-y-4">
           {/* Data Pengguna */}
           <li className="mt-5">
             <NavLink
               to="/admin/data/users"
-              className={({ isActive }) =>
-                isActive
-                  ? "text-blue-500 bg-blue-100/70 px-4 rounded-md py-2.5 font-semibold text-sm flex items-center"
-                  : "text-hitam hover:bg-gray-200 px-4 text-graytext hover:bg-opacity-40 py-2.5 font-semibold text-sm flex items-center"
+              className={
+                ({ isActive }) =>
+                  isSidebarCollapsed
+                    ? isHovered
+                      ? isActive
+                        ? "text-blue-500 bg-blue-100/70 px-4 py-2.5 space-x-2 rounded-md font-semibold text-sm w-full flex items-center" // Sidebar collapsed, hover, dan aktif
+                        : "text-hitam hover:bg-gray-200 px-4 py-2.5  text-graytext hover:bg-opacity-40 w-full space-x-2 font-semibold text-sm flex items-center" // Sidebar collapsed, hover, dan tidak aktif
+                      : isActive
+                      ? "text-blue-500 px-4 py-2.5 rounded-md bg-blue-100/70 w-fit font-semibold text-sm flex items-center" // Sidebar collapsed, tidak hover, dan aktif
+                      : "text-hitam px-4 py-2.5 hover:bg-gray-200 text-graytext hover:bg-opacity-40 w-fit font-semibold text-sm flex items-center" // Sidebar collapsed, tidak hover, dan tidak aktif
+                    : isActive
+                    ? "text-blue-500 bg-blue-100/70 space-x-2  px-4 py-2.5 rounded-md font-semibold text-sm flex items-center" // Sidebar normal dan aktif
+                    : "text-hitam hover:bg-gray-200 space-x-2 text-graytext hover:bg-opacity-40 px-4 py-2.5 font-semibold text-sm flex items-center" // Sidebar normal dan tidak aktif
               }
             >
-              <BsBox className="text-xl mr-2.5 ml-0.5 w-6 h-6" />{" "}
+              <BsPerson className="text-xl" />{" "}
               {isHovered || !isSidebarCollapsed ? (
                 <span className="flex-1">Data Pengguna</span>
               ) : (
-                <span className="flex-1">D</span>
+                <></>
+              )}
+            </NavLink>
+          </li>
+        </ul>
+      </div>
+
+      {/* Others */}
+      <div className="mt-3">
+        <h1
+          className={`font-semibold text-graytext/40 text-sm ${
+            isSidebarCollapsed
+              ? isHovered
+                ? ""
+                : "font-semibold text-black px-4 mr-2  text-center"
+              : ""
+          }`}
+        >
+          {isSidebarCollapsed && !isHovered ? "..." : "Lainnya"}
+        </h1>
+        <ul className="space-y-4">
+          {/* Data Pengguna */}
+          <li className="mt-5">
+            <NavLink
+              to="/admin/data/promo/codes"
+              className={
+                ({ isActive }) =>
+                  isSidebarCollapsed
+                    ? isHovered
+                      ? isActive
+                        ? "text-blue-500 bg-blue-100/70 px-4 py-2.5 space-x-2 rounded-md font-semibold text-sm w-full flex items-center" // Sidebar collapsed, hover, dan aktif
+                        : "text-hitam hover:bg-gray-200 px-4 py-2.5  text-graytext hover:bg-opacity-40 w-full space-x-2 font-semibold text-sm flex items-center" // Sidebar collapsed, hover, dan tidak aktif
+                      : isActive
+                      ? "text-blue-500 px-4 py-2.5 rounded-md bg-blue-100/70 w-fit font-semibold text-sm flex items-center" // Sidebar collapsed, tidak hover, dan aktif
+                      : "text-hitam px-4 py-2.5 hover:bg-gray-200 text-graytext hover:bg-opacity-40 w-fit font-semibold text-sm flex items-center" // Sidebar collapsed, tidak hover, dan tidak aktif
+                    : isActive
+                    ? "text-blue-500 bg-blue-100/70 space-x-2  px-4 py-2.5 rounded-md font-semibold text-sm flex items-center" // Sidebar normal dan aktif
+                    : "text-hitam hover:bg-gray-200 space-x-2 text-graytext hover:bg-opacity-40 px-4 py-2.5 font-semibold text-sm flex items-center" // Sidebar normal dan tidak aktif
+              }
+            >
+              <BsPercent className="text-xl" />
+              {isHovered || !isSidebarCollapsed ? (
+                <span className="flex-1">Kode Promo</span>
+              ) : (
+                <></>
               )}
             </NavLink>
           </li>

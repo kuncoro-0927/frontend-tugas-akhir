@@ -3,6 +3,7 @@ import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // menggunakan localStorage
 import authReducer from "./authSlice";
 import userReducer from "./userSlice";
+import adminReducer from "./adminSlice";
 import cartReducer from "./cartSlice";
 import checkoutReducer from "./checkoutSlice";
 import { combineReducers } from "redux";
@@ -15,6 +16,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   user: userReducer,
+  admin: adminReducer,
   auth: authReducer,
   cart: cartReducer,
   checkout: checkoutReducer,

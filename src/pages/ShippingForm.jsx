@@ -24,8 +24,11 @@ const ShippingForm = () => {
   const originCityId = 40561; // Pacitan
   const courier = "jne";
   const [formErrors, setFormErrors] = useState({});
+  const [promo, setPromo] = useState(null);
+  const [promoError, setPromoError] = useState("");
 
   const shippingMethod = useSelector((state) => state.checkout.shippingMethod);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastname: "",
@@ -54,6 +57,29 @@ const ShippingForm = () => {
 
     fetchOrderDetails();
   }, [passedOrderId]);
+
+  const handleApplyPromo = async () => {
+    if (!formData.promoCode) {
+      setFormErrors((prev) => ({
+        ...prev,
+        promoCode: "Silakan masukkan kode promo",
+      }));
+      return;
+    }
+
+    try {
+      const response = await instance.post("/promo/check", {
+        code: formData.promoCode,
+        total: orderDetails.total_amount, // atau orderDetails.subtotal jika diskon hanya dari subtotal
+      });
+      setPromo(response.data); // { valid, code, discount, total_after_discount }
+      setPromoError("");
+      setFormErrors((prev) => ({ ...prev, promoCode: "" }));
+    } catch (error) {
+      setPromo(null);
+      setPromoError(error.response?.data?.error || "Kode promo tidak valid");
+    }
+  };
 
   const debouncedSearchCity = debounce(async (keyword) => {
     if (!keyword) return;
@@ -98,47 +124,70 @@ const ShippingForm = () => {
 
     const errors = {};
 
-    // Email validation
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    // Validasi dasar (selalu dibutuhkan)
     if (!formData.firstName) errors.firstName = "Nama depan wajib diisi";
+    if (!formData.lastname) errors.lastname = "Nama belakang wajib diisi";
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!formData.email) errors.email = "Email wajib diisi";
     else if (!emailRegex.test(formData.email))
       errors.email = "Email tidak valid";
 
-    if (!formData.lastname) errors.lastname = "Nama belakang wajib diisi";
-
-    // Phone validation for Indonesia
+    // Validasi nomor telepon Indonesia
     if (!formData.phone) errors.phone = "Nomor telepon wajib diisi";
     else {
-      // Hapus semua karakter non-angka dan tambahkan +62
-      const cleanedPhone = formData.phone.replace(/[^\d]/g, ""); // Menghapus non-digit
+      const cleanedPhone = formData.phone.replace(/[^\d]/g, "");
       const phoneWithCountryCode = `+62${cleanedPhone}`;
-
-      // Phone number validation for Indonesia
-      const phoneRegex = /^\+62\d{9,11}$/; // Memastikan format +62 diikuti oleh 9-11 digit
+      const phoneRegex = /^\+62\d{9,11}$/;
       if (!phoneRegex.test(phoneWithCountryCode)) {
         errors.phone =
           "Nomor telepon tidak valid, format harus +62 diikuti 9-11 digit angka.";
       }
     }
 
-    if (!formData.address) errors.address = "Alamat wajib diisi";
-    if (!formData.province) errors.province = "Provinsi wajib diisi";
-    if (!formData.city) errors.city = "Kota wajib diisi";
-    if (!formData.postalCode) errors.postalCode = "Kode pos wajib diisi";
+    // Jika shipping method adalah 'delivery', tambahkan validasi alamat lengkap
+    const isPickup = orderDetails.shipping_method === "pickup";
 
+    if (!isPickup) {
+      if (!formData.address) errors.address = "Alamat wajib diisi";
+      if (!formData.province) errors.province = "Provinsi wajib diisi";
+      if (!formData.city) errors.city = "Kota wajib diisi";
+      if (!formData.postalCode) errors.postalCode = "Kode pos wajib diisi";
+    }
+
+    // Jika ada error, hentikan
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
 
+    setFormErrors({}); // clear errors
+
+    // Jika pickup, langsung lanjut ke payment tanpa menghitung ongkir
+    if (isPickup) {
+      dispatch(
+        setCheckoutItems({
+          shippingMethod: orderDetails.shipping_method,
+          admin_fee: orderDetails.admin_fee,
+          items: orderItems,
+          orderDetails: orderDetails,
+          formData: formData,
+          promo: promo,
+          shippingOptions: [],
+        })
+      );
+
+      navigate(`/tes/payment/${orderId}`);
+      return;
+    }
+
+    // Jika delivery, pastikan city_id tersedia
     if (!formData.city_id) {
       alert("Pilih kota tujuan terlebih dahulu!");
       return;
     }
 
     setLoadingOngkir(true);
-    setFormErrors({}); // clear errors
 
     try {
       const response = await instance.post("/calculate-shipping", {
@@ -157,9 +206,12 @@ const ShippingForm = () => {
 
       dispatch(
         setCheckoutItems({
-          shippingMethod: formData.shippingMethod,
+          shippingMethod: orderDetails.shipping_method,
+          admin_fee: orderDetails.admin_fee,
+          orderDetails: orderDetails,
           items: orderItems,
           formData: formData,
+          promo: promo,
           shippingOptions: shippingOptions,
         })
       );
@@ -223,10 +275,15 @@ const ShippingForm = () => {
       <div className="flex  justify-between items-start gap-6">
         {/* Kiri: Info User + Form */}
         <div className="max-w-[600px] h-full my-10 overflow-y-auto w-full">
-          <h1 className="font-extrabold text-3xl">Lengkapi Alamat Penerima</h1>
+          <h1 className="font-extrabold text-3xl">
+            {orderDetails?.shipping_method === "pickup"
+              ? "Formulir Penjemputan"
+              : "Lengkapi Alamat Penerima"}
+          </h1>
           <p className="mt-2">
-            Mohon isi alamat lengkap untuk pengiriman barang ke tempat yang
-            tepat. Pastikan data yang dimasukkan benar dan sesuai.
+            {orderDetails?.shipping_method === "pickup"
+              ? "Mohon isi data kontak agar kami bisa menginformasikan waktu penjemputan."
+              : "Mohon isi alamat lengkap untuk pengiriman barang ke tempat yang tepat. Pastikan data yang dimasukkan benar dan sesuai."}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5  w-full mt-6">
@@ -267,108 +324,112 @@ const ShippingForm = () => {
                 />
               </div>
             </div>
-            <div>
-              <FormInput
-                type="text"
-                name="address"
-                value={formData.address || ""}
-                onChange={handleChange}
-                label="Alamat Lengkap"
-                error={!!formErrors.address}
-                helperText={formErrors.address}
-              />
-            </div>
-            <div>
-              <FormInput
-                type="text"
-                name="city"
-                value={formData.city || ""}
-                onChange={handleChange}
-                label="Kota/Kabupaten"
-                error={!!formErrors.city}
-                helperText={formErrors.city}
-              />
-
-              {[
-                ...new Map(
-                  destinationResults
-                    .filter((city) =>
-                      city.city_name
-                        .toLowerCase()
-                        .startsWith(formData.city.toLowerCase())
-                    )
-                    .map((item) => [item.city_name, item])
-                ).values(),
-              ].map((city) => {
-                const formattedCity =
-                  city.city_name.charAt(0).toUpperCase() +
-                  city.city_name.slice(1).toLowerCase();
-
-                return (
-                  <p
-                    key={city.id}
-                    onClick={() => handleSelectCity(city)}
-                    className="px-4 py-2 hover:bg-gray-200/40  cursor-pointer border border-gray-400 rounded-sm max-h-60 overflow-y-auto mt-1"
-                  >
-                    {formattedCity}
-                  </p>
-                );
-              })}
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <div className="relative">
+            {orderDetails?.shipping_method === "delivery" && (
+              <>
+                <div>
                   <FormInput
                     type="text"
-                    name="province"
-                    value={
-                      selectedProvince
-                        ? selectedProvince.name
-                        : searchQuery || ""
-                    }
-                    onChange={handleSearchChange}
-                    label="Provinsi"
-                    error={!!formErrors.province}
-                    helperText={formErrors.province}
+                    name="address"
+                    value={formData.address || ""}
+                    onChange={handleChange}
+                    label="Alamat Lengkap"
+                    error={!!formErrors.address}
+                    helperText={formErrors.address}
                   />
-                  {selectedProvince && (
-                    <button
-                      type="button"
-                      onClick={handleClearSelection}
-                      className="absolute right-4 top-[13px] text-black"
-                    >
-                      &#10005; {/* Ikon X untuk menghapus */}
-                    </button>
-                  )}
                 </div>
+                <div>
+                  <FormInput
+                    type="text"
+                    name="city"
+                    value={formData.city || ""}
+                    onChange={handleChange}
+                    label="Kota/Kabupaten"
+                    error={!!formErrors.city}
+                    helperText={formErrors.city}
+                  />
 
-                {filteredProvinces.length > 0 && searchQuery && (
-                  <ul className="border rounded-md max-h-60 overflow-y-auto mt-1">
-                    {filteredProvinces.map((province) => (
-                      <li
-                        key={province.code}
-                        onClick={() => handleSelectProvince(province.code)}
-                        className="p-2 cursor-pointer hover:bg-gray-200"
+                  {[
+                    ...new Map(
+                      destinationResults
+                        .filter((city) =>
+                          city.city_name
+                            .toLowerCase()
+                            .startsWith(formData.city.toLowerCase())
+                        )
+                        .map((item) => [item.city_name, item])
+                    ).values(),
+                  ].map((city) => {
+                    const formattedCity =
+                      city.city_name.charAt(0).toUpperCase() +
+                      city.city_name.slice(1).toLowerCase();
+
+                    return (
+                      <p
+                        key={city.id}
+                        onClick={() => handleSelectCity(city)}
+                        className="px-4 py-2 hover:bg-gray-200/40  cursor-pointer border border-gray-400 rounded-sm max-h-60 overflow-y-auto mt-1"
                       >
-                        {province.name}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+                        {formattedCity}
+                      </p>
+                    );
+                  })}
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <div className="relative">
+                      <FormInput
+                        type="text"
+                        name="province"
+                        value={
+                          selectedProvince
+                            ? selectedProvince.name
+                            : searchQuery || ""
+                        }
+                        onChange={handleSearchChange}
+                        label="Provinsi"
+                        error={!!formErrors.province}
+                        helperText={formErrors.province}
+                      />
+                      {selectedProvince && (
+                        <button
+                          type="button"
+                          onClick={handleClearSelection}
+                          className="absolute right-4 top-[13px] text-black"
+                        >
+                          &#10005; {/* Ikon X untuk menghapus */}
+                        </button>
+                      )}
+                    </div>
 
-              <div>
-                <FormInput
-                  type="text"
-                  label="Kode Pos"
-                  name="postalCode"
-                  value={formData.postalCode || ""}
-                  onChange={handleChange}
-                  error={!!formErrors.postalCode}
-                  helperText={formErrors.postalCode}
-                />
-              </div>
-            </div>
+                    {filteredProvinces.length > 0 && searchQuery && (
+                      <ul className="border rounded-md max-h-60 overflow-y-auto mt-1">
+                        {filteredProvinces.map((province) => (
+                          <li
+                            key={province.code}
+                            onClick={() => handleSelectProvince(province.code)}
+                            className="p-2 cursor-pointer hover:bg-gray-200"
+                          >
+                            {province.name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  <div>
+                    <FormInput
+                      type="text"
+                      label="Kode Pos"
+                      name="postalCode"
+                      value={formData.postalCode || ""}
+                      onChange={handleChange}
+                      error={!!formErrors.postalCode}
+                      helperText={formErrors.postalCode}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
             <div>
               <FormInput
                 type="tel"
@@ -434,7 +495,10 @@ const ShippingForm = () => {
               error={!!formErrors.promoCode}
               helperText={formErrors.promoCode}
             />
-            <button className="bg-black text-white py-3 px-4 rounded-md">
+            <button
+              onClick={handleApplyPromo}
+              className="bg-black text-white py-3 px-4 rounded-md"
+            >
               Klaim
             </button>
           </div>
@@ -456,41 +520,76 @@ const ShippingForm = () => {
                 </span>
               </div>
 
-              <div className="flex mt-2 justify-between">
-                <p className="text-sm">Biaya admin</p>
-                <span>
-                  {orderDetails && orderDetails.admin_fee != null
-                    ? `IDR ${Number(orderDetails.admin_fee).toLocaleString(
-                        "id-ID",
-                        {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }
-                      )}`
-                    : "Loading..."}
-                </span>
-              </div>
+              {orderDetails?.shipping_method === "delivery" && (
+                <>
+                  <div className="flex mt-2 justify-between">
+                    <p>Biaya admin</p>
+                    <span>
+                      {orderDetails?.admin_fee != null
+                        ? `IDR ${Number(orderDetails.admin_fee).toLocaleString(
+                            "id-ID",
+                            {
+                              minimumFractionDigits: 2,
+                            }
+                          )}`
+                        : "Loading..."}
+                    </span>
+                  </div>
 
-              <div className="flex mt-2 justify-between">
-                <p className="text-sm">Biaya pengiriman</p>
-                <span>IDR 0</span>
-              </div>
+                  <div className="flex mt-2 justify-between">
+                    <p>Biaya pengiriman</p>
+                    <span>
+                      {orderDetails?.shipping_cost != null
+                        ? `IDR ${Number(
+                            orderDetails.shipping_cost
+                          ).toLocaleString("id-ID", {
+                            minimumFractionDigits: 2,
+                          })}`
+                        : "IDR 0"}
+                    </span>
+                  </div>
+                </>
+              )}
+              {promoError && (
+                <p className="text-red-500 text-sm mt-1">{promoError}</p>
+              )}
+              {promo && (
+                <p className="text-green-600 flex items-center justify-between text-sm mt-1">
+                  <span>
+                    Promo <strong>{promo.code}</strong>
+                  </span>
+                  <strong>
+                    - IDR{" "}
+                    {Number(promo.discount).toLocaleString("id-ID", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </strong>
+                </p>
+              )}
 
               <div className="border-b mt-5"></div>
 
               <div className="flex mt-5 justify-between font-semibold text-lg">
                 <p>Total</p>
-                {orderDetails && orderDetails.total_amount != null ? (
-                  <span>
-                    IDR{" "}
-                    {Number(orderDetails.total_amount).toLocaleString("id-ID", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </span>
-                ) : (
-                  <span>Loading...</span>
-                )}
+                <span>
+                  IDR{" "}
+                  {promo
+                    ? Number(promo.total_after_discount).toLocaleString(
+                        "id-ID",
+                        {
+                          minimumFractionDigits: 2,
+                        }
+                      )
+                    : orderDetails?.total_amount != null
+                    ? Number(orderDetails.total_amount).toLocaleString(
+                        "id-ID",
+                        {
+                          minimumFractionDigits: 2,
+                        }
+                      )
+                    : "Loading..."}
+                </span>
               </div>
             </div>
           </div>

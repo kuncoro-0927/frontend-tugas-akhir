@@ -1,41 +1,33 @@
 import axios from "axios";
-import { showSnackbar } from "../components/CustomSnackbar";
 
 const instanceAdmin = axios.create({
   baseURL: import.meta.env.VITE_APIURL,
-  timeout: 10000,
   withCredentials: true,
 });
 
-let isRefreshingAdmin = false; // Variabel khusus untuk admin
-let failedAdminQueue = []; // Queue untuk admin
+instanceAdmin.interceptors.request.use(
+  (config) => config,
+  (error) => Promise.reject(error)
+);
 
-const processAdminQueue = (error) => {
-  failedAdminQueue.forEach((prom) => {
-    if (error) prom.reject(error);
-    else prom.resolve();
-  });
-  failedAdminQueue = [];
-};
+let isRefreshing = false;
+let failedRequestsQueue = [];
 
 instanceAdmin.interceptors.response.use(
-  (res) => res,
-  async (err) => {
-    const originalRequest = err.config;
-    console.log("Intercepted error", err.response?.status, originalRequest.url); // Debug log
-    if (err.response?.status === 403 && !originalRequest._retry) {
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 403 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      if (isRefreshingAdmin) {
+      if (isRefreshing) {
         return new Promise((resolve, reject) => {
-          failedAdminQueue.push({
-            resolve: () => resolve(instanceAdmin(originalRequest)),
-            reject,
-          });
-        });
+          failedRequestsQueue.push({ resolve, reject });
+        }).then(() => instanceAdmin(originalRequest));
       }
 
-      isRefreshingAdmin = true;
+      isRefreshing = true;
 
       try {
         await axios.post(
@@ -43,21 +35,29 @@ instanceAdmin.interceptors.response.use(
           {},
           { withCredentials: true }
         );
-        processAdminQueue(null);
+
+        failedRequestsQueue.forEach(({ resolve }) => resolve());
+        failedRequestsQueue = [];
+
         return instanceAdmin(originalRequest);
       } catch (refreshError) {
-        processAdminQueue(refreshError);
-        showSnackbar(
-          "Sesi login Anda (admin) berakhir, silakan login kembali.",
-          "error"
-        );
+        failedRequestsQueue.forEach(({ reject }) => reject(refreshError));
+        failedRequestsQueue = [];
+
+        document.cookie =
+          "admin_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        document.cookie =
+          "admin_refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+
+        alert("Session expired. Please login again.");
+
         return Promise.reject(refreshError);
       } finally {
-        isRefreshingAdmin = false;
+        isRefreshing = false;
       }
     }
 
-    return Promise.reject(err);
+    return Promise.reject(error);
   }
 );
 

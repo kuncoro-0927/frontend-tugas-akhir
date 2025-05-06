@@ -83,6 +83,22 @@ const PaymentStatus = () => {
               pesanan Anda lebih lanjut.
             </p>
           </>
+        ) : paymentStatus === "cod" ? (
+          <>
+            <img
+              className="w-[300px] mx-auto"
+              src="/images/welldone.svg"
+              alt=""
+            />
+            <img className="w-12 mt-6 mx-auto" src="/images/check.svg" alt="" />
+            <h1 className="mt-5 text-3xl font-extrabold">
+              Pesanan Anda berhasil!
+            </h1>
+            <p className="mt-4 mb-7 text-lg text-gray-600">
+              Silakan ambil pesanan Anda di toko dan lakukan pembayaran di
+              tempat.
+            </p>
+          </>
         ) : (
           <p className="text-lg text-gray-600">
             Terjadi kesalahan, status pembayaran tidak ditemukan.

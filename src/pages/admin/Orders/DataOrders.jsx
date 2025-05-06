@@ -2,14 +2,20 @@ import React, { useEffect, useState, useRef } from "react";
 import AdminNavBar from "../../../components/Admin/AdminNavBar";
 import SidebarAdmin from "../../../components/Admin/SidebarAdmin";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
+import AddResiModal from "../../../components/Admin/Modal/AddTrackingNumber";
+import { showSnackbar } from "../../../components/CustomSnackbar";
+showSnackbar;
 const DataOrders = () => {
   const [orders, setOrders] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true); // Sidebar collapsed by default
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Sidebar collapsed by default
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+  const [showResiModal, setShowResiModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [activeTab, setActiveTab] = useState("all");
 
   // Toggle sidebar state
   const toggleSidebar = () => {
@@ -90,11 +96,43 @@ const DataOrders = () => {
     return `hsl(${hue}, 70%, 60%)`; // warna pastel-ish
   };
 
+  const handleOpenResiModal = (orderId) => {
+    setSelectedOrderId(orderId);
+    setShowResiModal(true);
+    setOpenDropdown(null);
+  };
+
+  const handleSubmitResi = async (orderId, trackingNumber) => {
+    try {
+      await instanceAdmin.post("/order/update-tracking", {
+        orderId,
+        trackingNumber,
+      });
+      // Refresh data kalau perlu
+      showSnackbar("Nomor resi berhasil ditambahkan.", "success");
+    } catch (error) {
+      console.error("Gagal menambahkan resi:", error);
+      showSnackbar("Gagal menambahkan resi.", "error");
+    }
+  };
+
+  const filteredOrders =
+    activeTab === "all"
+      ? filteredUsers
+      : filteredUsers.filter((order) => order.status === activeTab);
+
   return (
     <section className="flex gap-10">
+      {showResiModal && (
+        <AddResiModal
+          orderId={selectedOrderId}
+          onClose={() => setShowResiModal(false)}
+          onSubmit={handleSubmitResi}
+        />
+      )}
       <div
         className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
-          isSidebarCollapsed ? "w-[100px]" : "w-[300px]"
+          isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
         }`}
       >
         <SidebarAdmin
@@ -106,22 +144,22 @@ const DataOrders = () => {
         className={`w-full transition-all duration-300 ${
           isSidebarCollapsed
             ? isSidebarHovered
-              ? "ml-[300px]"
+              ? "ml-[250px]"
               : "ml-[100px]"
-            : "ml-[300px]"
+            : "ml-[250px]"
         }`}
       >
         <AdminNavBar onToggleSidebar={toggleSidebar} />
         <div className="mt-10 px-5 text-xl font-bold">
-          Data Pengguna
+          Data Pesanan
           <div className="border p-5 mt-10">
             <div className="flex  items-start justify-between">
-              <p className="font-semibold text-sm">Tabel Data Pengguna</p>
+              <p className="font-semibold text-sm">Tabel Data Pesanan</p>
 
               {/* Search Input */}
               <div className=" mb-4">
                 <div className="max-w-md mx-auto">
-                  <div className="relative flex items-center border border-gray-400 w-full h-10 rounded-lg focus-within:border-gray-700 bg-white overflow-hidden">
+                  <div className="relative flex items-center border border-gray-400 w-full h-10 rounded-md focus-within:border-gray-700 bg-white overflow-hidden">
                     <div className="grid place-items-center h-full w-12 text-gray-300">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -140,7 +178,7 @@ const DataOrders = () => {
                     </div>
 
                     <input
-                      className="peer h-full w-full outline-none text-sm text-gray-500 pr-2"
+                      className="peer font-normal rounded-sm h-full w-full outline-none text-sm text-gray-500 pr-2"
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -153,6 +191,19 @@ const DataOrders = () => {
             </div>
 
             <div className="  px-0">
+              {" "}
+              <div className="flex  ">
+                {["all", "paid", "shipped", "completed"].map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => setActiveTab(status)}
+                    className={`px-4 py-2  text-sm font-medium 
+        ${activeTab === status ? "border-b-2 border-blue-500" : ""}`}
+                  >
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </button>
+                ))}
+              </div>
               <table className=" w-full min-w-max table-auto text-left">
                 <thead>
                   <tr>
@@ -162,6 +213,7 @@ const DataOrders = () => {
                       "Pengiriman",
                       "Status",
                       "Total Harga",
+                      "Resi",
                       "Aksi",
                     ].map((header, index) => (
                       <th
@@ -176,12 +228,12 @@ const DataOrders = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((order) => (
+                  {filteredOrders.map((order) => (
                     <tr key={order.id}>
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="flex items-center gap-3">
                           <div className="">
-                            <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
+                            <p className="block antialiased font-sans text-xs leading-normal text-blue-gray-900 font-normal">
                               {order.order_code}
                             </p>
                           </div>
@@ -222,12 +274,14 @@ const DataOrders = () => {
                           <p
                             className={`block w-fit px-2 py-0.5 rounded-md antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal
       ${
-        order.status === "paid"
-          ? "text-blue-600 font-bold bg-blue-200"
+        order.status === "pending"
+          ? "text-orange-500 font-bold bg-orange-100"
+          : order.status === "paid"
+          ? "text-green-500 font-bold bg-green-100"
           : order.status === "shipped"
-          ? "text-orange-600 font-bold bg-orange-200"
+          ? "text-blue-500 font-bold bg-blue-100"
           : order.status === "completed"
-          ? "text-green-600 font-bold bg-green-200"
+          ? "text-yellow-500 font-bold bg-yellow-100"
           : "text-gray-500"
       }`}
                           >
@@ -244,6 +298,23 @@ const DataOrders = () => {
                             maximumFractionDigits: 2,
                           })}{" "}
                         </p>
+                      </td>
+
+                      <td className="p-4 border-b border-blue-gray-50">
+                        <div className="flex items-center gap-3">
+                          {order.tracking_number ? (
+                            <p className="block antialiased font-sans text-xs leading-normal text-blue-gray-900 font-normal">
+                              {order.tracking_number}
+                            </p>
+                          ) : (
+                            <button
+                              onClick={() => handleOpenResiModal(order.id)}
+                              className="text-xs text-graytext hover:underline"
+                            >
+                              + Tambah
+                            </button>
+                          )}
+                        </div>
                       </td>
 
                       <td className="p-4 border-b border-blue-gray-50 relative">
@@ -265,6 +336,12 @@ const DataOrders = () => {
                           {openDropdown === order.id && (
                             <div className="absolute right-0 mt-2 w-36 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                               <div className="py-1">
+                                <button
+                                  onClick={() => handleOpenResiModal(order.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                  Tambah Resi
+                                </button>
                                 <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                   Edit
                                 </button>
