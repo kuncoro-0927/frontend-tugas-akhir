@@ -4,7 +4,7 @@ import SidebarAdmin from "../../../components/Admin/SidebarAdmin";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
 import AddResiModal from "../../../components/Admin/Modal/AddTrackingNumber";
 import { showSnackbar } from "../../../components/CustomSnackbar";
-showSnackbar;
+import ModalCreateOrder from "../../../components/Modal/Orders/CreateOrder";
 const DataOrders = () => {
   const [orders, setOrders] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -14,8 +14,11 @@ const DataOrders = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Sidebar collapsed by default
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
   const [showResiModal, setShowResiModal] = useState(false);
+  const [createModal, setCreateModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [activeTab, setActiveTab] = useState("all");
+  const handleOpenCreateModal = () => setCreateModal(true);
+  const handleCloseCreateModal = () => setCreateModal(false);
 
   // Toggle sidebar state
   const toggleSidebar = () => {
@@ -130,6 +133,10 @@ const DataOrders = () => {
           onSubmit={handleSubmitResi}
         />
       )}
+      <ModalCreateOrder
+        open={createModal}
+        handleClose={handleCloseCreateModal}
+      />
       <div
         className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
           isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
@@ -151,7 +158,15 @@ const DataOrders = () => {
       >
         <AdminNavBar onToggleSidebar={toggleSidebar} />
         <div className="mt-10 px-5 text-xl font-bold">
-          Data Pesanan
+          <div className="flex items-center justify-between">
+            <h1>Data Pesanan</h1>
+            <button
+              onClick={handleOpenCreateModal}
+              className=" bg-black rounded-md text-white px-3 py-2 font-normal text-sm"
+            >
+              Tambah
+            </button>
+          </div>
           <div className="border p-5 mt-10">
             <div className="flex  items-start justify-between">
               <p className="font-semibold text-sm">Tabel Data Pesanan</p>
@@ -197,14 +212,18 @@ const DataOrders = () => {
                   <button
                     key={status}
                     onClick={() => setActiveTab(status)}
-                    className={`px-4 py-2  text-sm font-medium 
-        ${activeTab === status ? "border-b-2 border-blue-500" : ""}`}
+                    className={`px-4 py-2  text-sm 
+        ${
+          activeTab === status
+            ? "border-b-2 font-bold border-blue-500"
+            : "font-normal"
+        }`}
                   >
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                   </button>
                 ))}
               </div>
-              <table className=" w-full min-w-max table-auto text-left">
+              <table className=" w-full table-auto  text-left">
                 <thead>
                   <tr>
                     {[
@@ -309,7 +328,12 @@ const DataOrders = () => {
                           ) : (
                             <button
                               onClick={() => handleOpenResiModal(order.id)}
-                              className="text-xs text-graytext hover:underline"
+                              disabled={order.status === "pending"}
+                              className={`text-xs ${
+                                order.status === "pending"
+                                  ? "text-gray-400 cursor-not-allowed"
+                                  : "text-graytext hover:underline"
+                              }`}
                             >
                               + Tambah
                             </button>

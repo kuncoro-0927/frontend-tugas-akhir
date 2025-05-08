@@ -11,7 +11,7 @@ const StatusModal = ({ open, onClose, data }) => {
   const statusColors = {
     paid: { text: "#16a34a", bg: "#dcfce7" }, // hijau
     shipped: { text: "#2563eb", bg: "#dbeafe" }, // biru
-    completed: { text: "#15803d", bg: "#bbf7d0" }, // hijau muda
+    completed: { text: "#0e9f6e", bg: "#def7ec" }, // hijau muda
   };
 
   return (
@@ -101,7 +101,7 @@ const StatusModal = ({ open, onClose, data }) => {
         {courierService !== "pickup" && (
           <>
             <div className="px-5 pt-4 text-xs font-medium">
-              Progress Pengiriman:
+              Kemajuan Pengiriman:
             </div>
             <TimelinePengiriman
               status={status}

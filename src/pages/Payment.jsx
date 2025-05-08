@@ -100,14 +100,13 @@ const Payment = () => {
   const handlePayment = async () => {
     try {
       // Siapkan default service jika metode pickup
-      const service =
-        formData.shippingMethod === "pickup"
-          ? {
-              name: "Ambil di tempat",
-              etd: "-",
-              cost: 0,
-            }
-          : selectedService;
+      const service = isPickup
+        ? {
+            name: "Ambil di tempat",
+            etd: "-",
+            cost: 0,
+          }
+        : selectedService;
 
       // 1. Simpan data pengiriman ke DB (pickup tetap disimpan juga)
       await instance.post("/shipping/details", {
