@@ -15,14 +15,16 @@ const Home = () => {
     <>
       <section className="mt-10 mx-14">
         <div className="flex justify-between gap-10">
-          <div className=" w-full py-7 rounded-2xl">
-            <h1 className="font-semibold text-6xl max-w-sm">
-              Lorem ipsum dolor sit amet
+          <div className=" w-full py-5 rounded-2xl">
+            <h1 className="font-semibold text-6xl max-w-lg">
+              <span className="font-semibold">
+                Buat Setiap Sudut Ruang{" "}
+                <span className="font-bold">Lebih Elegan</span>{" "}
+              </span>{" "}
             </h1>
-            <p className="mt-7">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Provident, cupiditate nihil maxime harum sapiente voluptas nam
-              quam.
+            <p className="mt-7 font-medium">
+              Hadirkan kesan rapi dan berkelas di ruangan Anda dengan berbagai
+              pilihan figura yang sesuai untuk beragam gaya penataan interior.
             </p>
 
             <div className="flex items-center  mt-7">

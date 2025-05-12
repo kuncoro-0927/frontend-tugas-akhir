@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { instance } from "../../utils/axios";
 import { IconButton } from "@mui/material";
 import { Link } from "react-router-dom";
-import { IoMdArrowBack } from "react-icons/io";
+import { RiPokerHeartsLine, RiPokerHeartsFill } from "react-icons/ri";
 import Card from "../../components/Card/Card";
 import CardImage from "../../components/Card/CardImage";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -12,14 +12,15 @@ import { showSnackbar } from "../../components/CustomSnackbar";
 import { useSelector, useDispatch } from "react-redux";
 import { toggleWishlist, fetchWishlist } from "../../redux/wishlistSlice";
 import SidebarAccount from "../../components/SidebarforAccount";
-
+import { addToCart } from "../../redux/cartSlice";
+import { fetchCartItemCount } from "../../redux/cartSlice";
 const Wishlist = () => {
   const { isLoggedIn, user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [setWishlist] = useState([]); // Initial state as an array
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [products, setProducts] = useState([]);
+  const [loadingProductId, setLoadingProductId] = useState(null);
   const wishlist = useSelector((state) => state.wishlist.wishlist);
 
   const handleToggleWishlist = (productId) => {
@@ -75,25 +76,44 @@ const Wishlist = () => {
     fetchWishlist();
   }, []);
 
-  const truncateDescriptionByChar = (description, charLimit) => {
-    if (description.length <= charLimit) {
-      return description;
-    } else {
-      return description.slice(0, charLimit) + "...";
+  const addCart = async (product, quantity) => {
+    try {
+      setLoadingProductId(product.id); // Mulai loading
+
+      // Simulasi loading 2 detik
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      await instance.post("/add/to/cart", {
+        product_id: product.id,
+        quantity,
+      });
+
+      dispatch(
+        addToCart({
+          product_id: product.id,
+          name: product.name,
+          quantity,
+        })
+      );
+
+      dispatch(fetchCartItemCount(user.id)); // 🔥 langsung update icon cart
+      showSnackbar("Produk berhasil ditambahkan ke keranjang!", "success"); // 🔔 notif manis
+    } catch (err) {
+      console.error("Gagal menambahkan produk ke cart:", err.message);
+      showSnackbar("Gagal menambahkan produk ke keranjang", "error");
+    } finally {
+      setLoadingProductId(null); // ✅ Hentikan loading
     }
   };
-
-  if (loading) return <p>Loading wishlist...</p>;
-
   return (
     <>
-      <section className="flex 2xl:mx-32">
+      <section className="flex h-screen 2xl:mx-32">
         <div className="hidden sm:block md:block lg:block">
           <SidebarAccount />
         </div>
         <div className="mt-5 md:p-8 mx-4 w-full text-hitam">
           <h1 className="font-extrabold text-2xl md:text-3xl  mb-5">
-            Favorit wisata Anda
+            Produk yang Anda sukai
           </h1>
 
           {wishlist.length === 0 ? (
@@ -118,43 +138,52 @@ const Wishlist = () => {
               </Link>
             </div>
           ) : (
-            <div className="mt-7 md:mt-14 lg:mt-14 grid grid-cols-2 md:flex lg:justify-start lg:p-1 xl:mt-14">
-              <div className="hidden md:hidden lg:flex lg:justify-start lg:gap-7 lg:w-full">
-                {Array.isArray(wishlist) &&
-                  wishlist.map((product) => (
-                    <div key={product.id} className="relative">
-                      <Link to={`/wisata/detail/${product.id}`}>
-                        <Card
-                          title={product.name}
-                          image={`${import.meta.env.VITE_BACKEND_URL}${
-                            product.image_url
-                          }`}
-                          price={Number(product.price).toLocaleString("id-ID")}
-                          average_rating={product.rating || "0.0"}
-                        />
-                      </Link>
-                      <div className="absolute top-2 right-2">
-                        <IconButton
-                          onClick={() => handleToggleWishlist(product.id)}
-                          className="p-2"
-                        >
-                          {" "}
-                          {isProductInWishlist(product.id) ? (
-                            <FavoriteIcon
-                              className="text-red-500"
-                              sx={{ width: 28, height: 28 }}
-                            />
-                          ) : (
-                            <FavoriteIcon
-                              className=""
-                              sx={{ width: 28, height: 28 }}
-                            />
-                          )}
-                        </IconButton>
-                      </div>
+            <div className="grid lg:grid-cols-3 gap-10">
+              {Array.isArray(wishlist) &&
+                wishlist.map((product) => (
+                  <div key={product.id} className="relative">
+                    <Link to={`/wisata/detail/${product.id}`}>
+                      <Card
+                        title={product.name}
+                        image={`${import.meta.env.VITE_BACKEND_URL}${
+                          product.image_url
+                        }`}
+                        price={Number(product.price).toLocaleString("id-ID")}
+                        average_rating={product.rating || "0.0"}
+                      />
+                    </Link>
+                    <div className="absolute top-1 right-1">
+                      <IconButton
+                        onClick={() => handleToggleWishlist(product.id)}
+                        className="p-2"
+                      >
+                        {" "}
+                        {isProductInWishlist(product.id) ? (
+                          <div className="bg-white pt-2 pb-2 px-2 rounded-full">
+                            <RiPokerHeartsFill className="text-red-500 text-xl" />
+                          </div>
+                        ) : (
+                          <div className="bg-white pt-2 pb-2 px-2 rounded-full">
+                            <RiPokerHeartsLine className="text-xl" />
+                          </div>
+                        )}
+                      </IconButton>
                     </div>
-                  ))}
-              </div>
+                    <div className="">
+                      <button
+                        className="border duration-300 border-black font-medium flex items-center justify-center gap-2 text-sm  px-5  py-2 rounded-full"
+                        onClick={() => addCart(product, 1)}
+                        disabled={loadingProductId === product.id}
+                      >
+                        {loadingProductId === product.id ? (
+                          <span className="animate-pulse">Menambahkan...</span>
+                        ) : (
+                          "Tambah Item"
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ))}
             </div>
           )}
 

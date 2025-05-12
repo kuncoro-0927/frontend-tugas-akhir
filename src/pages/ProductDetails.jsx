@@ -19,12 +19,28 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
-
-  const [value, setValue] = React.useState(2);
+  const [reviews, setReviews] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const location = useLocation();
   const from = location.state?.from;
+  const [averageRating, setAverageRating] = useState(0);
 
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await instance.get(`/review/product/${id}`);
+        setReviews(res.data.reviews);
+        const total = res.data.reviews.reduce((sum, r) => sum + r.rating, 0);
+        const avg =
+          res.data.reviews.length > 0 ? total / res.data.reviews.length : 0;
+        setAverageRating(avg);
+      } catch (error) {
+        console.error("Gagal mengambil review produk:", error);
+      }
+    };
+
+    if (id) fetchReviews();
+  }, [id]);
   // Metode yang dipilih (default Delivery)
 
   useEffect(() => {
@@ -112,27 +128,26 @@ const ProductDetails = () => {
             </div>
 
             <div className="flex mt-4 items-center gap-3">
-              <h1 className="text-xl font-medium">{product.name}</h1>
+              <h1 className="text-2xl font-extrabold">{product.name}</h1>
               <GoShareAndroid className="text-xl" />
-              <p className="text-lg ml-auto">
-                <span className="font-semibold">
+              <p className="text-2xl  ml-auto">
+                <span className="font-bold">
                   IDR {Number(product.price).toLocaleString("id-ID")}
                 </span>
               </p>
             </div>
             <p className="flex mt-2 items-center gap-2 text-gray-700">
               <Rating
-                name="simple-controlled"
-                value={value}
+                name="read-only"
+                value={averageRating}
                 size="small"
-                onChange={(event, newValue) => {
-                  setValue(newValue);
-                }}
+                precision={0.1}
+                readOnly
               />
-              <span>4.5 rating & 3 ulasan</span>
+              <span>
+                {averageRating.toFixed(1)} rating & {reviews.length} ulasan
+              </span>
             </p>
-
-            <p className=" mt-5 text-gray-700">Metode:</p>
 
             <p className=" mt-5 text-gray-700">Ukuran:</p>
             <div className="flex flex-col gap-2 mt-3">
@@ -215,64 +230,81 @@ const ProductDetails = () => {
         <div className="border-t mt-10 pb-10"></div>
       </section>
 
-      <section className="mx-[75px]  pb-20">
-        <div className="mt-7 ">
-          <h2 className="text-2xl text-hitam2 font-bold">Ulasan Pengguna</h2>
+      <section className="mx-[75px] pb-20">
+        <div className="mt-7">
+          <h2 className="text-2xl text-hitam2 font-extrabold">
+            Ulasan Pengguna
+          </h2>
         </div>
-        <div className="mt-3 md:flex items-start justify-between text-hitam2 lg:max-w-3xl ">
-          <div className=" items-end gap-3">
-            <h1 className="flex items-center text-3xl md:text-4xl font-extrabold text-hitam2">
-              <Rating
-                readOnly
-                max={1}
-                defaultValue={1}
-                sx={{ fontSize: "2rem" }}
-                className="mr-2"
-              />{" "}
-              {"0.0"}
-            </h1>
-            {/* <p>{reviews[0].total_reviews} ulasan terverifikasi</p> */}
-            <p className="mt-2">{3} ulasan terverifikasi</p>
-          </div>
 
-          <div className="">
-            {[5, 4, 3, 2, 1].map((number, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <span className="text-sm font-semibold text-hitam2">
-                  {number}
-                </span>
-
-                <LinearProgress
-                  variant="determinate"
-                  value={[4 - index]}
-                  color="inherit"
-                  sx={{
-                    width: "270px",
-                    borderRadius: 5,
-                    "& .MuiLinearProgress-bar": {
-                      borderRadius: 5,
-                    },
-                  }}
+        <div className="flex items-start justify-start gap-10">
+          {/* Bagian kiri: Ringkasan rating */}
+          <div className="mt-3 flex-col gap-10 flex items-start justify-between text-hitam2 w-fit p-5 rounded-md">
+            <div className="items-end gap-3">
+              <h1 className="flex items-center text-3xl md:text-5xl font-extrabold text-hitam2">
+                <Rating
+                  readOnly
+                  max={1}
+                  value={1}
+                  sx={{ fontSize: "4rem" }}
+                  className="mr-2"
                 />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-10">
-          <div className="mb-4">
-            <Rating name="read-only" readOnly />
-
-            <div className="">
-              <h1 className="text-xs font-semibold">"Anonymous"</h1>
-              <div
-                className="text-base w-full  border-b pb-5 mt-2 rounded-md 
-                    max-w-full 
-                    break-words"
-              >
-                "No review text available."
-              </div>
+                {(
+                  reviews.reduce((sum, r) => sum + r.rating, 0) /
+                    reviews.length || 0
+                ).toFixed(1)}
+              </h1>
+              <p className="mt-2">{reviews.length} ulasan terverifikasi</p>
             </div>
+
+            {/* Grafik distribusi rating */}
+            <div className="">
+              {[5, 4, 3, 2, 1].map((star) => {
+                const count = reviews.filter((r) => r.rating === star).length;
+                const percentage = (count / reviews.length) * 100 || 0;
+
+                return (
+                  <div key={star} className="flex items-center gap-3 mb-1">
+                    <span className="text-sm font-semibold text-hitam2">
+                      {star}
+                    </span>
+                    <LinearProgress
+                      variant="determinate"
+                      value={percentage}
+                      color="inherit"
+                      sx={{
+                        width: "270px",
+                        borderRadius: 5,
+                        "& .MuiLinearProgress-bar": {
+                          borderRadius: 5,
+                        },
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Bagian kanan: List review */}
+          <div className="w-full mt-5">
+            {reviews.length === 0 ? (
+              <p className="text-gray-600">
+                Belum ada ulasan untuk produk ini.
+              </p>
+            ) : (
+              reviews.map((review) => (
+                <div key={review.id} className="mb-6">
+                  <Rating name="read-only" value={review.rating} readOnly />
+                  <h1 className="text-xs font-semibold mt-1">
+                    {review.user_name || "Anonymous"}
+                  </h1>
+                  <div className="text-base w-full border-b pb-5 mt-2 rounded-md max-w-full break-words">
+                    {review.comment || "Tidak ada komentar."}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>

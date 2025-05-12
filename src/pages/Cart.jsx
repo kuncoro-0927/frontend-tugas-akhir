@@ -156,13 +156,7 @@ const Cart = () => {
                           <div className="flex items-center justify-between">
                             <p className="text-gray-400/80">{item.category}</p>
                             <div className="flex items-center">
-                              <IoHeartCircle
-                                className="text-2xl cursor-pointer hover:scale-110 transition-transform"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleRemoveItem(item.id);
-                                }}
-                              />
+                              <IoHeartCircle className="text-2xl cursor-pointer hover:scale-110 transition-transform" />
                               <IoIosCloseCircle
                                 className="text-2xl cursor-pointer hover:scale-110 transition-transform"
                                 onClick={(e) => {

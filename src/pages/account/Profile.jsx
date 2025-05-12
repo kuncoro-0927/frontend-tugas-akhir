@@ -85,10 +85,10 @@ const Profile = () => {
 
   return (
     <section className="flex 2xl:mx-32 ">
-      <div className="hidden sm:block md:block lg:block">
+      <div className="hidden sm:block md:block lg:block ">
         <SidebarAccount />
       </div>
-      <div className="md:p-8 mt-5 mx-4">
+      <div className="md:p-8  mt-5 mx-4">
         <span className="font-extrabold text-3xl">Informasi Akun</span>
         <p>Lengkapi data akun anda untuk pemesanan</p>
         <form onSubmit={handleSubmit} className="space-y-4">

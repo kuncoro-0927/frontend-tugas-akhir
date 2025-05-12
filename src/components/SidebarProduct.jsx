@@ -54,7 +54,7 @@ const SidebarProduct = ({ onFilterChange }) => {
       <button
         onClick={() => toggleDropdown(0)}
         className={`flex items-center justify-between w-full px-4 py-2 rounded-md ${
-          dropdownStates[0] ? "bg-gray-200/40" : "bg-white"
+          dropdownStates[0] ? "bg-blue-300/15" : "bg-white"
         }`}
       >
         Kategori
@@ -78,6 +78,7 @@ const SidebarProduct = ({ onFilterChange }) => {
                   type="checkbox"
                   checked={selectedCategory === item.name}
                   readOnly
+                  className="accent-black"
                 />
                 <span>{item.name}</span>
               </li>
@@ -92,7 +93,7 @@ const SidebarProduct = ({ onFilterChange }) => {
       <button
         onClick={() => toggleDropdown(1)}
         className={`flex items-center justify-between w-full px-4 py-2 rounded-md ${
-          dropdownStates[1] ? "bg-gray-300/15" : "bg-white"
+          dropdownStates[1] ? "bg-blue-300/15" : "bg-white"
         }`}
       >
         Harga
@@ -116,6 +117,7 @@ const SidebarProduct = ({ onFilterChange }) => {
                   type="checkbox"
                   checked={selectedPrice?.label === item.label}
                   readOnly
+                  className="accent-black"
                 />
                 <span>{item.label}</span>
               </li>

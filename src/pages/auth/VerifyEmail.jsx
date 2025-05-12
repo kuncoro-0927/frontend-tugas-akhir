@@ -162,6 +162,13 @@ const ModalVerifyEmail = ({ otpToken, handleSwitch, handleClose }) => {
 
   const handleVerify = async (e) => {
     e.preventDefault();
+
+    // Validasi untuk memastikan OTP terisi dengan benar
+    if (otp.length !== 6 || !otp.match(/^\d{6}$/)) {
+      setError("OTP yang Anda masukkan tidak valid.");
+      return; // Hentikan eksekusi jika OTP tidak valid
+    }
+
     setError(null);
     setLoadingVerify(true);
 

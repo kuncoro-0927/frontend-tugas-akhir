@@ -1,5 +1,6 @@
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
+import MenuItem from "@mui/material/MenuItem";
 
 export default function FormInput({
   type,
@@ -8,6 +9,7 @@ export default function FormInput({
   value,
   helperText,
   onChange,
+  options = [],
   ...rest
 }) {
   const formatPhoneNumber = (number) => {
@@ -25,7 +27,7 @@ export default function FormInput({
     if (type === "tel") {
       let rawValue = val.replace(/\D/g, "");
       if (rawValue.startsWith("0")) {
-        rawValue = rawValue.slice(1); // Hapus 0 di depan
+        rawValue = rawValue.slice(1);
       }
       val = formatPhoneNumber(rawValue);
     }
@@ -42,7 +44,8 @@ export default function FormInput({
     <div className="w-full">
       <TextField
         fullWidth
-        type={type}
+        select={type === "select"}
+        type={type !== "select" ? type : undefined}
         label={label}
         variant="outlined"
         name={name}
@@ -94,10 +97,9 @@ export default function FormInput({
             color: "gray !important",
           },
           "& .MuiInputLabel-root.MuiInputLabel-shrink": {
-            fontSize: "1rem", // ukuran saat shrink (fokus / ada isian)
+            fontSize: "1rem",
           },
           "& .MuiInputLabel-root.Mui-focused": {
-            color: "",
             fontSize: "1rem",
           },
           "& .MuiOutlinedInput-input": {
@@ -105,7 +107,14 @@ export default function FormInput({
           },
         }}
         {...rest}
-      />
+      >
+        {type === "select" &&
+          options.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+      </TextField>
     </div>
   );
 }

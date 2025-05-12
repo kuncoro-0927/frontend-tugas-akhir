@@ -111,6 +111,7 @@ const Payment = () => {
       // 1. Simpan data pengiriman ke DB (pickup tetap disimpan juga)
       await instance.post("/shipping/details", {
         order_id: orderId,
+        email: formData.email,
         firstName: formData.firstName,
         lastName: formData.lastname,
         phone: formData.phone,
@@ -118,7 +119,7 @@ const Payment = () => {
         province: formData.province || "-",
         city: formData.city || "-",
         postal_code: formData.postalCode || "-",
-        shipping_method: formData.shippingMethod,
+        shipping_method: shippingMethod,
         courier: service.name,
         etd: service.etd,
         shipping_cost: parseInt(service.cost),
@@ -187,10 +188,12 @@ const Payment = () => {
                 </p>
 
                 {isPickup ? (
-                  <p className="mt-3 text-sm text-blue-600">
-                    <span className="font-bold">Metode Pickup:</span> Silakan
-                    ambil pesanan di toko kami:
+                  <p className=" text-sm ">
+                    <span className="font-bold">
+                      Metode: <span className="font-normal">Pickup</span>
+                    </span>{" "}
                     <br />
+                    <span>Silakan ambil pesanan di </span>{" "}
                     <span className="font-semibold">
                       Jl. Contoh No.123, Pacitan, Jawa Timur
                     </span>

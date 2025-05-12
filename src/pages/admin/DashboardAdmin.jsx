@@ -122,7 +122,7 @@ const Dashboard = () => {
                 </p>
                 <p className="text-xl font-medium">Total saldo</p>
               </div>
-              <div className="shadow-md  w-full rounded-xl  p-4">
+              <div className="border border-gray-300 w-full rounded-xl  p-4">
                 <h1 className="text-sm font-bold mb-3">Data Status Pesanan</h1>
                 <div className="">
                   <div className="text-xs flex mb-1 justify-between">
@@ -143,7 +143,7 @@ const Dashboard = () => {
                 </div>
               </div>
             </div>
-            <div className="flex-col items-center  p-4 border shadow-md rounded-lg ">
+            <div className="flex-col items-center  p-4 border  rounded-lg ">
               <div className="flex justify-between space-x-5 mt-5">
                 <div className="border border-gray-300  hover:-translate-y-2 duration-300 w-60 h-36 rounded-2xl px-5 p-5">
                   <div className="text-sm flex items-center gap-4">

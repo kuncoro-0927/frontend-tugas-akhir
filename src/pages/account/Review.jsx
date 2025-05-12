@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { instance } from "../../utils/axios";
+import { CiCalendar } from "react-icons/ci";
 import SidebarAccount from "../../components/SidebarforAccount";
 import Rating from "@mui/material/Rating";
 import CardImage from "../../components/Card/CardImage";
@@ -61,7 +62,7 @@ const Review = () => {
 
   return (
     <>
-      <section className="flex 2xl:mx-32">
+      <section className="flex h-screen  2xl:mx-32">
         <ModalReview
           open={modalOpen}
           handleClose={handleCloseReviewModal}
@@ -138,10 +139,13 @@ const Review = () => {
                   </div>
                   <div className="p-4 w-full md:p-4 flex flex-col justify-start">
                     <h1 className="font-bold text-xl">{product.name}</h1>
-                    <h1 className="mt-3 text-sm">{product.size}</h1>
-                    <p className="text-xs md:text-sm flex items-center text-hitam2 font-semibold ">
-                      {formatDate(product.created_at)}
+                    <p className="mt-3 text-sm flex items-center">
+                      <CiCalendar className="text-lg mr-1" />
+                      <span className="mr-1">Tanggal Pesanan:</span>{" "}
+                      <span>{formatDate(product.ordered_at)}</span>
                     </p>
+                    <h1 className="mt-1 text-sm">{product.size}</h1>
+
                     <p className="mt-auto">Beri ulasan untuk produk ini</p>
                     <div className="mt-auto flex justify-between items-end">
                       <button
@@ -149,9 +153,9 @@ const Review = () => {
                         disabled={hasReviewedProduct(product)}
                         className={`${
                           hasReviewedProduct(product)
-                            ? "bg-gray-100 text-gray-300 cursor-not-allowed"
-                            : "bg-black"
-                        } px-4 w-fit py-2 rounded-md text-white text-xs md:text-sm`}
+                            ? "bg-gray-100/70 text-gray-500/50 cursor-not-allowed"
+                            : "bg-black text-white"
+                        } px-4 w-fit py-2 rounded-md  text-xs md:text-sm`}
                       >
                         {hasReviewedProduct(product)
                           ? "Selesai"
@@ -195,7 +199,7 @@ const Review = () => {
                     <div className="flex mt-auto justify-between items-end">
                       {" "}
                       <p className="mt-2 text-xs hidden md:flex md:text-sm items-center text-hitam2 font-semibold ">
-                        Diberikan pada: {formatDate(review.ordered_at)}
+                        Diberikan pada: {formatDate(review.created_at)}
                       </p>
                       <button className="underline">Lihat produk</button>
                     </div>

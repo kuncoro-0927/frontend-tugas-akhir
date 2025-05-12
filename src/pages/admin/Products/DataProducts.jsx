@@ -3,37 +3,63 @@ import AdminNavBar from "../../../components/Admin/AdminNavBar";
 import SidebarAdmin from "../../../components/Admin/SidebarAdmin";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
 import CardImage from "../../../components/Card/CardImage";
+import ModalCreateProduct from "../../../components/Modal/Products/CreateProduct";
+import ModalEditProduct from "../../../components/Modal/Products/UpdateProduct";
+import ModalDeleteProduct from "../../../components/Modal/Products/DeleteProduct";
 const DataProducts = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Sidebar collapsed by default
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
-
-  // Toggle sidebar state
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed); // Toggle state
+  const [createModal, setCreateModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const handleCloseEditModal = () => setEditModal(false);
+  const handleOpenEditModal = (productId) => {
+    setSelectedProductId(productId);
+    setEditModal(true);
+  };
+  const handleCloseDeleteModal = () => setDeleteModal(false);
+  const handleOpenDeleteModal = (productId) => {
+    setSelectedProductId(productId);
+    setDeleteModal(true);
+  };
+  const handleOpenCreateModal = () => setCreateModal(true);
+  const handleCloseCreateModal = () => setCreateModal(false);
+  const handleDeleteSuccess = () => {
+    fetchProducts();
+  };
+  const handleCreateSuccess = () => {
+    fetchProducts();
+  };
+  const handleEditSuccess = () => {
+    fetchProducts();
   };
 
-  // Handle hover effect for sidebar
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
   const handleSidebarHover = (isHovered) => {
     setIsSidebarHovered(isHovered);
   };
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await instanceAdmin.get("/all/products");
-        console.log("DATA USERS:", response.data);
-        setUsers(response.data);
-        setFilteredUsers(response.data);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      }
-    };
 
-    fetchUsers();
+  const fetchProducts = async () => {
+    try {
+      const response = await instanceAdmin.get("/all/products");
+      setUsers(response.data);
+      setFilteredUsers(response.data);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -60,7 +86,7 @@ const DataProducts = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpenDropdown(null);
+        setOpenDropdown(false);
       }
     };
 
@@ -72,6 +98,24 @@ const DataProducts = () => {
 
   return (
     <section className="flex gap-10">
+      <ModalCreateProduct
+        open={createModal}
+        handleClose={handleCloseCreateModal}
+        onUpdate={handleCreateSuccess}
+      />
+      <ModalEditProduct
+        open={editModal}
+        handleClose={handleCloseEditModal}
+        productId={selectedProductId}
+        onUpdate={handleEditSuccess}
+      />
+      <ModalDeleteProduct
+        open={deleteModal}
+        handleClose={handleCloseDeleteModal}
+        productId={selectedProductId}
+        onUpdate={handleDeleteSuccess} // ✅ ini akan memicu fetch ulang data
+      />
+
       <div
         className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
           isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
@@ -93,10 +137,18 @@ const DataProducts = () => {
       >
         <AdminNavBar onToggleSidebar={toggleSidebar} />
         <div className="mt-10 px-5 text-xl font-bold">
-          Data Pengguna
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-extrabold">Data Produk</h1>
+            <button
+              onClick={handleOpenCreateModal}
+              className=" bg-black rounded-md text-white px-3 py-2 font-normal text-sm"
+            >
+              Tambah
+            </button>
+          </div>
           <div className="border p-5 mt-10">
             <div className="flex  items-start justify-between">
-              <p className="font-semibold text-sm">Tabel Data Pengguna</p>
+              <p className="font-bold text-sm">Tabel Data Produk</p>
 
               {/* Search Input */}
               <div className=" mb-4">
@@ -156,14 +208,14 @@ const DataProducts = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((user) => (
-                    <tr key={user.id}>
+                  {filteredUsers.map((product) => (
+                    <tr key={product.id}>
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="flex items-center gap-3">
                           <div className="">
                             <CardImage
                               image={`${import.meta.env.VITE_BACKEND_URL}${
-                                user.image_url
+                                product.image_url
                               }`}
                               width="w-[70px]"
                               height="h-[70px]"
@@ -176,27 +228,27 @@ const DataProducts = () => {
                           /> */}
                           <div className="">
                             <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                              {user.name}
+                              {product.name}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
                         <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                          {user.size}
+                          {product.size}
                         </p>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="">
                           <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                            {user.weight_gram}
+                            {product.weight_gram}
                           </p>
                         </div>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="">
                           <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                            {user.category_name}
+                            {product.category_name}
                           </p>
                         </div>
                       </td>
@@ -204,7 +256,7 @@ const DataProducts = () => {
                       <td className="p-4 border-b border-blue-gray-50">
                         <p className="block antialiased font-sans text-xs leading-normal text-blue-gray-900 font-normal">
                           IDR{" "}
-                          {Number(user.price).toLocaleString("id-ID", {
+                          {Number(product.price).toLocaleString("id-ID", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           })}{" "}
@@ -219,7 +271,7 @@ const DataProducts = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setOpenDropdown(user.id);
+                              setOpenDropdown(product.id);
                             }}
                             type="button"
                             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200"
@@ -227,16 +279,26 @@ const DataProducts = () => {
                             ⋮
                           </button>
 
-                          {openDropdown === user.id && (
+                          {openDropdown === product.id && (
                             <div className="absolute right-0 mt-2 w-36 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                               <div className="py-1">
-                                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button
+                                  onClick={() =>
+                                    handleOpenEditModal(product.id)
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
                                   Edit
                                 </button>
                                 <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                   Detail
                                 </button>
-                                <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                <button
+                                  onClick={() =>
+                                    handleOpenDeleteModal(product.id)
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                                >
                                   Hapus
                                 </button>
                               </div>

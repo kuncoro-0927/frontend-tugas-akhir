@@ -79,17 +79,16 @@ const Order = () => {
   };
 
   return (
-    <section className="flex 2xl:mx-32">
+    <section className="flex min-h-screen 2xl:mx-32">
       <StatusModal
         open={openModal}
         onClose={() => setOpenModal(false)}
         data={modalData}
       />
-      <div className="hidden sm:block md:block lg:block">
+      <div className="hidden sm:block md:block lg:block ">
         <SidebarAccount />
       </div>
-
-      <div className="mt-5 md:p-8 mx-4 w-full text-hitam">
+      <div className="mt-5  md:p-8 mx-4 w-full text-hitam">
         <h1 className="font-extrabold text-2xl md:text-3xl mb-5">
           Riwayat Pesanan
         </h1>

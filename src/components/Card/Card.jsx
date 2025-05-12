@@ -12,7 +12,7 @@ export default function Card({
   return (
     <>
       <div className=" bg-abu  rounded-lg h-full max-h-[280px]  lg:max-h-[250px] md:max-h-[300px] relative overflow-hidden group flex flex-col">
-        <div className="relative justify-center items-center flex w-full h-full overflow-hidden flex-shrink-0">
+        <div className="relative justify-center items-center flex w-full   h-full overflow-hidden flex-shrink-0">
           {isLoading ? (
             <Skeleton variant="rectangular" width="100%" height={200} />
           ) : (
@@ -28,7 +28,7 @@ export default function Card({
       </div>
 
       {/* Bagian Konten */}
-      <div className="  py-2 md:py-2 flex-grow">
+      <div className="flex justify-between items-center py-2 md:py-2 flex-grow">
         {/* Skeleton untuk Judul */}
         {isLoading ? (
           <Skeleton
@@ -44,6 +44,18 @@ export default function Card({
             {title}
           </h1>
         )}
+        <div className="flex items-center ">
+          {/* Skeleton untuk Harga */}
+          {isLoading ? (
+            <div className="flex items-center ml-auto">
+              <Skeleton width="50%" height={20} />
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm font-extrabold">IDR {price}</p>
+            </div>
+          )}
+        </div>
 
         {/* Bagian Bawah: From dan Harga */}
       </div>
@@ -58,31 +70,11 @@ export default function Card({
       ) : (
         <div className="backdrop-blur-lg justify-between mb-3 text-black rounded-tr-lg text-sm font-medium flex items-center">
           <span className="mr-1 flex items-center gap-1">
-            <FaStar className="text-yellow-500" /> {average_rating || "5.0"} (0
+            <FaStar className="text-yellow-300" /> {average_rating || "5.0"} (0
             ulasan)
           </span>
-          <div className="flex items-center ">
-            {/* Skeleton untuk Harga */}
-            {isLoading ? (
-              <div className="flex items-center ml-auto">
-                <Skeleton width="50%" height={20} />
-              </div>
-            ) : (
-              <div>
-                <p className="text-base font-semibold">IDR {price}</p>
-              </div>
-            )}
-          </div>
         </div>
       )}
-      <div className="flex justify-between gap-x-3">
-        <button className="border border-gray-300 flex items-center justify-center gap-2 text-sm  px-2  py-2 rounded-full w-full">
-          Tambah +
-        </button>
-        <button className="bg-black text-sm inline-block text-white  py-2 w-full rounded-full">
-          Beli
-        </button>
-      </div>
     </>
   );
 }

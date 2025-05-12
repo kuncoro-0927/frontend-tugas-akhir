@@ -29,7 +29,7 @@ const TableOrderDashboard = () => {
 
   return (
     <>
-      <div className="w-full border shadow-md  rounded-lg">
+      <div className="w-full border   rounded-lg">
         <table className="w-full rounded-lg min-w-max table-auto text-left">
           <thead>
             <tr className="p-4">

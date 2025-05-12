@@ -9,11 +9,13 @@ import Card from "../components/Card/Card";
 import { IconButton } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { showSnackbar } from "../components/CustomSnackbar";
-import FavoriteIcon from "@mui/icons-material/Favorite";
+import { RiPokerHeartsLine, RiPokerHeartsFill } from "react-icons/ri";
 import { MdKeyboardArrowRight, MdKeyboardArrowDown } from "react-icons/md";
 import { instance } from "../utils/axios";
 import { toggleWishlist } from "../redux/wishlistSlice";
 import { fetchWishlist } from "../redux/wishlistSlice";
+import { addToCart } from "../redux/cartSlice";
+import { fetchCartItemCount } from "../redux/cartSlice";
 const Product = () => {
   const { isLoggedIn, user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -22,6 +24,7 @@ const Product = () => {
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [products, setProducts] = useState([]);
+  const [loadingProductId, setLoadingProductId] = useState(null);
   const wishlist = useSelector((state) => state.wishlist.wishlist);
 
   const toggleDropdown = (index) => {
@@ -94,6 +97,36 @@ const Product = () => {
     fetchProducts();
   }, [selectedCategory, selectedPrice, selectedSize]);
 
+  const addCart = async (product, quantity) => {
+    try {
+      setLoadingProductId(product.id); // Mulai loading
+
+      // Simulasi loading 2 detik
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      await instance.post("/add/to/cart", {
+        product_id: product.id,
+        quantity,
+      });
+
+      dispatch(
+        addToCart({
+          product_id: product.id,
+          name: product.name,
+          quantity,
+        })
+      );
+
+      dispatch(fetchCartItemCount(user.id)); // 🔥 langsung update icon cart
+      showSnackbar("Produk berhasil ditambahkan ke keranjang!", "success"); // 🔔 notif manis
+    } catch (err) {
+      console.error("Gagal menambahkan produk ke cart:", err.message);
+      showSnackbar("Gagal menambahkan produk ke keranjang", "error");
+    } finally {
+      setLoadingProductId(null); // ✅ Hentikan loading
+    }
+  };
+
   return (
     <section className="mx-14 mt-10 pb-20">
       <Breadcrumbs
@@ -114,7 +147,7 @@ const Product = () => {
         </div>
 
         <div className="w-full">
-          <h1 className="text-3xl font-bold">Produk dari Faza Frame</h1>
+          <h1 className="text-3xl font-extrabold">Produk dari Faza Frame</h1>
 
           <div className="flex items-center justify-between mt-5 mb-5">
             <p>Menampilkan {products.length} produk sesuai filter</p>
@@ -203,24 +236,35 @@ const Product = () => {
                     average_rating={product.rating || "0.0"}
                   />
                 </Link>
-                <div className="absolute top-2 right-2">
+                <div className="absolute top-1 right-1">
                   <IconButton
                     onClick={() => handleToggleWishlist(product.id)}
                     className="p-2"
                   >
                     {" "}
                     {isProductInWishlist(product.id) ? (
-                      <FavoriteIcon
-                        className="text-red-500"
-                        sx={{ width: 28, height: 28 }}
-                      />
+                      <div className="bg-white pt-2 pb-2 px-2 rounded-full">
+                        <RiPokerHeartsFill className="text-red-500 text-xl" />
+                      </div>
                     ) : (
-                      <FavoriteIcon
-                        className=""
-                        sx={{ width: 28, height: 28 }}
-                      />
+                      <div className="bg-white pt-2 pb-2 px-2 rounded-full">
+                        <RiPokerHeartsLine className="text-xl" />
+                      </div>
                     )}
                   </IconButton>
+                </div>
+                <div className="">
+                  <button
+                    className="border duration-300 border-black font-medium flex items-center justify-center gap-2 text-sm  px-5  py-2 rounded-full"
+                    onClick={() => addCart(product, 1)}
+                    disabled={loadingProductId === product.id}
+                  >
+                    {loadingProductId === product.id ? (
+                      <span className="animate-pulse">Menambahkan...</span>
+                    ) : (
+                      "Tambah Item"
+                    )}
+                  </button>
                 </div>
               </div>
             ))}

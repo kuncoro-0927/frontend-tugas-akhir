@@ -292,6 +292,11 @@ const ModalCreateOrder = ({ open, handleClose }) => {
     const quantity = item?.quantity || 0;
     return acc + weight * quantity;
   }, 0);
+  const handleRemovePromo = () => {
+    setPromo(null);
+    setFormData((prev) => ({ ...prev, promoCode: "" }));
+    setPromoError("");
+  };
 
   return (
     <Modal
@@ -693,161 +698,202 @@ const ModalCreateOrder = ({ open, handleClose }) => {
 
             {activeStep === 2 && (
               <div className="grid gap-4">
-                {/* <div className="mt-4">
-                  <h3 className="font-bold">Subtotal:</h3>
-                  <p>Rp {calculateSubtotal().toLocaleString()}</p>
-                </div> */}
-
                 <div>
                   <h1 className="font-semibold text-lg">Informasi Penerima</h1>
                   <p className="text-sm">
                     Masukkan data penerima untuk pengiriman pesanan.
                   </p>
                 </div>
-                <FormInput
-                  name="email"
-                  type="email"
-                  label="Email"
-                  onChange={handleChange}
-                />
-                <div className="flex gap-5">
-                  <FormInput
-                    name="firstname"
-                    type="text"
-                    label="Nama Depan"
-                    onChange={handleChange}
-                  />
-                  <FormInput
-                    name="lastname"
-                    type="text"
-                    value={formData.lastname || ""}
-                    label="Nama Belakang"
-                    onChange={handleChange}
-                  />
-                </div>
-                <FormInput
-                  name="address"
-                  label="Alamat"
-                  value={formData.address || ""}
-                  onChange={handleChange}
-                />
-                <FormInput
-                  name="province"
-                  type="text"
-                  value={formData.province || ""}
-                  label="Provinsi"
-                  onChange={handleChange}
-                />
-                <div className="flex gap-5">
-                  {" "}
-                  <div className="w-full">
+
+                {formData.shippingMethod === "pickup" ? (
+                  <>
                     <FormInput
-                      type="text"
-                      name="city"
-                      value={formData.city || ""}
+                      name="email"
+                      type="email"
+                      label="Email"
+                      value={formData.email || ""}
                       onChange={handleChange}
-                      label="Kota/Kabupaten"
                     />
-
-                    {[
-                      ...new Map(
-                        destinationResults
-                          .filter((city) =>
-                            city.city_name
-                              .toLowerCase()
-                              .startsWith(formData.city.toLowerCase())
-                          )
-                          .map((item) => [item.city_name, item])
-                      ).values(),
-                    ].map((city) => {
-                      const formattedCity =
-                        city.city_name.charAt(0).toUpperCase() +
-                        city.city_name.slice(1).toLowerCase();
-
-                      return (
-                        <p
-                          key={city.id}
-                          onClick={() => handleSelectCity(city)}
-                          className="px-4 py-2 hover:bg-gray-200/40  cursor-pointer border border-gray-400 rounded-sm max-h-60 overflow-y-auto mt-1"
-                        >
-                          {formattedCity}
-                        </p>
-                      );
-                    })}
-                  </div>{" "}
-                  <FormInput
-                    name="postal"
-                    label="Kode Pos"
-                    value={formData.postal || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-                <FormInput
-                  type="tel"
-                  name="phone"
-                  label="Nomor Telepon"
-                  value={formData.phone || ""}
-                  onChange={handleChange}
-                  error={!!formErrors.phone}
-                  helperText={formErrors.phone}
-                />
+                    <div className="flex gap-5">
+                      <FormInput
+                        name="firstname"
+                        type="text"
+                        label="Nama Depan"
+                        value={formData.firstname || ""}
+                        onChange={handleChange}
+                      />
+                      <FormInput
+                        name="lastname"
+                        type="text"
+                        label="Nama Belakang"
+                        value={formData.lastname || ""}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <FormInput
+                      type="tel"
+                      name="phone"
+                      label="Nomor Telepon"
+                      value={formData.phone || ""}
+                      onChange={handleChange}
+                      error={!!formErrors.phone}
+                      helperText={formErrors.phone}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <FormInput
+                      name="email"
+                      type="email"
+                      label="Email"
+                      value={formData.email || ""}
+                      onChange={handleChange}
+                    />
+                    <div className="flex gap-5">
+                      <FormInput
+                        name="firstname"
+                        type="text"
+                        label="Nama Depan"
+                        value={formData.firstname || ""}
+                        onChange={handleChange}
+                      />
+                      <FormInput
+                        name="lastname"
+                        type="text"
+                        label="Nama Belakang"
+                        value={formData.lastname || ""}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <FormInput
+                      name="address"
+                      label="Alamat"
+                      value={formData.address || ""}
+                      onChange={handleChange}
+                    />
+                    <FormInput
+                      name="province"
+                      type="text"
+                      label="Provinsi"
+                      value={formData.province || ""}
+                      onChange={handleChange}
+                    />
+                    <div className="flex gap-5">
+                      <div className="w-full">
+                        <FormInput
+                          type="text"
+                          name="city"
+                          value={formData.city || ""}
+                          onChange={handleChange}
+                          label="Kota/Kabupaten"
+                        />
+                        {[
+                          ...new Map(
+                            destinationResults
+                              .filter((city) =>
+                                city.city_name
+                                  .toLowerCase()
+                                  .startsWith(
+                                    formData.city?.toLowerCase() || ""
+                                  )
+                              )
+                              .map((item) => [item.city_name, item])
+                          ).values(),
+                        ].map((city) => {
+                          const formattedCity =
+                            city.city_name.charAt(0).toUpperCase() +
+                            city.city_name.slice(1).toLowerCase();
+                          return (
+                            <p
+                              key={city.id}
+                              onClick={() => handleSelectCity(city)}
+                              className="px-4 py-2 hover:bg-gray-200/40 cursor-pointer border border-gray-400 rounded-sm max-h-60 overflow-y-auto mt-1"
+                            >
+                              {formattedCity}
+                            </p>
+                          );
+                        })}
+                      </div>
+                      <FormInput
+                        name="postal"
+                        label="Kode Pos"
+                        value={formData.postal || ""}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <FormInput
+                      type="tel"
+                      name="phone"
+                      label="Nomor Telepon"
+                      value={formData.phone || ""}
+                      onChange={handleChange}
+                      error={!!formErrors.phone}
+                      helperText={formErrors.phone}
+                    />
+                  </>
+                )}
               </div>
             )}
 
             {activeStep === 3 && (
               <div className="grid gap-4">
-                {shippingOptions.length > 0 ? (
-                  <div className="mb-5">
-                    <h1 className="text-lg font-semibold">
-                      Pilih Layanan / Kurir
-                    </h1>
-                    <p className="text-sm mb-2">
-                      Silakan pilih layanan pengiriman yang paling sesuai dengan
-                      kebutuhan kamu.
-                    </p>
+                {formData.shippingMethod !== "pickup" && (
+                  <div>
+                    {shippingOptions.length > 0 ? (
+                      <div className="mb-5">
+                        <h1 className="text-lg font-semibold">
+                          Pilih Layanan / Kurir
+                        </h1>
+                        <p className="text-sm mb-2">
+                          Silakan pilih layanan pengiriman yang paling sesuai
+                          dengan kebutuhan kamu.
+                        </p>
 
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => setIsDropdownOpen((prev) => !prev)}
-                        className="w-full border border-gray-400 px-3 py-3.5 rounded-md text-sm flex justify-between items-center shadow-sm bg-white hover:border-black transition-all"
-                      >
-                        {selectedShippingOption
-                          ? `${selectedShippingOption.name} - ${selectedShippingOption.service}  `
-                          : "Pilih layanan pengiriman"}
-                        <MdKeyboardArrowDown />
-                      </button>
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={() => setIsDropdownOpen((prev) => !prev)}
+                            className="w-full border border-gray-400 px-3 py-3.5 rounded-md text-sm flex justify-between items-center shadow-sm bg-white hover:border-black transition-all"
+                          >
+                            {selectedShippingOption
+                              ? `${selectedShippingOption.name} - ${selectedShippingOption.service}`
+                              : "Pilih layanan pengiriman"}
+                            <MdKeyboardArrowDown />
+                          </button>
 
-                      {isDropdownOpen && (
-                        <div className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
-                          {shippingOptions.map((option, index) => (
-                            <button
-                              key={index}
-                              type="button"
-                              onClick={() => {
-                                setSelectedShippingOption(option);
-                                setIsDropdownOpen(false);
-                              }}
-                              className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                                selectedShippingOption?.service ===
-                                option.service
-                                  ? "bg-gray-100 font-semibold"
-                                  : ""
-                              }`}
-                            >
-                              {option.name} - {option.service} ({option.etd}) -
-                              Rp {option.cost.toLocaleString()}
-                            </button>
-                          ))}
+                          {isDropdownOpen && (
+                            <div className="absolute z-10 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-auto">
+                              {shippingOptions.map((option, index) => (
+                                <button
+                                  key={index}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedShippingOption(option);
+                                    setIsDropdownOpen(false);
+                                  }}
+                                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                                    selectedShippingOption?.service ===
+                                    option.service
+                                      ? "bg-gray-100 font-semibold"
+                                      : ""
+                                  }`}
+                                >
+                                  {option.name} - {option.service} ({option.etd}
+                                  ) - Rp {option.cost.toLocaleString()}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        Belum ada opsi pengiriman tersedia.
+                      </p>
+                    )}
                   </div>
-                ) : (
-                  <p className="text-sm text-gray-500">
-                    Belum ada opsi pengiriman tersedia.
-                  </p>
                 )}
+
                 <div className="flex gap-6">
                   <div className="flex-1">
                     <FormInput
@@ -860,20 +906,32 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                       helperText={formErrors.promoCode || promoError}
                     />
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleApplyPromo}
-                    className="bg-black text-white py-3 px-4 rounded-md"
-                  >
-                    Klaim
-                  </button>
+                  {promo ? (
+                    <button
+                      type="button"
+                      onClick={handleRemovePromo}
+                      className="bg-black text-white py-3 px-4 rounded-md hover:bg-black/80 transition"
+                    >
+                      Batalkan
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleApplyPromo}
+                      className="bg-black text-white py-3 px-4 rounded-md hover:bg-black/80 transition"
+                    >
+                      Klaim
+                    </button>
+                  )}
                 </div>
+
                 {promo && (
-                  <p className="text-green-600 text-sm">
-                    Promo <strong>{promo.code}</strong> berhasil! Diskon Rp
+                  <p className="text-green-600 text-sm mt-2">
+                    Promo <strong>{promo.code}</strong> berhasil! Diskon Rp{" "}
                     {promo.discount.toLocaleString()}
                   </p>
                 )}
+
                 <h1 className="text-lg font-bold">Rincian Pesanan</h1>
                 <div className="space-y-1 text-sm">
                   <p className="flex  justify-between items-center ">
@@ -898,18 +956,25 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                       Rp {(adminFee ?? 0).toLocaleString()}
                     </span>
                   </p>
-                  <p className="flex justify-between items-center">
-                    Biaya Layanan / Kurir{" "}
-                    <span className="font-semibold">
-                      Rp {(selectedShippingOption?.cost ?? 0).toLocaleString()}
-                    </span>
-                  </p>
-                  <p className="flex text-green-600 justify-between items-center">
-                    <span className="text-black">Diskon</span>
-                    <span className="font-semibold">
-                      - Rp {(promo?.discount ?? 0).toLocaleString()}
-                    </span>
-                  </p>
+                  {formData.shippingMethod !== "pickup" && (
+                    <p className="flex justify-between items-center">
+                      Biaya Layanan / Kurir{" "}
+                      <span className="font-semibold">
+                        Rp{" "}
+                        {(selectedShippingOption?.cost ?? 0).toLocaleString()}
+                      </span>
+                    </p>
+                  )}
+
+                  {promo?.discount > 0 && (
+                    <p className="flex text-green-600 justify-between items-center">
+                      <span className="text-black">Diskon</span>
+                      <span className="font-semibold">
+                        - Rp {promo.discount.toLocaleString()}
+                      </span>
+                    </p>
+                  )}
+
                   <div className="border-b py-1"></div>
                   <p className="flex justify-between pt-2 items-center">
                     <span className="font-semibold text-base">Total</span>
@@ -937,7 +1002,7 @@ const ModalCreateOrder = ({ open, handleClose }) => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleSubmit} // handleSubmit di sini
+                onClick={handleSubmit}
               >
                 Submit
               </Button>
@@ -945,32 +1010,33 @@ const ModalCreateOrder = ({ open, handleClose }) => {
               <button
                 className="bg-black px-4 py-2 rounded-md text-white hover:bg-black/80"
                 onClick={() => {
-                  // Validasi setiap langkah
-                  console.log("User yang dipilih:", selectedUser); //
-                  if (activeStep === 0 && !formData.selectedUserId) {
-                    console.log(
-                      "Step 1: Penerima belum dipilih",
-                      formData.selectedUserId
-                    );
-                    alert("Silakan pilih penerima terlebih dahulu");
-                    return;
+                  // Step 0: Validasi user dan metode pengiriman
+                  if (activeStep === 0) {
+                    if (!formData.selectedUserId) {
+                      alert("Silakan pilih penerima terlebih dahulu");
+                      return;
+                    }
+                    if (!formData.shippingMethod) {
+                      alert("Silakan pilih metode pengiriman terlebih dahulu");
+                      return;
+                    }
                   }
-                  if (activeStep === 0 && !formData.shippingMethod) {
-                    console.log(
-                      "Step 2: Metode pengiriman belum dipilih",
-                      formData.shippingMethod
-                    );
-                    alert("Silakan pilih metode pengiriman terlebih dahulu");
-                    return;
-                  }
+
+                  // Step 1: Validasi produk
                   if (activeStep === 1 && selectedItems.length === 0) {
-                    console.log("Step 2: Produk belum dipilih", selectedItems);
                     alert("Silakan pilih produk terlebih dahulu");
                     return;
                   }
+
+                  // Step 2: Validasi data form berdasarkan metode pengiriman
                   if (activeStep === 2) {
-                    // Memastikan semua informasi penerima terisi
-                    const requiredFields = [
+                    const requiredFieldsPickup = [
+                      "email",
+                      "firstname",
+                      "lastname",
+                      "phone",
+                    ];
+                    const requiredFieldsDelivery = [
                       "email",
                       "firstname",
                       "lastname",
@@ -980,13 +1046,13 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                       "postal",
                       "phone",
                     ];
+                    const requiredFields =
+                      formData.shippingMethod === "pickup"
+                        ? requiredFieldsPickup
+                        : requiredFieldsDelivery;
 
                     for (const field of requiredFields) {
                       if (!formData[field]) {
-                        console.log(
-                          `Step 3: ${field} belum diisi`,
-                          formData[field]
-                        );
                         alert(
                           `Silakan lengkapi field ${field} terlebih dahulu`
                         );
@@ -994,22 +1060,17 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                       }
                     }
                   }
-                  // Lanjutkan ke step berikutnya jika semua validasi terpenuhi
-                  console.log("Lanjut ke step berikutnya");
+
+                  // Jika metode delivery, hitung ongkir
                   if (
-                    (activeStep === 0 && formData.selectedUserId) || // Cek pada step 0
-                    (activeStep === 1 && selectedItems.length > 0) || // Cek pada step 1
-                    (activeStep === 2 && formData.shippingMethod) // Cek pada step 2
+                    activeStep === 2 &&
+                    formData.shippingMethod === "delivery"
                   ) {
-                    if (
-                      activeStep === 2 &&
-                      formData.shippingMethod === "delivery"
-                    ) {
-                      handleShippingFee(); // Hanya hitung ongkir jika metode delivery
-                    }
-                    console.log("Melanjutkan ke step berikutnya...");
-                    handleNext(); // Lanjutkan ke step berikutnya
+                    handleShippingFee();
                   }
+
+                  // Lanjut ke step berikutnya
+                  handleNext();
                 }}
               >
                 Lanjut

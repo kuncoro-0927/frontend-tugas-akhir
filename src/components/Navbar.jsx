@@ -249,7 +249,7 @@ export default function NavBar({ handleOpenModal }) {
               <CiShoppingCart className="text-2xl" />
 
               {/* Menampilkan jumlah produk di keranjang */}
-              <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-[12px]">
+              <span className="absolute top-1 right-1 w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[10px]">
                 {itemCount}
               </span>
             </Link>
