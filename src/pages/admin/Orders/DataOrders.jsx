@@ -4,45 +4,54 @@ import SidebarAdmin from "../../../components/Admin/SidebarAdmin";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
 import AddResiModal from "../../../components/Admin/Modal/AddTrackingNumber";
 import { showSnackbar } from "../../../components/CustomSnackbar";
-import ModalCreateOrder from "../../../components/Modal/Orders/CreateOrder";
+import ModalCreateOrder from "../../../components/Admin/Modal/Orders/CreateOrder";
+import ModalUpdateOrder from "../../../components/Admin/Modal/Orders/UpdateOrder";
+import ExportOrdersModal from "../../../components/ExportOrder";
 const DataOrders = () => {
   const [orders, setOrders] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
+  const [openExport, setOpenExport] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Sidebar collapsed by default
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
   const [showResiModal, setShowResiModal] = useState(false);
   const [createModal, setCreateModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [activeTab, setActiveTab] = useState("all");
   const handleOpenCreateModal = () => setCreateModal(true);
   const handleCloseCreateModal = () => setCreateModal(false);
-
+  const handleCloseEditModal = () => setEditModal(false);
+  const handleOpenEditModal = (orderId) => {
+    setSelectedOrderId(orderId);
+    setEditModal(true);
+  };
   // Toggle sidebar state
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed); // Toggle state
   };
-
-  // Handle hover effect for sidebar
+  const handleEditSuccess = () => {
+    fetchOrders();
+  };
   const handleSidebarHover = (isHovered) => {
     setIsSidebarHovered(isHovered);
   };
 
+  const fetchOrders = async () => {
+    try {
+      const response = await instanceAdmin.get("/all/orders");
+
+      setOrders(response.data);
+      setFilteredUsers(response.data);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await instanceAdmin.get("/all/orders");
-
-        setOrders(response.data);
-        setFilteredUsers(response.data);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      }
-    };
-
-    fetchUsers();
+    fetchOrders();
   }, []);
 
   useEffect(() => {
@@ -57,7 +66,6 @@ const DataOrders = () => {
             order.user_name?.toLowerCase().includes(lowerSearch) ||
             order.user_email?.toLowerCase().includes(lowerSearch) ||
             order.status?.toLowerCase().includes(lowerSearch) ||
-            order.shipping_method?.toLowerCase().includes(lowerSearch) ||
             order.total_amount?.toString().toLowerCase().includes(lowerSearch)
           );
         });
@@ -137,6 +145,12 @@ const DataOrders = () => {
         open={createModal}
         handleClose={handleCloseCreateModal}
       />
+      <ModalUpdateOrder
+        open={editModal}
+        handleClose={handleCloseEditModal}
+        orderId={selectedOrderId}
+        onUpdate={handleEditSuccess}
+      />
       <div
         className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
           isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
@@ -166,6 +180,12 @@ const DataOrders = () => {
             >
               Tambah
             </button>
+            <button onClick={() => setOpenExport(true)}>Export Pesanan</button>
+
+            <ExportOrdersModal
+              open={openExport}
+              onClose={() => setOpenExport(false)}
+            />
           </div>
           <div className="border p-5 mt-10">
             <div className="flex  items-start justify-between">
@@ -184,9 +204,9 @@ const DataOrders = () => {
                         stroke="currentColor"
                       >
                         <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                         />
                       </svg>
@@ -229,7 +249,7 @@ const DataOrders = () => {
                     {[
                       "ID Pesanan",
                       "Nama",
-                      "Pengiriman",
+
                       "Status",
                       "Total Harga",
                       "Resi",
@@ -281,13 +301,6 @@ const DataOrders = () => {
                         </div>
                       </td>
 
-                      <td className="p-4 border-b border-blue-gray-50">
-                        <div className="">
-                          <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                            {order.shipping_method}
-                          </p>
-                        </div>
-                      </td>
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="">
                           <p
@@ -366,7 +379,10 @@ const DataOrders = () => {
                                 >
                                   Tambah Resi
                                 </button>
-                                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button
+                                  onClick={() => handleOpenEditModal(order.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
                                   Edit
                                 </button>
                                 <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">

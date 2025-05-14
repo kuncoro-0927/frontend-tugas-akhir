@@ -5,6 +5,7 @@ import authReducer from "./authSlice";
 import userReducer from "./userSlice";
 import adminReducer from "./adminSlice";
 import cartReducer from "./cartSlice";
+import cartDrawerReducer from "./cartDrawer";
 import checkoutReducer from "./checkoutSlice";
 import { combineReducers } from "redux";
 import wishlistReducer from "./wishlistSlice";
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   admin: adminReducer,
   auth: authReducer,
   cart: cartReducer,
+  cartDrawer: cartDrawerReducer,
   checkout: checkoutReducer,
   wishlist: wishlistReducer,
 });

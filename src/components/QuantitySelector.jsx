@@ -14,18 +14,17 @@ const QuantitySelector = ({ quantity, onIncrease, onDecrease }) => {
           onDecrease();
         }}
         sx={{
-          backgroundColor: isOne ? "white" : "black",
-          border: "1px solid black", // 👉 border hitam
+          backgroundColor: isOne ? "white" : "white",
 
           width: 10,
           height: 10,
           "&:hover": {
-            backgroundColor: isOne ? "#f0f0f0" : "#333",
+            text: isOne ? "#f0f0f0" : "#333",
           },
         }}
       >
         <RemoveIcon
-          sx={{ color: isOne ? "black" : "white", fontSize: "16px" }}
+          sx={{ color: isOne ? "black" : "black", fontSize: "16px" }}
         />
       </IconButton>
 
@@ -37,17 +36,16 @@ const QuantitySelector = ({ quantity, onIncrease, onDecrease }) => {
           onIncrease();
         }}
         sx={{
-          backgroundColor: "black",
-          border: "1px solid black", // 👉 border hitam juga di tombol +
+          backgroundColor: "white",
 
           width: 10,
           height: 10,
           "&:hover": {
-            backgroundColor: "#333",
+            text: "#333",
           },
         }}
       >
-        <AddIcon sx={{ color: "white", fontSize: "16px" }} />
+        <AddIcon sx={{ color: "black", fontSize: "16px" }} />
       </IconButton>
     </Box>
   );

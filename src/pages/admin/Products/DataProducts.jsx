@@ -3,9 +3,9 @@ import AdminNavBar from "../../../components/Admin/AdminNavBar";
 import SidebarAdmin from "../../../components/Admin/SidebarAdmin";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
 import CardImage from "../../../components/Card/CardImage";
-import ModalCreateProduct from "../../../components/Modal/Products/CreateProduct";
-import ModalEditProduct from "../../../components/Modal/Products/UpdateProduct";
-import ModalDeleteProduct from "../../../components/Modal/Products/DeleteProduct";
+import ModalCreateProduct from "../../../components/Admin/Modal/Products/CreateProduct";
+import ModalEditProduct from "../../../components/Admin/Modal/Products/UpdateProduct";
+import ModalDeleteProduct from "../../../components/Admin/Modal/Products/DeleteProduct";
 const DataProducts = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -163,9 +163,9 @@ const DataProducts = () => {
                         stroke="currentColor"
                       >
                         <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                         />
                       </svg>

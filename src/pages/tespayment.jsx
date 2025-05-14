@@ -9,14 +9,14 @@ const PaymentPage = () => {
   const dispatch = useDispatch();
 
   // Mengambil data checkout dari Redux store
-  const { shippingMethod, items, formData, shippingOptions, selectedService } =
-    useSelector((state) => state.checkout);
+  const { items, formData, shippingOptions, selectedService } = useSelector(
+    (state) => state.checkout
+  );
 
   const handleServiceChange = (service) => {
     // Pastikan data dipassing ke Redux dengan benar
     dispatch(
       setCheckoutItems({
-        shippingMethod,
         items,
         formData,
         shippingOptions: shippingOptions.map((option) =>

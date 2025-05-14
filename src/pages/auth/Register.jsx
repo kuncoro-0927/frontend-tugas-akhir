@@ -139,7 +139,7 @@ const ModalRegister = ({ handleSwitch, handleClose }) => {
                 </button>
               </div>
               <h2 className="text-2xl font-bold text-hitam2 mb-2">Daftar</h2>
-              <p>Daftar dulu yuk, biar perjalanan di Cultivo makin seru!</p>
+              <p>Daftar dulu yuk!</p>
             </div>
 
             <div className="px-5 py-7">

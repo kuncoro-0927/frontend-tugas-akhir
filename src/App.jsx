@@ -7,7 +7,8 @@ import { fetchUser } from "./redux/userSlice";
 import { fetchAdmin } from "./redux/adminSlice";
 import { useDispatch } from "react-redux";
 import AdminRoutes from "./routes/AdminRoutes";
-
+import FloatingButton from "./components/FloatingButton";
+import Cart from "./pages/Cart";
 function App() {
   const dispatch = useDispatch();
   const location = useLocation(); // untuk cek path saat ini

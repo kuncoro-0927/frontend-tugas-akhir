@@ -1,27 +1,110 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { GoArrowUpRight } from "react-icons/go";
-
+import { instance } from "../utils/axios";
 import Card from "../components/Card/Card";
-import { DataFigura } from "../data/DataDummy";
+import { RiPokerHeartsLine, RiPokerHeartsFill } from "react-icons/ri";
 import { Link } from "react-router-dom";
+import { PiAngleBold } from "react-icons/pi";
 import { IconButton } from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import { FaShippingFast } from "react-icons/fa";
 import AccordionTransition from "../components/Accordion";
 import SwiperCardReview from "../components/SwiperCardReview";
-
+import { useSelector, useDispatch } from "react-redux";
+import { toggleWishlist } from "../redux/wishlistSlice";
+import { fetchWishlist } from "../redux/wishlistSlice";
+import { showSnackbar } from "../components/CustomSnackbar";
+import { addToCart } from "../redux/cartSlice";
+import { fetchCartItemCount } from "../redux/cartSlice";
+import { GiPaintBrush } from "react-icons/gi";
 const Home = () => {
+  const dispatch = useDispatch();
+  const { isLoggedIn, user } = useSelector((state) => state.user);
+  const [products, setProducts] = useState([]);
+  const [loadingProductId, setLoadingProductId] = useState(null);
+  const wishlist = useSelector((state) => state.wishlist.wishlist);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await instance.get("/product");
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const addCart = async (product, quantity) => {
+    try {
+      setLoadingProductId(product.id); // Mulai loading
+
+      // Simulasi loading 2 detik
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      await instance.post("/add/to/cart", {
+        product_id: product.id,
+        quantity,
+      });
+
+      dispatch(
+        addToCart({
+          product_id: product.id,
+          name: product.name,
+          weight: product.weight_gram,
+          quantity,
+        })
+      );
+
+      dispatch(fetchCartItemCount(user.id)); // 🔥 langsung update icon cart
+      showSnackbar("Produk berhasil ditambahkan ke keranjang!", "success"); // 🔔 notif manis
+    } catch (err) {
+      console.error("Gagal menambahkan produk ke cart:", err.message);
+      showSnackbar("Gagal menambahkan produk ke keranjang", "error");
+    } finally {
+      setLoadingProductId(null); // ✅ Hentikan loading
+    }
+  };
+  const handleToggleWishlist = (productId) => {
+    if (!isLoggedIn) {
+      showSnackbar("Silakan login terlebih dahulu", "warning");
+      return;
+    }
+
+    console.log("Toggle wishlist:", { productId, user_id: user.id });
+
+    dispatch(toggleWishlist({ productId, user_id: user.id }))
+      .unwrap()
+      .then((res) => {
+        console.log("Wishlist updated:", res);
+        showSnackbar(res.message || "Berhasil ubah wishlist", "success");
+
+        // ✅ Refresh wishlist lengkap
+        dispatch(fetchWishlist(user.id));
+      })
+      .catch((err) => {
+        console.error("Toggle wishlist error:", err);
+        showSnackbar(err?.message || err || "Gagal mengubah wishlist", "error");
+      });
+  };
+  const isProductInWishlist = (productId) => {
+    return (
+      Array.isArray(wishlist) &&
+      wishlist.some((item) => item && item.id === productId)
+    );
+  };
   return (
     <>
       <section className="mt-10 mx-14">
-        <div className="flex justify-between gap-10">
+        <div className="flex justify-between gap-20">
           <div className=" w-full py-5 rounded-2xl">
-            <h1 className="font-semibold text-6xl max-w-lg">
-              <span className="font-semibold">
-                Buat Setiap Sudut Ruang{" "}
-                <span className="font-bold">Lebih Elegan</span>{" "}
+            <h1 className="font-bold text-6xl max-w-lg">
+              <span>
+                Buat Sudut Rumah <PiAngleBold className="inline text-6xl " />{" "}
+                Anda Lebih elegan
               </span>{" "}
             </h1>
+
             <p className="mt-7 font-medium">
               Hadirkan kesan rapi dan berkelas di ruangan Anda dengan berbagai
               pilihan figura yang sesuai untuk beragam gaya penataan interior.
@@ -37,8 +120,12 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-b from-coklat to-birulaut w-full flex justify-center p-7 rounded-2xl">
-            <img src="/public/images/home.png" className="w-[350px]" alt="" />
+          <div className="bg-gradient-to-b from-coklat to-birulaut w-full flex justify-center p-20 rounded-2xl">
+            <img
+              src="/public/images/bg-home-new3.png"
+              className="w-[320px]"
+              alt=""
+            />
           </div>
         </div>
       </section>
@@ -95,44 +182,61 @@ const Home = () => {
       <section className="mt-28 mx-14 ">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className=" font-bold text-3xl">Figura Terbaru</h1>
-            <p className="">
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nihil,
-              ratione!
-            </p>
+            <h1 className="font-extrabold text-3xl">Figura Terbaru</h1>
           </div>
+
           <button className="border border-gray-300 py-2 px-5 rounded-full text-sm hover:-translate-y-1 duration-300">
             Lihat semua
           </button>
         </div>
-        <div className="hidden md:hidden mt-10 lg:grid lg:grid-cols-3  lg:justify-between lg:w-full lg:gap-y-28 lg:gap-x-10">
-          {" "}
-          {Array.isArray(DataFigura) &&
-            DataFigura.slice(0, 6).map((agrotourismItem, index) => (
-              <div key={agrotourismItem.id || index} className="relative ">
-                {/* Link hanya membungkus card tanpa ikon wishlist */}
-                <Link to={`/wisata/detail/${agrotourismItem.id}`}>
-                  <Card
-                    title={agrotourismItem.title}
-                    image={agrotourismItem.image}
-                    price={Number(agrotourismItem.price || 0).toLocaleString(
-                      "id-ID"
-                    )}
-                    average_rating={
-                      agrotourismItem.average_rating
-                        ? parseFloat(agrotourismItem.average_rating).toFixed(1)
-                        : "0.0"
-                    }
-                  />
-                </Link>
-
-                <div className="absolute top-2 right-2">
-                  <IconButton className="p-2">
-                    <FavoriteIcon className="" sx={{ width: 28, height: 28 }} />
-                  </IconButton>
-                </div>
+        <div className="grid mt-10 lg:grid-cols-3 gap-10">
+          {products.map((product) => (
+            <div key={product.id} className="relative">
+              <Link
+                to={`/product/details/${product.id}`}
+                state={{ from: "produk" }}
+              >
+                <Card
+                  title={product.name}
+                  image={`${import.meta.env.VITE_BACKEND_URL}${
+                    product.image_url
+                  }`}
+                  price={Number(product.price).toLocaleString("id-ID")}
+                  average_rating={product.rating || "0.0"}
+                />
+              </Link>
+              <div className="absolute top-1 right-1">
+                <IconButton
+                  onClick={() => handleToggleWishlist(product.id)}
+                  className="p-2"
+                >
+                  {" "}
+                  {isProductInWishlist(product.id) ? (
+                    <div className="bg-white pt-2 pb-2 px-2 rounded-full">
+                      <RiPokerHeartsFill className="text-red-500 text-xl" />
+                    </div>
+                  ) : (
+                    <div className="bg-white pt-2 pb-2 px-2 rounded-full">
+                      <RiPokerHeartsLine className="text-xl" />
+                    </div>
+                  )}
+                </IconButton>
               </div>
-            ))}
+              <div className="">
+                <button
+                  className="border duration-300 border-black font-medium flex items-center justify-center gap-2 text-sm  px-5  py-2 rounded-full"
+                  onClick={() => addCart(product, 1)}
+                  disabled={loadingProductId === product.id}
+                >
+                  {loadingProductId === product.id ? (
+                    <span className="animate-pulse">Menambahkan...</span>
+                  ) : (
+                    "Tambah Item"
+                  )}
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

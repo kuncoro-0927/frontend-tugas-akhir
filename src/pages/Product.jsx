@@ -70,6 +70,8 @@ const Product = () => {
     setSelectedSize(size);
   };
 
+  const filterApplied = selectedCategory || selectedPrice || selectedSize;
+
   const fetchProducts = async () => {
     try {
       const res = await instance.get("/filtered/product", {
@@ -113,6 +115,7 @@ const Product = () => {
         addToCart({
           product_id: product.id,
           name: product.name,
+          weight: product.weight_gram,
           quantity,
         })
       );
@@ -147,10 +150,14 @@ const Product = () => {
         </div>
 
         <div className="w-full">
-          <h1 className="text-3xl font-extrabold">Produk dari Faza Frame</h1>
+          <h1 className="text-4xl font-extrabold">List Produk</h1>
 
           <div className="flex items-center justify-between mt-5 mb-5">
-            <p>Menampilkan {products.length} produk sesuai filter</p>
+            <p>
+              {filterApplied
+                ? `Menampilkan ${products.length} produk sesuai filter`
+                : "Menampilkan semua produk"}
+            </p>
 
             <div className="relative inline-block">
               <div className="flex items-center gap-2">

@@ -1,26 +1,34 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CardImage from "../components/Card/CardImage";
 import { instance } from "../utils/axios";
 import QuantitySelector from "../components/QuantitySelector";
-import { IoIosCloseCircle } from "react-icons/io";
+import { TfiClose } from "react-icons/tfi";
 import { setItemCount, removeFromCart } from "../redux/cartSlice";
-import { useDispatch } from "react-redux";
-import { IoHeartCircleOutline, IoHeartCircle } from "react-icons/io5";
-import ModalSelectMethod from "../components/Modal/ModalSelectMethod";
-import { Link } from "react-router-dom";
+import { closeDrawer } from "../redux/cartDrawer";
+import { useDispatch, useSelector } from "react-redux";
 
+import { Link } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([]);
-  const [selectedItems, setSelectedItems] = useState([]);
   const dispatch = useDispatch();
-  const [openModal, setOpenModal] = useState(false);
-  const [shippingMethod, setShippingMethod] = useState(""); // state untuk menyimpan metode pengiriman yang dipilih
+  const isOpen = useSelector((state) => state.cartDrawer.isDrawerOpen);
+  const handleCloseDrawer = () => dispatch(closeDrawer());
+  const [cartItems, setCartItems] = useState([]);
+  const [loadingCheckout, setLoadingCheckout] = useState(false);
   const navigate = useNavigate();
 
-  const handleOpen = () => setOpenModal(true);
-  const handleClose = () => setOpenModal(false);
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -33,10 +41,13 @@ const Cart = () => {
     };
 
     fetchCart();
-  }, []);
+  }, [isOpen]); // refresh saat cart dibuka
 
   const updateQuantity = async (cartId, newQuantity) => {
-    if (newQuantity < 1) return;
+    if (newQuantity < 1) {
+      await handleRemoveItem(cartId);
+      return;
+    }
     try {
       await instance.patch(`/update/cart/${cartId}`, { quantity: newQuantity });
       setCartItems((prev) =>
@@ -49,201 +60,167 @@ const Cart = () => {
     }
   };
 
-  const handleSelectItem = (cartId) => {
-    setSelectedItems((prev) =>
-      prev.includes(cartId)
-        ? prev.filter((id) => id !== cartId)
-        : [...prev, cartId]
-    );
-  };
-
   const calculateSubtotal = () => {
-    const filteredItems = cartItems.filter((item) =>
-      selectedItems.includes(item.id)
-    );
-    return filteredItems.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+    return cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
   };
 
   const handleRemoveItem = async (id) => {
     try {
       await instance.delete(`/delete/cart/${id}`);
-      setCartItems((prev) => prev.filter((item) => item.id !== id));
+      const updated = cartItems.filter((item) => item.id !== id);
+      setCartItems(updated);
       dispatch(removeFromCart(id));
-      const newItemCount = cartItems.filter((item) => item.id !== id).length;
-      dispatch(setItemCount(newItemCount));
+      dispatch(setItemCount(updated.length));
     } catch (error) {
       console.error("Gagal menghapus item:", error);
     }
   };
 
-  const handleCheckout = async (method) => {
-    // Filter cart items yang dipilih
-    const selectedData = cartItems.filter((item) =>
-      selectedItems.includes(item.id)
-    );
-
-    if (selectedData.length === 0) {
-      alert("Pilih produk terlebih dahulu.");
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) {
+      alert("Keranjang kosong.");
       return;
     }
 
-    // Pastikan shippingMethod yang dipilih digunakan
-    if (!method) {
-      alert("Pilih metode pengiriman terlebih dahulu.");
-      return;
-    }
+    setLoadingCheckout(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     try {
       const res = await instance.post("/checkout", {
-        shipping_method: method, // Kirimkan metode pengiriman yang dipilih
-        items: selectedData,
+        items: cartItems,
       });
 
-      console.log("Pesanan berhasil dibuat!", res.data);
+      handleCloseDrawer();
       navigate(`/shipping/form/${res.data.order_id}`);
     } catch (err) {
       console.error("Gagal melanjutkan pembayaran:", err);
       alert("Terjadi kesalahan saat melanjutkan pembayaran.");
+    } finally {
+      setLoadingCheckout(false); // Sembunyikan loading indikator
     }
   };
 
-  const handleSelectMethod = async (method) => {
-    setShippingMethod(method);
-    handleClose(); // tutup modal
-    await handleCheckout(method); // langsung checkout setelah pilih metode
-  };
-
-  // Checkout tetap dipicu user manual, lewat tombol
+  // const handleSelectMethod = async (method) => {
+  //   setShippingMethod(method);
+  //   handleClose();
+  //   await handleCheckout(method);
+  // };
 
   return (
-    <section
-      className={`mx-[75px] mt-10 space-y-6 ${
-        cartItems?.length === 0
-          ? "justify-center items-center min-h-screen"
-          : ""
-      }`}
-    >
-      <h1 className="font-extrabold text-black text-3xl">Keranjang Anda</h1>
-      {Array.isArray(cartItems) && cartItems.length > 0 ? (
-        <>
-          <div className="flex gap-10">
-            <div className="max-w-[730px] w-full">
-              {cartItems
-                .filter((item) => item.id)
-                .map((item, index) => (
-                  <div key={index} className="mb-4">
-                    <div
-                      onClick={() => handleSelectItem(item.id)}
-                      className={`flex items-start border rounded-lg gap-4 p-4 mr-4 cursor-pointer transition-all duration-300 ${
-                        selectedItems.includes(item.id)
-                          ? "shadow-md border-blue-400 border bg-blue-100/40"
-                          : "hover:shadow-md hover:border-black hover:bg-blue-100/20"
+    <>
+      {/* Overlay */}
+      <div
+        className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ${
+          isOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+        onClick={() => dispatch(closeDrawer())}
+      />
+
+      {/* Drawer */}
+      <div
+        className={`fixed top-0 right-0 z-[100] h-full w-full max-w-[500px] bg-white shadow-lg transform transition-transform duration-300 ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        } flex flex-col`}
+      >
+        <button
+          className="flex justify-end items-center px-6 py-7"
+          onClick={handleCloseDrawer}
+        >
+          <TfiClose className="text-lg" />
+        </button>
+
+        {cartItems && cartItems.length > 0 ? (
+          <>
+            <div className="flex-1 overflow-y-auto pb-5  px-10 space-y-4">
+              {cartItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-start gap-4 mb-10 rounded-lg transition"
+                >
+                  <div className="h-[90px] w-[90px] flex-shrink-0">
+                    <CardImage
+                      image={`${import.meta.env.VITE_BACKEND_URL}${
+                        item.image_url
                       }`}
-                    >
-                      <div className="h-[140px] w-[190px]">
-                        <CardImage
-                          image={`${import.meta.env.VITE_BACKEND_URL}${
-                            item.image_url
-                          }`}
-                          alt={item.name}
+                      alt={item.name}
+                    />
+                  </div>
+                  <div className="flex flex-col  justify-between w-full h-[110px]">
+                    <p className="font-bold max-w-[250px]">{item.name}</p>
+
+                    <p className="text-sm">{item.size}</p>
+
+                    <div className="flex justify-between items-end mt-auto">
+                      <div className="border-b-2 border-black px-2">
+                        <QuantitySelector
+                          quantity={item.quantity}
+                          onIncrease={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                          onDecrease={() =>
+                            updateQuantity(item.id, item.quantity - 1)
+                          }
                         />
                       </div>
-                      <div className="h-[140px] flex flex-col py-5 w-full justify-between">
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <p className="text-gray-400/80">{item.category}</p>
-                            <div className="flex items-center">
-                              <IoHeartCircle className="text-2xl cursor-pointer hover:scale-110 transition-transform" />
-                              <IoIosCloseCircle
-                                className="text-2xl cursor-pointer hover:scale-110 transition-transform"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleRemoveItem(item.id);
-                                }}
-                              />
-                            </div>
-                          </div>
-                          <p className="font-bold text-lg">{item.name}</p>
-                          <p className="mt-0">Ukuran: {item.size}</p>
-                        </div>
-                        <div className="flex items-end justify-between mt-auto">
-                          <QuantitySelector
-                            quantity={item.quantity}
-                            onIncrease={() =>
-                              updateQuantity(item.id, item.quantity + 1)
-                            }
-                            onDecrease={() =>
-                              updateQuantity(item.id, item.quantity - 1)
-                            }
-                          />
-                          <p className="font-bold text-base">
-                            IDR {Number(item.price).toLocaleString("id-ID")}
-                          </p>
-                        </div>
-                      </div>
+                      <p className="font-medium">
+                        IDR {Number(item.price).toLocaleString("id-ID")}
+                      </p>
                     </div>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
-
-            <div className="w-full max-w-sm">
-              <h1 className="font-semibold text-xl mb-4">Ringkasan pesanan</h1>
-              <div className="flex justify-between">
-                <p>Subtotal</p>
-                IDR{" "}
-                {selectedItems.length > 0
-                  ? (calculateSubtotal() || 0).toLocaleString("id-ID")
-                  : "0"}
+            <div className="border-t py-6 mx-10 ">
+              <div className="space-y-2">
+                <div className="flex font-semibold justify-between">
+                  <p>Subtotal</p>
+                  <p>
+                    IDR {calculateSubtotal().toLocaleString("id-ID") || "0"}
+                  </p>
+                </div>
+                <p className="text-sm text-gray-500">
+                  Biaya pengiriman & admin dihitung di halaman pembayaran.
+                </p>
+                <button
+                  onClick={handleCheckout}
+                  disabled={loadingCheckout}
+                  className={`w-full rounded-lg py-2 mt-4 transition 
+    ${
+      loadingCheckout
+        ? "bg-gray-300 text-gray-700 opacity-50 cursor-not-allowed"
+        : "bg-black text-white"
+    }`}
+                >
+                  {loadingCheckout ? (
+                    <CircularProgress size={17} color="inherit" />
+                  ) : (
+                    "Beli Sekarang"
+                  )}
+                </button>
               </div>
-
-              <p className="mt-10 text-sm text-graytext">
-                Biaya pengiriman, biaya admin, promo akan dihitung di halaman
-                pembayaran.
-              </p>
-              <div className="border-b mt-5"></div>
-              <div className="flex mt-5 justify-between">
-                <p>Total</p>
-                IDR{" "}
-                {selectedItems.length > 0
-                  ? (calculateSubtotal() || 0).toLocaleString("id-ID")
-                  : "0"}
-              </div>
-              <button
-                onClick={handleOpen}
-                className="bg-black text-white w-full py-2 rounded-lg mt-5"
-              >
-                Beli sekarang
-              </button>
-              <ModalSelectMethod
-                open={openModal}
-                handleClose={handleClose}
-                onSelectMethod={handleSelectMethod} // Panggil handleSelectMethod untuk memilih metode
-              />
             </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full p-10">
+            <img
+              src="/images/emptycart.svg"
+              alt="Empty"
+              className="w-64 mb-6"
+            />
+            <p className="text-center text-lg font-semibold">
+              Oops, keranjang Anda masih kosong.
+            </p>
+            <Link
+              to="/product"
+              className="mt-6 bg-black text-white px-6 py-3 rounded-lg hover:bg-opacity-80 transition"
+              onClick={handleCloseDrawer}
+            >
+              Lanjut Belanja
+            </Link>
           </div>
-        </>
-      ) : (
-        <div className="flex flex-col mx-auto items-center justify-center text-center">
-          <img
-            className="w-72 mx-auto mt-10"
-            src="/images/emptycart.svg"
-            alt="empty cart"
-          />
-          <p className="mt-10 font-semibold text-center">
-            Oops, keranjang Anda masih kosong. <br /> Yuk, mulai belanja!
-          </p>
-          <Link
-            to="/product"
-            className="bg-black text-sm text-white px-6 mt-10 py-3 hover:bg-black/80 hover:-translate-y-1 duration-500 rounded-md"
-          >
-            Lanjut Belanja
-          </Link>
-        </div>
-      )}
-    </section>
+        )}
+      </div>
+    </>
   );
 };
 

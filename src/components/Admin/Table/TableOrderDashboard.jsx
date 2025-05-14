@@ -85,11 +85,7 @@ const TableOrderDashboard = () => {
                     {order.user_name}
                   </p>
                 </td>
-                <td className="p-4 border-t border-blue-gray-50">
-                  <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                    {order.shipping_method}
-                  </p>
-                </td>
+
                 {/* <td className="p-4 border-t border-blue-gray-50">
                   <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
                     {formatDate(order.selected_date)}

@@ -9,6 +9,7 @@ import {
   CiMap,
   CiUser,
   CiLogout,
+  CiCircleQuestion,
   CiShoppingTag,
   CiChat1,
 } from "react-icons/ci";
@@ -24,7 +25,8 @@ import { fetchCartItemCount } from "../redux/cartSlice";
 import { resetWishlist } from "../redux/wishlistSlice";
 import { resetCart } from "../redux/cartSlice";
 import { fetchWishlist } from "../redux/wishlistSlice";
-export default function NavBar({ handleOpenModal }) {
+import { openDrawer } from "../redux/cartDrawer";
+export default function NavBar({ handleOpenModal, handleSearchOpen }) {
   const dispatch = useDispatch();
   const itemCount = useSelector((state) => state.cart.itemCount);
 
@@ -178,72 +180,25 @@ export default function NavBar({ handleOpenModal }) {
             </div>
           </div>
         </div>
-        <ul className="lg:items-center gap-7 items-baseline lg:px-5 lg:py-4 lg:rounded-full justify-start lg:flex lg:space-x-1">
-          <li>
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                isActive
-                  ? "lg:font-medium font-bold text-sm md:text-sm lg:text-base lg:relative lg:shadow-[0_1px_0_0px_black] lg:shadow-b-[2px] lg:shadow-white lg:duration-200 flex items-center justify-between"
-                  : "text-hitam font-medium text-sm md:text-sm lg:text-base lg:relative lg:hover:shadow-[0_1px_0_0px_black] lg:hover:shadow-b-[2px] lg:hover:shadow-white duration-200 flex items-center justify-between"
-              }
-            >
-              <CiMap className="text-base mr-2 lg:hidden" />
-              <span className="flex-1 text-sm 2xl:text-lg">Beranda</span>{" "}
-              <MdKeyboardArrowRight className="lg:hidden text-2xl ml-2" />{" "}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/product"
-              className={({ isActive }) =>
-                isActive
-                  ? "lg:font-medium font-bold text-sm md:text-sm lg:text-base lg:relative lg:shadow-[0_1px_0_0px_black] lg:shadow-b-[2px] lg:shadow-white lg:duration-200 flex items-center justify-between"
-                  : "text-hitam font-medium text-sm md:text-sm lg:text-base lg:relative lg:hover:shadow-[0_1px_0_0px_black] lg:hover:shadow-b-[2px] lg:hover:shadow-white duration-200 flex items-center justify-between"
-              }
-            >
-              <CiMap className="text-base mr-2 lg:hidden" />
-              <span className="flex-1 text-sm 2xl:text-lg">Produk</span>{" "}
-              <MdKeyboardArrowRight className="lg:hidden text-2xl ml-2" />{" "}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/tentang"
-              className={({ isActive }) =>
-                isActive
-                  ? "lg:font-medium font-bold text-sm md:text-sm lg:text-base lg:relative lg:shadow-[0_1px_0_0px_black] lg:shadow-b-[2px] lg:shadow-white lg:duration-200 flex items-center justify-between"
-                  : "text-hitam font-medium text-sm md:text-sm lg:text-base lg:relative lg:hover:shadow-[0_1px_0_0px_black] lg:hover:shadow-b-[2px] lg:hover:shadow-white duration-200 flex items-center justify-between"
-              }
-            >
-              <IoIosInformationCircleOutline className="text-base mr-2 lg:hidden" />
-              <span className="flex-1 text-sm 2xl:text-lg">Faqs</span>{" "}
-              <MdKeyboardArrowRight className="lg:hidden text-2xl ml-2" />{" "}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to="/kontak"
-              className={({ isActive }) =>
-                isActive
-                  ? "lg:font-medium font-bold text-sm md:text-sm lg:text-base lg:relative lg:shadow-[0_1px_0_0px_black] lg:shadow-b-[2px] lg:shadow-white lg:duration-200 flex items-center justify-between"
-                  : "text-hitam font-medium text-sm md:text-sm lg:text-base lg:relative lg:hover:shadow-[0_1px_0_0px_black] lg:hover:shadow-b-[2px] lg:hover:shadow-white duration-200 flex items-center justify-between"
-              }
-            >
-              <IoCallOutline className="text-base mr-2 lg:hidden" />
-              <span className="flex-1 text-sm 2xl:text-lg">Kontak</span>{" "}
-              <MdKeyboardArrowRight className="lg:hidden text-2xl ml-2" />{" "}
-            </NavLink>
-          </li>
-        </ul>
+        <div className="lg:items-center  gap-7 items-baseline lg:px-5 lg:py-4 lg:rounded-full justify-start lg:flex lg:space-x-1"></div>
 
         <div className="hidden  ml-auto space-x-2 lg:inline-block">
           <div className="hidden lg:flex items-center space-x-2 ml-auto">
-            <button className="rounded-full  px-3 py-1.5 hover:bg-gray-200/15">
-              <CiSearch className="text-2xl font-bold" />
+            <button
+              onClick={handleSearchOpen}
+              className="mr-3 flex items-center gap-2 border w-80   rounded-full hover:bg-gray-200/15  px-4 py-2 "
+            >
+              <CiSearch className="text-2xl font-bold" />{" "}
+              <span className="text-sm">Belanja sekarang...</span>
             </button>
             <Link
-              to="/checkout/cart"
+              to="/help/center"
+              className=" rounded-full hover:bg-gray-200/15  px-3 py-1.5 "
+            >
+              <CiCircleQuestion className="text-2xl font-bold" />{" "}
+            </Link>
+            <button
+              onClick={() => dispatch(openDrawer())}
               className="relative  rounded-full hover:bg-gray-200/15  px-3 py-1.5"
             >
               <CiShoppingCart className="text-2xl" />
@@ -252,7 +207,7 @@ export default function NavBar({ handleOpenModal }) {
               <span className="absolute top-1 right-1 w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[10px]">
                 {itemCount}
               </span>
-            </Link>
+            </button>
 
             <div className="hidden  px-2 ml-auto space-x-2 lg:inline-block">
               {isLoggedIn ? (

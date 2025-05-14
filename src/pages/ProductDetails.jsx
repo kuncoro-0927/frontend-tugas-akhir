@@ -80,6 +80,7 @@ const ProductDetails = () => {
         addToCart({
           product_id: product.id,
           name: product.name,
+          weight: product.weight,
           quantity,
         })
       );

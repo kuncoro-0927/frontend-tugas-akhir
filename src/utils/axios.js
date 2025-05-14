@@ -49,8 +49,6 @@ instance.interceptors.response.use(
         document.cookie =
           "user_refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
 
-        alert("Session expired. Please login again.");
-
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

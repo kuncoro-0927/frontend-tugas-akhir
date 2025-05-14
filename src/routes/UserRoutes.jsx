@@ -1,12 +1,15 @@
 import { Routes, Route, useLocation } from "react-router-dom";
-import Home from "../pages/Home";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import Home from "../pages/Home";
 import NavBar from "../components/Navbar";
 import AuthModal from "../pages/auth/AuthModal";
 import Footer from "../components/Footer";
 import Product from "../pages/Product";
+import Faqs from "../pages/Faqs";
+import Contact from "../pages/Contact";
 import ProductDetails from "../pages/ProductDetails";
-import Cart from "../pages/Cart";
 import Profile from "../pages/account/Profile";
 import ShippingForm from "../pages/ShippingForm";
 import OngkirChecker from "../pages/TesOngkir";
@@ -15,18 +18,18 @@ import Order from "../pages/account/Order";
 import Wishlist from "../pages/account/Wishlist";
 import Review from "../pages/account/Review";
 import PaymentSuccess from "../pages/PaymentSuccess";
+import Cart from "../pages/Cart";
+import FloatingButton from "../components/FloatingButton";
+import ModalSearch from "../components/Modal/ModalSearch";
 function UserRoutes() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState("login");
 
-  const handleOpenModal = (content) => {
-    setModalContent(content); // Mengubah konten modal
-    setIsModalOpen(true); // Membuka modal
-  };
+  const [isSearchOpen, setIsSearchOpen] = useState(false); // 🔍 modal pencarian
 
-  const handleCloseModal = () => setIsModalOpen(false);
-
-  const location = useLocation();
+  const isCartDrawerOpen = useSelector((state) => state.cart.isDrawerOpen);
 
   const isAuthPage =
     location.pathname === "/login" ||
@@ -37,39 +40,74 @@ function UserRoutes() {
 
   const isAccountPage = location.pathname.startsWith("/account");
 
-  const shouldShowNavBar = !isAuthPage;
   const isShippingOrPayment =
     location.pathname.startsWith("/shipping/form") ||
-    location.pathname.startsWith("/tes/payment");
-  location.pathname.startsWith("/payment/success/:orderId");
+    location.pathname.startsWith("/checkouts/payment");
 
+  const shouldShowNavBar = !isAuthPage && !isShippingOrPayment;
   const shouldShowFooter =
     !isAuthPage && !isAccountPage && !isShippingOrPayment;
 
+  const handleOpenModal = (content) => {
+    setModalContent(content);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => setIsModalOpen(false);
+
+  const handleSearchOpen = () => setIsSearchOpen(true);
+  const handleSearchClose = () => setIsSearchOpen(false);
+
+  const handleItemSelect = (item) => {
+    // Jika kamu mau redirect ke detail/daerah di sini
+    navigate(`/product/details/${item.id}`);
+    handleSearchClose();
+  };
+
   return (
     <>
-      {/* <NavBar handleOpenModal={handleOpenModal} /> */}
-      {shouldShowNavBar && <NavBar handleOpenModal={handleOpenModal} />}
+      {!isShippingOrPayment && !isCartDrawerOpen && (
+        <FloatingButton onClick={handleSearchOpen} />
+      )}
+
+      <Cart />
+
+      {shouldShowNavBar && (
+        <NavBar
+          handleOpenModal={handleOpenModal}
+          handleSearchOpen={handleSearchOpen} // 🔍 kirim ke NavBar kalau mau pencarian dari sana
+        />
+      )}
 
       <AuthModal
         open={isModalOpen}
         handleClose={handleCloseModal}
         initialContent={modalContent}
       />
+
+      {/* 🔍 ModalSearch selalu aktif */}
+      <ModalSearch
+        isOpen={isSearchOpen}
+        handleClose={handleSearchClose}
+        onSelect={handleItemSelect}
+      />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/product" element={<Product />} />
-        <Route path="/product/details/:id" element={<ProductDetails />} />
+        <Route path="/help/center" element={<Faqs />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/product/detail/:id" element={<ProductDetails />} />
         <Route path="/account/profile" element={<Profile />} />
         <Route path="/account/order" element={<Order />} />
         <Route path="/account/wishlist" element={<Wishlist />} />
         <Route path="/account/review" element={<Review />} />
         <Route path="/payment/success/:order_id" element={<PaymentSuccess />} />
-        <Route path="/checkout/cart" element={<Cart />} />
         <Route path="/shipping/form/:orderId" element={<ShippingForm />} />
         <Route path="/tes/ongkir" element={<OngkirChecker />} />
-        <Route path="/tes/payment/:orderId" element={<PaymentPage />} />
+        <Route path="/checkouts/payment/:orderId" element={<PaymentPage />} />
       </Routes>
+
       {shouldShowFooter && <Footer />}
     </>
   );

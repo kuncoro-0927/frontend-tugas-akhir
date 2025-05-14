@@ -1,14 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { FaRegCircleUser } from "react-icons/fa6";
+import { Link } from "react-router-dom";
+import { MuiTelInput } from "mui-tel-input";
+import { useDispatch } from "react-redux";
+import { CiShoppingCart } from "react-icons/ci";
 import { setCheckoutItems } from "../redux/checkoutSlice";
 import { useParams, useNavigate } from "react-router-dom";
 import { instance } from "../utils/axios";
 import CardImage from "../components/Card/CardImage";
 import debounce from "lodash.debounce";
 import FormInput from "../components/TextField";
-import CheckoutStepper from "../components/Stepper";
+import { openDrawer } from "../redux/cartDrawer";
 const ShippingForm = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
@@ -16,9 +18,7 @@ const ShippingForm = () => {
   const dispatch = useDispatch();
   const [orderDetails, setOrderDetails] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
-  const [provinces, setProvinces] = useState([]);
-  const [filteredProvinces, setFilteredProvinces] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+
   const [destinationResults, setDestinationResults] = useState([]);
   const [loadingOngkir, setLoadingOngkir] = useState(false);
   const originCityId = 40561; // Pacitan
@@ -26,9 +26,7 @@ const ShippingForm = () => {
   const [formErrors, setFormErrors] = useState({});
   const [promo, setPromo] = useState(null);
   const [promoError, setPromoError] = useState("");
-
-  const shippingMethod = useSelector((state) => state.checkout.shippingMethod);
-
+  console.log("orderdetails", orderDetails);
   const [formData, setFormData] = useState({
     firstName: "",
     lastname: "",
@@ -39,7 +37,6 @@ const ShippingForm = () => {
     city: "",
     postalCode: "",
     note: "",
-    shippingMethod: shippingMethod,
   });
 
   useEffect(() => {
@@ -135,25 +132,6 @@ const ShippingForm = () => {
 
     // Validasi nomor telepon Indonesia
     if (!formData.phone) errors.phone = "Nomor telepon wajib diisi";
-    else {
-      const cleanedPhone = formData.phone.replace(/[^\d]/g, "");
-      const phoneWithCountryCode = `+62${cleanedPhone}`;
-      const phoneRegex = /^\+62\d{9,11}$/;
-      if (!phoneRegex.test(phoneWithCountryCode)) {
-        errors.phone =
-          "Nomor telepon tidak valid, format harus +62 diikuti 9-11 digit angka.";
-      }
-    }
-
-    // Jika shipping method adalah 'delivery', tambahkan validasi alamat lengkap
-    const isPickup = orderDetails.shipping_method === "pickup";
-
-    if (!isPickup) {
-      if (!formData.address) errors.address = "Alamat wajib diisi";
-      if (!formData.province) errors.province = "Provinsi wajib diisi";
-      if (!formData.city) errors.city = "Kota wajib diisi";
-      if (!formData.postalCode) errors.postalCode = "Kode pos wajib diisi";
-    }
 
     // Jika ada error, hentikan
     if (Object.keys(errors).length > 0) {
@@ -162,24 +140,6 @@ const ShippingForm = () => {
     }
 
     setFormErrors({}); // clear errors
-
-    // Jika pickup, langsung lanjut ke payment tanpa menghitung ongkir
-    if (isPickup) {
-      dispatch(
-        setCheckoutItems({
-          shippingMethod: orderDetails.shipping_method,
-          admin_fee: orderDetails.admin_fee,
-          items: orderItems,
-          orderDetails: orderDetails,
-          formData: formData,
-          promo: promo,
-          shippingOptions: [],
-        })
-      );
-
-      navigate(`/tes/payment/${orderId}`);
-      return;
-    }
 
     // Jika delivery, pastikan city_id tersedia
     if (!formData.city_id) {
@@ -206,7 +166,6 @@ const ShippingForm = () => {
 
       dispatch(
         setCheckoutItems({
-          shippingMethod: orderDetails.shipping_method,
           admin_fee: orderDetails.admin_fee,
           orderDetails: orderDetails,
           items: orderItems,
@@ -216,7 +175,7 @@ const ShippingForm = () => {
         })
       );
 
-      navigate(`/tes/payment/${orderId}`);
+      navigate(`/checkouts/payment/${orderId}`);
     } catch (err) {
       console.error("Gagal menghitung ongkir:", err);
       alert("Gagal menghitung ongkir. Silakan coba lagi.");
@@ -225,65 +184,26 @@ const ShippingForm = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchProvinces = async () => {
-      try {
-        const response = await instance.get("/provinces");
-        setProvinces(response.data.data);
-      } catch (error) {
-        console.error("Gagal mengambil provinsi:", error);
-      }
-    };
-
-    fetchProvinces();
-  }, []);
-
-  const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-
-    const filtered = provinces.filter((province) =>
-      province.name.toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredProvinces(filtered);
-  };
-
-  const handleSelectProvince = (provinceCode) => {
-    setFormData({
-      ...formData,
-      province: provinceCode,
-    });
-    setSearchQuery("");
-    setFilteredProvinces([]);
-  };
-
-  const handleClearSelection = () => {
-    setFormData({
-      ...formData,
-      province: "",
-    });
-    setSearchQuery("");
-    setFilteredProvinces([]);
-  };
-
-  const selectedProvince = provinces.find(
-    (province) => province.code === formData.province
-  );
-
   return (
-    <section className="mx-[75px] h-screen space-y-6">
-      <div className="flex  justify-between items-start gap-6">
+    <section className=" h-screen ">
+      <div className="border-b flex items-center justify-between px-[75px] py-4">
+        <Link to="/">
+          <img className="w-10" src="/logoindex.svg" alt="" />
+        </Link>
+        <button
+          onClick={() => dispatch(openDrawer())}
+          className="relative  rounded-full hover:bg-gray-200/15  px-3 py-1.5"
+        >
+          <CiShoppingCart className="text-3xl" />
+        </button>
+      </div>
+      <div className="flex mx-[75px] justify-between items-start gap-6">
         {/* Kiri: Info User + Form */}
         <div className="max-w-[600px] h-full my-10 overflow-y-auto w-full">
-          <h1 className="font-extrabold text-3xl">
-            {orderDetails?.shipping_method === "pickup"
-              ? "Formulir Penjemputan"
-              : "Lengkapi Alamat Penerima"}
-          </h1>
+          <h1 className="font-extrabold text-3xl">Lengkapi Alamat Penerima</h1>
           <p className="mt-2">
-            {orderDetails?.shipping_method === "pickup"
-              ? "Mohon isi data kontak agar kami bisa menginformasikan waktu penjemputan."
-              : "Mohon isi alamat lengkap untuk pengiriman barang ke tempat yang tepat. Pastikan data yang dimasukkan benar dan sesuai."}
+            Mohon isi alamat lengkap untuk pengiriman barang ke tempat yang
+            tepat. Pastikan data yang dimasukkan benar dan sesuai.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5  w-full mt-6">
@@ -324,114 +244,83 @@ const ShippingForm = () => {
                 />
               </div>
             </div>
-            {orderDetails?.shipping_method === "delivery" && (
-              <>
-                <div>
-                  <FormInput
-                    type="text"
-                    name="address"
-                    value={formData.address || ""}
-                    onChange={handleChange}
-                    label="Alamat Lengkap"
-                    error={!!formErrors.address}
-                    helperText={formErrors.address}
-                  />
-                </div>
-                <div>
-                  <FormInput
-                    type="text"
-                    name="city"
-                    value={formData.city || ""}
-                    onChange={handleChange}
-                    label="Kota/Kabupaten"
-                    error={!!formErrors.city}
-                    helperText={formErrors.city}
-                  />
-
-                  {[
-                    ...new Map(
-                      destinationResults
-                        .filter((city) =>
-                          city.city_name
-                            .toLowerCase()
-                            .startsWith(formData.city.toLowerCase())
-                        )
-                        .map((item) => [item.city_name, item])
-                    ).values(),
-                  ].map((city) => {
-                    const formattedCity =
-                      city.city_name.charAt(0).toUpperCase() +
-                      city.city_name.slice(1).toLowerCase();
-
-                    return (
-                      <p
-                        key={city.id}
-                        onClick={() => handleSelectCity(city)}
-                        className="px-4 py-2 hover:bg-gray-200/40  cursor-pointer border border-gray-400 rounded-sm max-h-60 overflow-y-auto mt-1"
-                      >
-                        {formattedCity}
-                      </p>
-                    );
-                  })}
-                </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <div className="relative">
-                      <FormInput
-                        type="text"
-                        name="province"
-                        value={
-                          selectedProvince
-                            ? selectedProvince.name
-                            : searchQuery || ""
-                        }
-                        onChange={handleSearchChange}
-                        label="Provinsi"
-                        error={!!formErrors.province}
-                        helperText={formErrors.province}
-                      />
-                      {selectedProvince && (
-                        <button
-                          type="button"
-                          onClick={handleClearSelection}
-                          className="absolute right-4 top-[13px] text-black"
-                        >
-                          &#10005; {/* Ikon X untuk menghapus */}
-                        </button>
-                      )}
-                    </div>
-
-                    {filteredProvinces.length > 0 && searchQuery && (
-                      <ul className="border rounded-md max-h-60 overflow-y-auto mt-1">
-                        {filteredProvinces.map((province) => (
-                          <li
-                            key={province.code}
-                            onClick={() => handleSelectProvince(province.code)}
-                            className="p-2 cursor-pointer hover:bg-gray-200"
-                          >
-                            {province.name}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-
-                  <div>
-                    <FormInput
-                      type="text"
-                      label="Kode Pos"
-                      name="postalCode"
-                      value={formData.postalCode || ""}
-                      onChange={handleChange}
-                      error={!!formErrors.postalCode}
-                      helperText={formErrors.postalCode}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
             <div>
               <FormInput
+                type="text"
+                name="address"
+                value={formData.address || ""}
+                onChange={handleChange}
+                label="Alamat Lengkap"
+                error={!!formErrors.address}
+                helperText={formErrors.address}
+              />
+            </div>
+            <div>
+              <FormInput
+                type="text"
+                name="city"
+                value={formData.city || ""}
+                onChange={handleChange}
+                label="Kota/Kabupaten"
+                error={!!formErrors.city}
+                helperText={formErrors.city}
+              />
+
+              {[
+                ...new Map(
+                  destinationResults
+                    .filter((city) =>
+                      city.city_name
+                        .toLowerCase()
+                        .startsWith(formData.city.toLowerCase())
+                    )
+                    .map((item) => [item.city_name, item])
+                ).values(),
+              ].map((city) => {
+                const formattedCity =
+                  city.city_name.charAt(0).toUpperCase() +
+                  city.city_name.slice(1).toLowerCase();
+
+                return (
+                  <p
+                    key={city.id}
+                    onClick={() => handleSelectCity(city)}
+                    className="px-4 py-2 hover:bg-gray-200/40  cursor-pointer border border-gray-400 rounded-sm max-h-60 overflow-y-auto mt-1"
+                  >
+                    {formattedCity}
+                  </p>
+                );
+              })}
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <div className="relative">
+                  <FormInput
+                    type="text"
+                    name="province"
+                    value={formData.province}
+                    onChange={handleChange}
+                    label="Provinsi"
+                    error={!!formErrors.province}
+                    helperText={formErrors.province}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <FormInput
+                  type="text"
+                  label="Kode Pos"
+                  name="postalCode"
+                  value={formData.postalCode || ""}
+                  onChange={handleChange}
+                  error={!!formErrors.postalCode}
+                  helperText={formErrors.postalCode}
+                />
+              </div>
+            </div>
+            <div>
+              {/* <FormInput
                 type="tel"
                 name="phone"
                 label="Nomor Telepon"
@@ -439,6 +328,69 @@ const ShippingForm = () => {
                 onChange={handleChange}
                 error={!!formErrors.phone}
                 helperText={formErrors.phone}
+              /> */}
+              <MuiTelInput
+                value={formData.phone}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, phone: value }))
+                }
+                fullWidth
+                label="Nomor Telepon"
+                size="small"
+                helperText={formErrors.phone}
+                error={!!formErrors.phone}
+                defaultCountry="ID"
+                InputLabelProps={{
+                  sx: {
+                    fontSize: "0.78rem",
+                    pointerEvents: "none",
+                  },
+                }}
+                InputProps={{
+                  sx: {
+                    "& input": {
+                      fontSize: "0.87rem",
+                      lineHeight: "2.2",
+                      transition: "transform 0.2s ease",
+                    },
+                  },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    height: "49px",
+                    fontSize: "1rem",
+                    color: "black !important",
+                    "& fieldset": {
+                      borderWidth: "0.3px !important",
+                      borderColor: "gray !important",
+                    },
+                    "&:hover fieldset": {
+                      borderWidth: "0.5px !important",
+                      borderColor: "black !important",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderWidth: "1.5px !important",
+                      borderColor: "black !important",
+                    },
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "black !important",
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "gray !important",
+                  },
+                  "& .MuiInputLabel-root.MuiInputLabel-shrink": {
+                    fontSize: "1rem",
+                    color: "black !important",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    fontSize: "1rem",
+                    color: "black !important",
+                  },
+                  "& .MuiOutlinedInput-input": {
+                    marginTop: 0,
+                  },
+                }}
               />
             </div>
             <button
@@ -520,36 +472,22 @@ const ShippingForm = () => {
                 </span>
               </div>
 
-              {orderDetails?.shipping_method === "delivery" && (
-                <>
-                  <div className="flex mt-2 justify-between">
-                    <p>Biaya admin</p>
-                    <span>
-                      {orderDetails?.admin_fee != null
-                        ? `IDR ${Number(orderDetails.admin_fee).toLocaleString(
-                            "id-ID",
-                            {
-                              minimumFractionDigits: 2,
-                            }
-                          )}`
-                        : "Loading..."}
-                    </span>
-                  </div>
-
-                  <div className="flex mt-2 justify-between">
-                    <p>Biaya pengiriman</p>
-                    <span>
-                      {orderDetails?.shipping_cost != null
-                        ? `IDR ${Number(
-                            orderDetails.shipping_cost
-                          ).toLocaleString("id-ID", {
+              <>
+                <div className="flex mt-2 justify-between">
+                  <p>Biaya admin</p>
+                  <span>
+                    {orderDetails?.admin_fee != null
+                      ? `IDR ${Number(orderDetails.admin_fee).toLocaleString(
+                          "id-ID",
+                          {
                             minimumFractionDigits: 2,
-                          })}`
-                        : "IDR 0"}
-                    </span>
-                  </div>
-                </>
-              )}
+                          }
+                        )}`
+                      : "Loading..."}
+                  </span>
+                </div>
+              </>
+
               {promoError && (
                 <p className="text-red-500 text-sm mt-1">{promoError}</p>
               )}

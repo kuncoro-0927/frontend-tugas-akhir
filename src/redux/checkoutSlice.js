@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  shippingMethod: null, // Metode pengiriman
   items: [], // Produk yang dipilih
   formData: null, // Form pengiriman user (alamat, dsb)
   shippingOptions: [], // Hasil ongkir dari API
@@ -16,7 +15,6 @@ const checkoutSlice = createSlice({
   reducers: {
     // Set data untuk checkout
     setCheckoutItems: (state, action) => {
-      state.shippingMethod = action.payload.shippingMethod; // Metode pengiriman
       state.items = action.payload.items; // Produk yang dipilih
       state.formData = action.payload.formData; // Data form pengiriman
       state.promo = action.payload.promo; // Info promo
@@ -36,7 +34,6 @@ const checkoutSlice = createSlice({
 
     // Clear semua data checkout (reset)
     clearCheckout: (state) => {
-      state.shippingMethod = null;
       state.items = [];
       state.formData = null;
       state.promo = null;
@@ -48,11 +45,6 @@ const checkoutSlice = createSlice({
     // Clear data promo
     clearPromo: (state) => {
       state.promo = null; // Reset promo
-    },
-
-    // Action untuk menyimpan metode pengiriman
-    setShippingMethod: (state, action) => {
-      state.shippingMethod = action.payload; // Simpan metode pengiriman
     },
 
     // Action untuk menyimpan data produk yang dipilih dari Cart
@@ -78,7 +70,6 @@ export const {
   setOrderItems,
   clearCheckout,
   clearPromo,
-  setShippingMethod,
   setCartItems,
   setFormData,
   setShippingOptions,

@@ -1,13 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { instanceAdmin } from "../../../utils/axiosAdmin";
-import { showSnackbar } from "../../CustomSnackbar";
 import { IoClose } from "react-icons/io5";
-import FormInput from "../../TextField";
-import { IoImageOutline } from "react-icons/io5";
+import FormInput from "../../../TextField";
 import { Modal, Box, Button } from "@mui/material";
-
-const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
-  const [categories, setCategories] = useState([]);
+import { instanceAdmin } from "../../../../utils/axiosAdmin";
+import { showSnackbar } from "../../../CustomSnackbar";
+import { IoImageOutline } from "react-icons/io5";
+const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -16,28 +15,20 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
     size: "",
     weight: "",
   });
+  const [oldImageUrl, setOldImageUrl] = useState("");
+
+  const [categories, setCategories] = useState([]);
   const [image, setImage] = useState(null);
   const [imageInfo, setImageInfo] = useState({
     name: "",
     size: 0,
   });
-
+  // Handle form data change
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      setImageInfo({
-        name: file.name,
-        size: file.size,
-      });
-    }
   };
 
   const handleRemoveImage = () => {
@@ -48,42 +39,91 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
     });
     document.getElementById("imageUpload").value = ""; // Mengosongkan input file
   };
+  const fetchProductDetails = async () => {
+    try {
+      const res = await instanceAdmin.get(`/product/${productId}`);
+      const product = res.data.data; // <== penting!
+      console.log("data res", product);
+      setFormData({
+        name: product.name || "",
+        description: product.description || "",
+        price: product.price || "",
+        category: product.category_id || "",
+        size: product.size || "",
+        weight: product.weight_gram || "",
+      });
+      setOldImageUrl(product.image_url || "");
+    } catch (err) {
+      console.error("Failed to fetch product details", err);
+    }
+  };
 
+  // Fetch categories for select
+  const fetchCategories = async () => {
+    try {
+      const res = await instanceAdmin.get("/all/category");
+      setCategories(res.data.categories);
+    } catch (err) {
+      console.error("Failed to fetch categories", err);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Product ID:", productId); // <== tambahkan ini
+    if (open) {
+      fetchProductDetails();
+      fetchCategories();
+    } else {
+      // Reset form ketika modal ditutup
+      setFormData({
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        size: "",
+        weight: "",
+      });
+      setImage(null);
+    }
+  }, [open]);
+
+  // Handle image change
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  // Handle product update
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const data = new FormData();
       for (const key in formData) {
         data.append(key, formData[key]);
       }
-      if (image) data.append("image", image); // Menambahkan image ke FormData
+      if (image) data.append("image", image);
 
-      const res = await instanceAdmin.post("/create/product", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      console.log("Produk berhasil:", res.data);
-      showSnackbar("Produk berhasil ditambahkan", "success");
+      const res = await instanceAdmin.put(
+        `/update/product/${productId}`,
+        data,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      console.error(res);
+
+      showSnackbar("Produk berhasil diperbarui", "success");
       handleClose();
       onUpdate();
     } catch (err) {
-      console.error("Gagal:", err.message);
-      showSnackbar("Gagal menambahkan produk", "error");
+      console.error("Failed to update product", err);
+      console.error(
+        "Failed to update product",
+        err.response?.data || err.message
+      );
+
+      showSnackbar("Gagal memperbarui produk", "error");
     }
   };
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await instanceAdmin.get("/all/category");
-        setCategories(res.data.categories);
-      } catch (err) {
-        console.error("Gagal mengambil kategori:", err);
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   return (
     <Modal
@@ -127,7 +167,7 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
               <IoClose />
             </button>
             <div className="px-5 pb-2">
-              <h2 className="text-2xl font-bold text-hitam2">Tambah Produk</h2>
+              <h2 className="text-2xl font-bold">Edit Produk</h2>
             </div>
           </div>
           <div className="mx-5 mt-5 mb-7">
@@ -136,13 +176,13 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
               Isi detail produk agar mudah dikenali dan menarik bagi pelanggan.
             </p>
           </div>
-
           <form className="px-6 mt-5 pb-6" onSubmit={handleSubmit}>
             <div className="grid gap-4">
               <FormInput
                 name="name"
                 type="text"
                 label="Nama Produk"
+                value={formData.name}
                 onChange={handleChange}
               />
               <div className="flex gap-5">
@@ -150,6 +190,7 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                   name="category"
                   type="select"
                   label="Kategori"
+                  value={formData.category}
                   onChange={handleChange}
                   options={categories.map((cat) => ({
                     value: cat.id,
@@ -161,6 +202,7 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                   type="text"
                   helperText="Contoh: 100000 untuk Rp100.000"
                   label="Harga"
+                  value={formData.price}
                   onChange={handleChange}
                 />
               </div>
@@ -168,6 +210,7 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                 name="description"
                 type="text"
                 label="Deskripsi"
+                value={formData.description}
                 onChange={handleChange}
               />
               <div className="flex gap-5">
@@ -176,13 +219,15 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                   type="text"
                   helperText="Ukuran dalam cm, contoh: 40 x 50"
                   label="Ukuran"
+                  value={formData.size}
                   onChange={handleChange}
                 />
                 <FormInput
                   name="weight"
                   type="text"
+                  label="Berat (gram)"
                   helperText="Berat (gram), contoh: 1000 untuk 1kg"
-                  label="Berat / gram"
+                  value={formData.weight}
                   onChange={handleChange}
                 />
               </div>
@@ -232,16 +277,30 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                 onChange={handleImageChange}
                 className="hidden"
               />
+              {/* Jika belum memilih gambar baru, tampilkan gambar lama */}
+              {!image && oldImageUrl && (
+                <div className="mt-3">
+                  <p className="text-base text-graytext  mr-auto">
+                    Gambar saat ini:
+                  </p>
+                  <div className="mt-3 border border-black rounded-md border-dashed flex flex-col items-center p-4 justify-center">
+                    <img
+                      src={`${import.meta.env.VITE_BACKEND_URL}${oldImageUrl}`}
+                      alt="Gambar Lama"
+                      className="w-32 h-auto mt-1 rounded-md shadow"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
-
-            <div className="text-right mt-5 ">
+            <div className="text-right mt-10 ">
               <button
                 type="submit"
                 className="bg-black px-4 py-2 text-white rounded-md hover:bg-black/80 duration-300"
                 variant="contained"
                 color="primary"
               >
-                Submit
+                Perbarui
               </button>
             </div>
           </form>
@@ -251,4 +310,4 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
   );
 };
 
-export default ModalCreateProduct;
+export default ModalEditProduct;

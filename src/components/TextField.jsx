@@ -45,7 +45,9 @@ export default function FormInput({
       <TextField
         fullWidth
         select={type === "select"}
-        type={type !== "select" ? type : undefined}
+        multiline={type === "textarea"} // tambahkan ini
+        rows={type === "textarea" ? 4 : 1} // default 4 baris
+        type={type !== "select" && type !== "textarea" ? type : undefined}
         label={label}
         variant="outlined"
         name={name}
@@ -74,7 +76,7 @@ export default function FormInput({
         }}
         sx={{
           "& .MuiOutlinedInput-root": {
-            height: "49px",
+            height: type === "textarea" ? "auto" : "49px", // auto height untuk textarea
             fontSize: "1rem",
             color: "black !important",
             "& fieldset": {
@@ -98,9 +100,11 @@ export default function FormInput({
           },
           "& .MuiInputLabel-root.MuiInputLabel-shrink": {
             fontSize: "1rem",
+            color: "black !important",
           },
           "& .MuiInputLabel-root.Mui-focused": {
             fontSize: "1rem",
+            color: "black !important",
           },
           "& .MuiOutlinedInput-input": {
             marginTop: 0,

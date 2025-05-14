@@ -1,38 +1,38 @@
 import { Modal, Box, Button } from "@mui/material";
 import { IoClose, IoWarningOutline } from "react-icons/io5";
-import { instanceAdmin } from "../../../utils/axiosAdmin";
-import { showSnackbar } from "../../CustomSnackbar";
+import { instanceAdmin } from "../../../../utils/axiosAdmin";
+import { showSnackbar } from "../../../CustomSnackbar";
 import { TiWarningOutline } from "react-icons/ti";
-const ModalDeleteProduct = ({ open, handleClose, productId, onUpdate }) => {
+const ModalDeleteCategory = ({ open, handleClose, categoryId, onUpdate }) => {
   const handleDelete = async (e) => {
     e.preventDefault();
-    console.log("Mengirim request DELETE untuk productId:", productId);
+    console.log("Mengirim request DELETE untuk categoryId:", categoryId);
 
     try {
-      const res = await instanceAdmin.delete(`/delete/product/${productId}`);
+      const res = await instanceAdmin.delete(`/delete/category/${categoryId}`);
       console.log("Respon berhasil:", res.data);
 
-      showSnackbar("Produk berhasil dihapus", "success");
+      showSnackbar("Kategori berhasil dihapus", "success");
       handleClose();
       onUpdate();
     } catch (err) {
-      // Log detail error
-      console.error("Gagal menghapus produk. Detail error:");
+      console.error("Gagal menghapus kategori. Detail error:");
 
       if (err.response) {
-        // Server merespon dengan status kode di luar 2xx
         console.error("Response data:", err.response.data);
         console.error("Status code:", err.response.status);
         console.error("Headers:", err.response.headers);
-      } else if (err.request) {
-        // Request terkirim tapi tidak ada respon
-        console.error("No response received:", err.request);
-      } else {
-        // Error saat setup request
-        console.error("Error message:", err.message);
-      }
 
-      showSnackbar("Gagal menghapus produk", "error");
+        // Tampilkan pesan dari backend jika ada
+        const errorMsg = err.response.data.msg || "Gagal menghapus kategori";
+        showSnackbar(errorMsg, "error");
+      } else if (err.request) {
+        console.error("No response received:", err.request);
+        showSnackbar("Tidak ada respon dari server", "error");
+      } else {
+        console.error("Error message:", err.message);
+        showSnackbar("Terjadi kesalahan", "error");
+      }
     }
   };
 
@@ -72,7 +72,7 @@ const ModalDeleteProduct = ({ open, handleClose, productId, onUpdate }) => {
               <IoClose />
             </button>
             <div className="px-5 pb-2">
-              <h2 className="text-2xl font-bold ">Hapus Produk</h2>
+              <h2 className="text-2xl font-bold ">Hapus Kategori</h2>
             </div>
           </div>
 
@@ -107,4 +107,4 @@ const ModalDeleteProduct = ({ open, handleClose, productId, onUpdate }) => {
   );
 };
 
-export default ModalDeleteProduct;
+export default ModalDeleteCategory;

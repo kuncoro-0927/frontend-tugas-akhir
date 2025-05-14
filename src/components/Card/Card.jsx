@@ -29,35 +29,26 @@ export default function Card({
 
       {/* Bagian Konten */}
       <div className="flex justify-between items-center py-2 md:py-2 flex-grow">
-        {/* Skeleton untuk Judul */}
+        {/* Judul dengan truncate agar tidak membuat baris baru */}
         {isLoading ? (
-          <Skeleton
-            width="80%"
-            height={20}
-            className=" font-bold text-hitam2"
-          />
+          <Skeleton width="80%" height={20} />
         ) : (
           <h1
-            className="text-sm md:text-base font-bold text-hitam2"
-            title={title} // Tooltip agar bisa melihat judul lengkap saat hover
+            className="text-sm md:text-base font-bold text-hitam2 truncate max-w-[60%]"
+            title={title}
           >
             {title}
           </h1>
         )}
-        <div className="flex items-center ">
-          {/* Skeleton untuk Harga */}
-          {isLoading ? (
-            <div className="flex items-center ml-auto">
-              <Skeleton width="50%" height={20} />
-            </div>
-          ) : (
-            <div>
-              <p className="text-sm font-extrabold">IDR {price}</p>
-            </div>
-          )}
-        </div>
 
-        {/* Bagian Bawah: From dan Harga */}
+        {/* Harga tetap di kanan */}
+        {isLoading ? (
+          <Skeleton width="30%" height={20} />
+        ) : (
+          <p className="text-sm font-extrabold text-right  ml-2 whitespace-nowrap">
+            IDR {price}
+          </p>
+        )}
       </div>
 
       {isLoading ? (

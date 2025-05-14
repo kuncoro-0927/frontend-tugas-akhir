@@ -25,7 +25,7 @@ const getActiveStep = (path) => {
   if (matchPath("/shipping/form/:orderId", path)) {
     return 1; // Halaman Form
   }
-  if (matchPath("/tes/payment/:orderId", path)) {
+  if (matchPath("/checkouts/payment/:orderId", path)) {
     return 2; // Halaman Pengiriman
   }
   if (path.includes("/payment")) {
