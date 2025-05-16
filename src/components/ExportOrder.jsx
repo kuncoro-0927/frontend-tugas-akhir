@@ -127,7 +127,7 @@ export default function ExportOrdersModal({ open, onClose }) {
 
           <button
             onClick={handleExport}
-            className="mx-5 my-8 py-2 px-4 rounded-md hover:bg-black/80 duration-300 bg-black text-white "
+            className="mx-5 my-8 py-2 px-4 rounded-md hover:bg-blue-600/80 duration-300 bg-blue-600 text-white "
             disabled={loading}
           >
             {loading ? (

@@ -5,7 +5,7 @@ import SidebarAdmin from "../../components/Admin/SidebarAdmin";
 import TableOrderDashboard from "../../components/Admin/Table/TableOrderDashboard";
 import ProgressBar from "../../components/Admin/Progress/OrdersOverview";
 import { useState } from "react";
-
+import TopProduct from "../../components/Admin/Table/TopProducts";
 import TopUsers from "../../components/Admin/Table/TopUsers";
 import { IoCartOutline, IoPricetagsOutline } from "react-icons/io5";
 import { LuMountain } from "react-icons/lu";
@@ -31,6 +31,7 @@ const Dashboard = () => {
   };
 
   const [totalAmount, setTotalAmount] = useState(0);
+  const [totalProducts, setTotalProdcuts] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalAgrotourism, setTotalAgrotourism] = useState(null);
@@ -66,13 +67,26 @@ const Dashboard = () => {
 
     fetchTotalAmount();
   }, []);
+
+  const fetchTotalProducts = async () => {
+    try {
+      const response = await instanceAdmin.get("/all/products");
+      setTotalProdcuts(response.data.total);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalProducts();
+  }, []);
   const formatNumber = (number) => {
     return parseFloat(number).toLocaleString("id-ID"); // Format Indonesia
   };
 
   return (
     <>
-      <section className="flex gap-10">
+      <section className="flex pb-10 gap-10">
         <div
           className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
             isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
@@ -145,7 +159,7 @@ const Dashboard = () => {
             </div>
             <div className="flex-col items-center  p-4 border  rounded-lg ">
               <div className="flex justify-between space-x-5 mt-5">
-                <div className="border border-gray-300  hover:-translate-y-2 duration-300 w-60 h-36 rounded-2xl px-5 p-5">
+                <div className="border border-gray-300  hover:-translate-y-2 duration-300 w-full h-36 rounded-2xl px-5 p-5">
                   <div className="text-sm flex items-center gap-4">
                     <div className="bg-orange-100 p-2 rounded-md text-orange-600 text-base font-extrabold">
                       {" "}
@@ -161,7 +175,7 @@ const Dashboard = () => {
                     + IDR {formatNumber(totalTodaySales)} hari ini
                   </p>
                 </div>
-                <div className="border border-gray-300  hover:-translate-y-2 duration-300 w-60 h-36 rounded-2xl px-5 p-5">
+                <div className="border border-gray-300  hover:-translate-y-2 duration-300 w-full h-36 rounded-2xl px-5 p-5">
                   <div className="text-sm flex items-center gap-4">
                     <div className="bg-green-100 p-2 rounded-md text-green-600 text-base font-extrabold">
                       {" "}
@@ -176,17 +190,15 @@ const Dashboard = () => {
                   </p>
                 </div>
 
-                <div className="border border-gray-300 hover:-translate-y-2 duration-300 w-60 h-36 rounded-2xl px-5 p-5">
+                <div className="border border-gray-300 hover:-translate-y-2 duration-300 w-full h-36 rounded-2xl px-5 p-5">
                   <div className="text-sm flex items-center gap-4">
                     <div className="bg-blue-100 p-2 rounded-md text-blue-600 text-base font-extrabold">
                       {" "}
                       <LuMountain />
                     </div>
-                    <p className="font-semibold">Total Wisata</p>
+                    <p className="font-semibold">Total Produk</p>
                   </div>
-                  <p className="font-extrabold text-xl mt-3">
-                    {totalAgrotourism}
-                  </p>
+                  <p className="font-extrabold text-xl mt-3">{totalProducts}</p>
 
                   <p className="text-xs font-bold mt-5 text-blue-600">
                     Terus tingkatkan!
@@ -199,8 +211,10 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="mt-10 flex items-center justify-between gap-10 ">
-            <div className="mb-5 w-full mt-5">{/* <TopUsers /> */}</div>
+          <div className="mt-10 mx-5 flex items-start justify-between gap-10 ">
+            <div className=" w-full">
+              <TopProduct />
+            </div>
             <div className="w-full">
               <TopUsers />
             </div>

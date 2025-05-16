@@ -7,7 +7,6 @@ const PaymentStatus = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Function untuk fetch status pembayaran menggunakan axios
     const fetchPaymentStatus = async () => {
       try {
         const response = await instance.get(`/payment/status/${order_id}`);

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { CiLogout } from "react-icons/ci";
 import { BsGrid } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
@@ -10,42 +9,15 @@ import {
   BsPerson,
 } from "react-icons/bs";
 import { IoCartOutline, IoWalletOutline } from "react-icons/io5";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
-import { useLocation } from "react-router-dom";
+
 import { useEffect, useState } from "react";
 
 const SidebarAdmin = ({ onSidebarHover, isSidebarCollapsed }) => {
-  const location = useLocation();
-  const [isPesananOpen, setIsPesananOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    if (
-      location.pathname.startsWith("/admin/data/orders") ||
-      location.pathname.startsWith("/admin/data/order/items") ||
-      location.pathname.startsWith("/admin/data/order/shipping")
-    ) {
-      setIsPesananOpen(true);
-    }
-  }, [location.pathname]);
 
   useEffect(() => {
     onSidebarHover(isHovered); // Notify parent when sidebar is hovered
   }, [isHovered, onSidebarHover]);
-
-  const pesananRoutes = [
-    "/admin/data/orders",
-    "/admin/data/order/items",
-    "/admin/data/order/shipping",
-  ];
-
-  const isActivePesananRoute = pesananRoutes.includes(location.pathname);
-
-  useEffect(() => {
-    if (isActivePesananRoute) {
-      setIsPesananOpen(true);
-    }
-  }, [location.pathname]);
 
   return (
     <div
@@ -176,75 +148,33 @@ const SidebarAdmin = ({ onSidebarHover, isSidebarCollapsed }) => {
             </NavLink>
           </li>
 
-          {/* Pesanan (Dropdown) */}
           <li className="mt-5">
-            <button
-              onClick={() => setIsPesananOpen(!isPesananOpen)}
-              className={`w-full space-x-2 px-4 py-2 font-semibold text-sm flex items-center justify-between rounded-md
-        ${
-          isPesananOpen
-            ? "text-blue-500 bg-blue-100/70"
-            : "text-hitam hover:bg-gray-200 hover:bg-opacity-40 text-graytext"
-        }`}
+            <NavLink
+              to="/admin/data/orders"
+              className={
+                ({ isActive }) =>
+                  isSidebarCollapsed
+                    ? isHovered
+                      ? isActive
+                        ? "text-blue-500 bg-blue-100/70 px-4 py-2.5 space-x-2 rounded-md font-semibold text-sm w-full flex items-center" // Sidebar collapsed, hover, dan aktif
+                        : "text-hitam hover:bg-gray-200 px-4 py-2.5  text-graytext hover:bg-opacity-40 w-full space-x-2 font-semibold text-sm flex items-center" // Sidebar collapsed, hover, dan tidak aktif
+                      : isActive
+                      ? "text-blue-500 px-4 py-2.5 rounded-md bg-blue-100/70 w-fit font-semibold text-sm flex items-center" // Sidebar collapsed, tidak hover, dan aktif
+                      : "text-hitam px-4 py-2.5 hover:bg-gray-200 text-graytext hover:bg-opacity-40 w-fit font-semibold text-sm flex items-center" // Sidebar collapsed, tidak hover, dan tidak aktif
+                    : isActive
+                    ? "text-blue-500 bg-blue-100/70 space-x-2  px-4 py-2.5 rounded-md font-semibold text-sm flex items-center" // Sidebar normal dan aktif
+                    : "text-hitam hover:bg-gray-200 space-x-2 text-graytext hover:bg-opacity-40 px-4 py-2.5 font-semibold text-sm flex items-center" // Sidebar normal dan tidak aktif
+              }
             >
-              <span className="flex space-x-2 items-center">
-                <BsCart className="text-xl" />
-                {!isSidebarCollapsed || isHovered ? (
-                  <span>Pesanan</span>
-                ) : isActivePesananRoute ? null : (
-                  <></>
-                )}
-              </span>
-              {!isSidebarCollapsed || isHovered ? (
-                isPesananOpen ? (
-                  <FiChevronUp />
-                ) : (
-                  <FiChevronDown />
-                )
-              ) : null}
-            </button>
-
-            {isPesananOpen && (!isSidebarCollapsed || isHovered) && (
-              <ul className="ml-8 mt-2 space-y-2">
-                <li>
-                  <NavLink
-                    to="/admin/data/orders"
-                    className={({ isActive }) =>
-                      isActive
-                        ? "text-blue-500 bg-blue-100/70 px-4 rounded-md py-2.5 font-semibold text-sm flex items-center"
-                        : "text-hitam hover:bg-gray-200 px-4 text-graytext hover:bg-opacity-40 py-2.5 font-semibold text-sm flex items-center"
-                    }
-                  >
-                    Order
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/admin/data/order/items"
-                    className={({ isActive }) =>
-                      isActive
-                        ? "text-blue-500 bg-blue-100/70 px-4 rounded-md py-2.5 font-semibold text-sm flex items-center"
-                        : "text-hitam hover:bg-gray-200 px-4 text-graytext hover:bg-opacity-40 py-2.5 font-semibold text-sm flex items-center"
-                    }
-                  >
-                    Order Items
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/admin/data/order/shipping"
-                    className={({ isActive }) =>
-                      isActive
-                        ? "text-blue-500 bg-blue-100/70 px-4 rounded-md py-2.5 font-semibold text-sm flex items-center"
-                        : "text-hitam hover:bg-gray-200 px-4 text-graytext hover:bg-opacity-40 py-2.5 font-semibold text-sm flex items-center"
-                    }
-                  >
-                    Order Shipping
-                  </NavLink>
-                </li>
-              </ul>
-            )}
+              <BsCart className="text-xl " />{" "}
+              {isHovered || !isSidebarCollapsed ? (
+                <span className="flex-1">Pesanan</span> // Tampilkan teks saat hover atau sidebar normal
+              ) : (
+                <></>
+              )}
+            </NavLink>
           </li>
+
           <li className="mt-5">
             <NavLink
               to="/admin/data/transactions"

@@ -154,7 +154,7 @@ const Payment = () => {
 
       // 3. Update status order menjadi pending
       await instance.patch(`/order/${orderId}/status`, {
-        status: "paid",
+        status: "pending",
         shipping_fee: parseInt(service.cost),
         total_amount: response.data.grossAmount,
       });

@@ -5,7 +5,7 @@ const ProgressBar = ({ percentage }) => {
     <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
       <LinearProgress
         variant="determinate"
-        value={percentage}
+        value={Number(percentage)}
         sx={{
           marginTop: 0,
           height: 10,

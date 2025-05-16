@@ -22,8 +22,6 @@ export default function Card({
               alt="Image"
             />
           )}
-
-          {/* Rating di pojok kiri bawah */}
         </div>
       </div>
 

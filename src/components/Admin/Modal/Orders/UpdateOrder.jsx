@@ -21,7 +21,23 @@ const ModalUpdateOrder = ({ open, handleClose, onUpdate, orderId }) => {
     total_amount: "",
     status: "",
     tracking_number: "",
+
+    // Shipping detail:
+    shipping_firstname: "",
+    shipping_lastname: "",
+    shipping_phone: "",
+    shipping_address: "",
+    province: "",
+    city: "",
+    postal_code: "",
+    courier: "",
+    etd: "",
+    shipping_cost: "",
+
+    // Optional: items
+    items: [],
   });
+
   const [isEditable, setIsEditable] = useState(true); // Variabel untuk status editable
 
   const handleChange = (e) => {
@@ -34,11 +50,12 @@ const ModalUpdateOrder = ({ open, handleClose, onUpdate, orderId }) => {
   const fetchOrderDetails = async () => {
     try {
       const res = await instanceAdmin.get(`/get/order/${orderId}`);
-      const order = res.data; // <== penting!
+      const order = res.data;
 
       console.log("data res", order);
+
       setFormData({
-        order_id: order.order_id || "",
+        order_id: order.order_id || "", // perhatikan: `order.id`, bukan `order.order_id` lagi
         order_code: order.order_code || "",
         invoice_url: order.invoice_url || "",
         user_email: order.user_email || "",
@@ -50,9 +67,24 @@ const ModalUpdateOrder = ({ open, handleClose, onUpdate, orderId }) => {
         total_amount: order.total_amount || "",
         status: order.status || "",
         tracking_number: order.tracking_number || "",
+
+        // Shipping details
+        shipping_firstname: order.shipping_firstname || "",
+        shipping_lastname: order.shipping_lastname || "",
+        shipping_phone: order.shipping_phone || "",
+        shipping_address: order.shipping_address || "",
+        province: order.province || "",
+        city: order.city || "",
+        postal_code: order.postal_code || "",
+        courier: order.courier || "",
+        etd: order.etd || "",
+        shipping_cost: order.shipping_cost || "",
+
+        // Tambahkan item list ke formData jika perlu (misalnya untuk ditampilkan)
+        items: order.items || [],
       });
 
-      // Set status editable sesuai dengan response
+      // Atur status apakah form editable atau tidak
       setIsEditable(order.isEditable);
     } catch (err) {
       console.error("Failed to fetch order details", err);
@@ -77,6 +109,21 @@ const ModalUpdateOrder = ({ open, handleClose, onUpdate, orderId }) => {
         total_amount: "",
         status: "",
         tracking_number: "",
+
+        // Shipping detail:
+        shipping_firstname: "",
+        shipping_lastname: "",
+        shipping_phone: "",
+        shipping_address: "",
+        province: "",
+        city: "",
+        postal_code: "",
+        courier: "",
+        etd: "",
+        shipping_cost: "",
+
+        // Optional: items
+        items: [],
       });
       setIsEditable(true); // Reset editable jika modal ditutup
     }
@@ -85,7 +132,13 @@ const ModalUpdateOrder = ({ open, handleClose, onUpdate, orderId }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await instanceAdmin.put(`/update/order/${orderId}`, formData);
+      const payload = { ...formData };
+
+      // Jika tidak ingin update items, hapus key-nya
+      if (!payload.items || payload.items.length === 0) {
+        delete payload.items;
+      }
+      const res = await instanceAdmin.put(`/update/order/${orderId}`, payload);
       console.log("Order berhasil:", res.data);
       showSnackbar("Order berhasil diperbarui", "success");
       handleClose();
@@ -150,6 +203,7 @@ const ModalUpdateOrder = ({ open, handleClose, onUpdate, orderId }) => {
           </div>
 
           <form className="px-6 mt-5 pb-6" onSubmit={handleSubmit}>
+            {/* Informasi Dasar Pesanan */}
             <div className="grid gap-4">
               <FormInput
                 name="order_id"
@@ -157,112 +211,104 @@ const ModalUpdateOrder = ({ open, handleClose, onUpdate, orderId }) => {
                 value={formData.order_id}
                 label="ID Pesanan"
                 onChange={handleChange}
-                readOnly={!isEditable}
+                readOnly
                 disabled
               />
-            </div>
-            <div className="grid mt-7 gap-4">
               <FormInput
                 name="order_code"
                 type="text"
                 value={formData.order_code}
                 label="Kode Pesanan"
                 onChange={handleChange}
+                readOnly
                 disabled
-                readOnly={!isEditable}
               />
-            </div>
-
-            <div className="grid mt-7 gap-4">
               <FormInput
                 name="invoice_url"
                 type="text"
                 value={formData.invoice_url}
                 label="Invoice"
                 onChange={handleChange}
+                readOnly
                 disabled
-                readOnly={!isEditable}
               />
-            </div>
-
-            <div className="flex mt-7 gap-4">
               <FormInput
                 name="user_id"
                 type="text"
                 value={formData.user_email}
                 label="Pemesan"
                 onChange={handleChange}
+                readOnly
                 disabled
-                readOnly={!isEditable}
               />
             </div>
 
-            <div className="flex mt-7 gap-4">
-              <FormInput
-                name="admin_fee"
-                type="text"
-                value={formData.admin_fee}
-                label="Biaya Admin"
-                onChange={handleChange}
-                disabled
-                readOnly={!isEditable}
-              />
-
-              <FormInput
-                name="shipping_fee"
-                type="text"
-                value={formData.shipping_fee}
-                label="Biaya Pengiriman"
-                onChange={handleChange}
-                disabled
-                readOnly={!isEditable}
-              />
+            {/* Informasi Biaya */}
+            <div className="grid mt-7 gap-4">
+              <div className="flex items-center gap-5">
+                <FormInput
+                  name="admin_fee"
+                  type="text"
+                  value={formData.admin_fee}
+                  label="Biaya Admin"
+                  onChange={handleChange}
+                  readOnly
+                  disabled
+                />
+                <FormInput
+                  name="shipping_fee"
+                  type="text"
+                  value={formData.shipping_fee}
+                  label="Biaya Pengiriman"
+                  onChange={handleChange}
+                  readOnly
+                  disabled
+                />
+              </div>
+              <div className="flex items-center gap-5">
+                <FormInput
+                  name="promo_code"
+                  type="text"
+                  value={formData.promo_code}
+                  label="Kode Promo"
+                  onChange={handleChange}
+                  readOnly
+                  disabled
+                />
+                <FormInput
+                  name="discount_amount"
+                  type="text"
+                  value={formData.discount_amount}
+                  label="Total Diskon"
+                  onChange={handleChange}
+                  readOnly
+                  disabled
+                />
+              </div>
+              <div className="flex items-center gap-5">
+                <FormInput
+                  name="subtotal"
+                  type="text"
+                  value={formData.subtotal}
+                  label="Subtotal"
+                  onChange={handleChange}
+                  readOnly
+                  disabled
+                />
+                <FormInput
+                  name="total_amount"
+                  type="text"
+                  value={formData.total_amount}
+                  label="Total Bayar"
+                  onChange={handleChange}
+                  readOnly
+                  disabled
+                />
+              </div>
             </div>
 
-            <div className="flex mt-7 gap-4">
-              <FormInput
-                name="promo_code"
-                type="text"
-                value={formData.promo_code}
-                label="Kode Promo"
-                onChange={handleChange}
-                disabled
-                readOnly={!isEditable}
-              />
-
-              <FormInput
-                name="discount_amount"
-                type="text"
-                value={formData.discount_amount}
-                label="Total Diskon"
-                onChange={handleChange}
-                disabled
-                readOnly={!isEditable}
-              />
-            </div>
-
-            <div className="flex mt-7 gap-4">
-              <FormInput
-                name="subtotal"
-                type="text"
-                value={formData.subtotal}
-                label="Subtotal"
-                onChange={handleChange}
-                disabled
-                readOnly={!isEditable}
-              />
-
-              <FormInput
-                name="total_amount"
-                type="text"
-                value={formData.total_amount}
-                label="Total Bayar"
-                onChange={handleChange}
-                disabled
-                readOnly={!isEditable}
-              />
-            </div>
-            <div className="flex mt-7 gap-4">
+            {/* Status & Tracking */}
+            <div className="flex mt-5 gap-4">
               <FormInput
                 name="status"
                 type="select"
@@ -277,7 +323,6 @@ const ModalUpdateOrder = ({ open, handleClose, onUpdate, orderId }) => {
                   { label: "cancelled", value: "cancelled" },
                 ]}
               />
-
               <FormInput
                 name="tracking_number"
                 type="text"
@@ -287,13 +332,106 @@ const ModalUpdateOrder = ({ open, handleClose, onUpdate, orderId }) => {
                 disabled={formData.status === "pending"}
               />
             </div>
-            <div className="text-right mt-5 ">
+
+            <h1 className="mt-7 font-bold text-lg">Informasi Penerima</h1>
+            <p className="text-sm text-graytext">
+              Berikut informasi data penerima pesanan.
+            </p>
+            {/* Informasi Pengiriman */}
+            <div className="grid mt-7 gap-4">
+              <div className="flex items-center gap-5">
+                <FormInput
+                  name="shipping_firstname"
+                  type="text"
+                  value={formData.shipping_firstname}
+                  label="Nama Depan Penerima"
+                  onChange={handleChange}
+                  readOnly={!isEditable}
+                />
+                <FormInput
+                  name="shipping_lastname"
+                  type="text"
+                  value={formData.shipping_lastname}
+                  label="Nama Belakang Penerima"
+                  onChange={handleChange}
+                  readOnly={!isEditable}
+                />
+              </div>
+
+              <FormInput
+                name="shipping_address"
+                type="text"
+                value={formData.shipping_address}
+                label="Alamat Lengkap"
+                onChange={handleChange}
+                readOnly={!isEditable}
+              />
+              <div className="flex items-center gap-5">
+                <FormInput
+                  name="province"
+                  type="text"
+                  value={formData.province}
+                  label="Provinsi"
+                  onChange={handleChange}
+                  readOnly={!isEditable}
+                  disabled
+                />
+                <FormInput
+                  name="city"
+                  type="text"
+                  value={formData.city}
+                  label="Kota"
+                  onChange={handleChange}
+                  readOnly={!isEditable}
+                  disabled
+                />
+              </div>
+              <div className="flex items-center gap-5">
+                <FormInput
+                  name="postal_code"
+                  type="text"
+                  value={formData.postal_code}
+                  label="Kode Pos"
+                  onChange={handleChange}
+                  readOnly={!isEditable}
+                  disabled
+                />
+                <FormInput
+                  name="shipping_phone"
+                  type="text"
+                  value={formData.shipping_phone}
+                  label="No. HP Penerima"
+                  onChange={handleChange}
+                  readOnly={!isEditable}
+                />
+              </div>
+              <div className="flex items-center gap-5">
+                <FormInput
+                  name="courier"
+                  type="text"
+                  value={formData.courier}
+                  label="Kurir"
+                  onChange={handleChange}
+                  readOnly={!isEditable}
+                  disabled
+                />
+                <FormInput
+                  name="etd"
+                  type="text"
+                  value={formData.etd}
+                  label="Estimasi Pengiriman (ETD)"
+                  onChange={handleChange}
+                  readOnly={!isEditable}
+                />
+              </div>
+            </div>
+
+            {/* Tombol Submit */}
+            <div className="text-right mt-6">
               <button
                 type="submit"
                 className="bg-black px-4 py-2 text-white rounded-md hover:bg-black/80 duration-300"
-                variant="contained"
-                color="primary"
-                disabled={!isEditable} // Disable tombol submit jika tidak bisa di-edit
+                disabled={!isEditable}
               >
                 Submit
               </button>

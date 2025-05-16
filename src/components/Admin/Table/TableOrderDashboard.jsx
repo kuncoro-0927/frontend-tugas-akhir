@@ -34,13 +34,13 @@ const TableOrderDashboard = () => {
           <thead>
             <tr className="p-4">
               <th className="block antialiased p-4 font-sans text-base text-blue-gray-900 font-bold leading-none opacity-70">
-                Orderan Terakhir
+                Pesanan Terbaru
               </th>
             </tr>
             <tr>
               <th className=" border-blue-gray-100 bg-blue-gray-50/50 p-4">
                 <p className="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">
-                  Id Order
+                  ID Pesanan
                 </p>
               </th>
               <th className=" border-blue-gray-100 bg-blue-gray-50/50 p-4">
@@ -48,16 +48,12 @@ const TableOrderDashboard = () => {
                   Nama
                 </p>
               </th>
+
               <th className=" border-blue-gray-100 bg-blue-gray-50/50 p-4">
-                <p className="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">
-                  Metode Pengiriman
-                </p>
-              </th>
-              {/* <th className=" border-blue-gray-100 bg-blue-gray-50/50 p-4">
                 <p className="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">
                   Tanggal
                 </p>
-              </th> */}
+              </th>
               <th className=" border-blue-gray-100 bg-blue-gray-50/50 p-4">
                 <p className="block antialiased font-sans text-sm text-blue-gray-900 font-normal leading-none opacity-70">
                   Total Harga
@@ -72,7 +68,7 @@ const TableOrderDashboard = () => {
           </thead>
           <tbody>
             {orders.map((order) => (
-              <tr key={order.order_id}>
+              <tr key={order.id}>
                 <td className="p-4 border-t border-blue-gray-50">
                   <div className="flex items-center gap-3">
                     <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-bold">
@@ -86,28 +82,30 @@ const TableOrderDashboard = () => {
                   </p>
                 </td>
 
-                {/* <td className="p-4 border-t border-blue-gray-50">
+                <td className="p-4 border-t border-blue-gray-50">
                   <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                    {formatDate(order.selected_date)}
+                    {formatDate(order.created_at)}
                   </p>
-                </td> */}
+                </td>
                 <td className="p-4 border-t border-blue-gray-50">
                   <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
                     {order.total_amount}
                   </p>
                 </td>
-                <td className="p-4 border-t border-blue-gray-50">
+                <td className="p-4 border-t ">
                   <p
                     className={`block antialiased text-center rounded-md py-0.5 text-sm leading-normal 
-      ${
-        order.status === "paid"
-          ? "text-blue-600 font-bold bg-blue-200" // warna biru untuk paid
-          : order.status === "shipped"
-          ? "text-orange-600 font-bold bg-orange-200" // warna oranye untuk shipped
-          : order.status === "completed"
-          ? "text-green-600 font-bold bg-green-200" // warna hijau untuk completed
-          : "text-gray-500" // warna abu-abu jika status lain
-      }`}
+     ${
+       order.status === "pending"
+         ? "text-orange-500 font-normal bg-orange-100"
+         : order.status === "paid"
+         ? "text-green-500 font-normal bg-green-100"
+         : order.status === "shipped"
+         ? "text-blue-500 font-bold bg-blue-100"
+         : order.status === "completed"
+         ? "text-yellow-500 font-bold bg-yellow-100"
+         : "text-gray-500"
+     }`}
                   >
                     {order.status}
                   </p>

@@ -2,10 +2,12 @@ import React, { useEffect, useState, useRef } from "react";
 import AdminNavBar from "../../../components/Admin/AdminNavBar";
 import SidebarAdmin from "../../../components/Admin/SidebarAdmin";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
+import { LuPackagePlus } from "react-icons/lu";
 import CardImage from "../../../components/Card/CardImage";
 import ModalCreateProduct from "../../../components/Admin/Modal/Products/CreateProduct";
 import ModalEditProduct from "../../../components/Admin/Modal/Products/UpdateProduct";
 import ModalDeleteProduct from "../../../components/Admin/Modal/Products/DeleteProduct";
+import DetailProduct from "../../../components/Admin/Modal/Products/DetailProduct";
 const DataProducts = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -18,6 +20,12 @@ const DataProducts = () => {
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleOpenDrawer = (productId) => {
+    setSelectedProductId(productId);
+    setDrawerOpen(true);
+  };
   const handleCloseEditModal = () => setEditModal(false);
   const handleOpenEditModal = (productId) => {
     setSelectedProductId(productId);
@@ -51,8 +59,8 @@ const DataProducts = () => {
   const fetchProducts = async () => {
     try {
       const response = await instanceAdmin.get("/all/products");
-      setUsers(response.data);
-      setFilteredUsers(response.data);
+      setUsers(response.data.data);
+      setFilteredUsers(response.data.data);
     } catch (error) {
       console.error("Failed to fetch products:", error);
     }
@@ -96,8 +104,22 @@ const DataProducts = () => {
     };
   }, []);
 
+  const handleToggle = async (id) => {
+    try {
+      await instanceAdmin.put(`/toggle/status/${id}`);
+      fetchProducts(); // Refresh data setelah toggle
+    } catch (error) {
+      console.error("Gagal toggle status:", error);
+    }
+  };
+
   return (
     <section className="flex gap-10">
+      <DetailProduct
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        productId={selectedProductId}
+      />
       <ModalCreateProduct
         open={createModal}
         handleClose={handleCloseCreateModal}
@@ -117,7 +139,7 @@ const DataProducts = () => {
       />
 
       <div
-        className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
+        className={`h-screen  fixed top-0 left-0 z-40 transition-all duration-300 ${
           isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
         }`}
       >
@@ -141,8 +163,9 @@ const DataProducts = () => {
             <h1 className="text-2xl font-extrabold">Data Produk</h1>
             <button
               onClick={handleOpenCreateModal}
-              className=" bg-black rounded-md text-white px-3 py-2 font-normal text-sm"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600/80 duration-200 rounded-md text-white px-4 py-2 font-normal text-base"
             >
+              <LuPackagePlus className="text-lg" />
               Tambah
             </button>
           </div>
@@ -194,6 +217,7 @@ const DataProducts = () => {
                       "Berat / gram",
                       "Kategori",
                       "Harga",
+                      "Status",
                       "Aksi",
                     ].map((header, index) => (
                       <th
@@ -262,7 +286,25 @@ const DataProducts = () => {
                           })}{" "}
                         </p>
                       </td>
-
+                      <td className="p-4 border-b border-blue-gray-50">
+                        <button
+                          onClick={() => handleToggle(product.id)}
+                          className={`w-12 h-6 flex items-center rounded-full p-1 duration-300 ease-in-out ${
+                            product.status?.toLowerCase().trim() === "available"
+                              ? "bg-green-100 border border-green-400"
+                              : "bg-red-100 border border-red-400"
+                          }`}
+                        >
+                          <div
+                            className={`border  w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${
+                              product.status?.toLowerCase().trim() ===
+                              "available"
+                                ? "translate-x-6 bg-green-200 border-green-400"
+                                : "translate-x-0 bg-red-200 border-red-400"
+                            }`}
+                          ></div>
+                        </button>
+                      </td>
                       <td className="p-4 border-b border-blue-gray-50 relative">
                         <div
                           className="relative inline-block text-left"
@@ -290,7 +332,10 @@ const DataProducts = () => {
                                 >
                                   Edit
                                 </button>
-                                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button
+                                  onClick={() => handleOpenDrawer(product.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
                                   Detail
                                 </button>
                                 <button

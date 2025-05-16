@@ -6,7 +6,11 @@ import AddResiModal from "../../../components/Admin/Modal/AddTrackingNumber";
 import { showSnackbar } from "../../../components/CustomSnackbar";
 import ModalCreateOrder from "../../../components/Admin/Modal/Orders/CreateOrder";
 import ModalUpdateOrder from "../../../components/Admin/Modal/Orders/UpdateOrder";
+import ModalDeleteOrder from "../../../components/Admin/Modal/Orders/DeleteOrder";
 import ExportOrdersModal from "../../../components/ExportOrder";
+import DetailOrders from "../../../components/Admin/Modal/Orders/DetailOrders";
+import { BsCartPlus } from "react-icons/bs";
+import { PiExport } from "react-icons/pi";
 const DataOrders = () => {
   const [orders, setOrders] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -19,20 +23,37 @@ const DataOrders = () => {
   const [showResiModal, setShowResiModal] = useState(false);
   const [createModal, setCreateModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [activeTab, setActiveTab] = useState("all");
   const handleOpenCreateModal = () => setCreateModal(true);
   const handleCloseCreateModal = () => setCreateModal(false);
   const handleCloseEditModal = () => setEditModal(false);
+  const handleCloseDeleteModal = () => setDeleteModal(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const handleOpenDrawer = (id) => {
+    setSelectedOrderId(id);
+    setDrawerOpen(true);
+  };
   const handleOpenEditModal = (orderId) => {
     setSelectedOrderId(orderId);
     setEditModal(true);
+  };
+
+  const handleOpenDeleteModal = (orderId) => {
+    setSelectedOrderId(orderId);
+    setDeleteModal(true);
   };
   // Toggle sidebar state
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed); // Toggle state
   };
   const handleEditSuccess = () => {
+    fetchOrders();
+  };
+
+  const handleDeleteSuccess = () => {
     fetchOrders();
   };
   const handleSidebarHover = (isHovered) => {
@@ -134,6 +155,11 @@ const DataOrders = () => {
 
   return (
     <section className="flex gap-10">
+      <DetailOrders
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        orderId={selectedOrderId}
+      />
       {showResiModal && (
         <AddResiModal
           orderId={selectedOrderId}
@@ -151,8 +177,16 @@ const DataOrders = () => {
         orderId={selectedOrderId}
         onUpdate={handleEditSuccess}
       />
+
+      <ModalDeleteOrder
+        open={deleteModal}
+        handleClose={handleCloseDeleteModal}
+        orderId={selectedOrderId}
+        onUpdate={handleDeleteSuccess}
+      />
+
       <div
-        className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
+        className={`h-screen  fixed top-0 left-0 z-40 transition-all duration-300 ${
           isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
         }`}
       >
@@ -174,18 +208,27 @@ const DataOrders = () => {
         <div className="mt-10 px-5 text-xl font-bold">
           <div className="flex items-center justify-between">
             <h1>Data Pesanan</h1>
-            <button
-              onClick={handleOpenCreateModal}
-              className=" bg-black rounded-md text-white px-3 py-2 font-normal text-sm"
-            >
-              Tambah
-            </button>
-            <button onClick={() => setOpenExport(true)}>Export Pesanan</button>
+            <div className="flex items-center gap-5">
+              <button
+                className="text-base flex items-center gap-2 hover:border-blue-600/80 hover:text-blue-600/80 border border-blue-600 text-blue-600 rounded-md font-normal px-3 py-2 "
+                onClick={() => setOpenExport(true)}
+              >
+                <PiExport className="text-lg" />
+                Export
+              </button>
+              <button
+                onClick={handleOpenCreateModal}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600/80 duration-200 rounded-md text-white px-4 py-2 font-normal text-base"
+              >
+                <BsCartPlus className="text-lg" />
+                Tambah
+              </button>
 
-            <ExportOrdersModal
-              open={openExport}
-              onClose={() => setOpenExport(false)}
-            />
+              <ExportOrdersModal
+                open={openExport}
+                onClose={() => setOpenExport(false)}
+              />
+            </div>
           </div>
           <div className="border p-5 mt-10">
             <div className="flex  items-start justify-between">
@@ -385,10 +428,18 @@ const DataOrders = () => {
                                 >
                                   Edit
                                 </button>
-                                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button
+                                  onClick={() => handleOpenDrawer(order.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
                                   Detail
                                 </button>
-                                <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                <button
+                                  onClick={() =>
+                                    handleOpenDeleteModal(order.id)
+                                  }
+                                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                                >
                                   Hapus
                                 </button>
                               </div>

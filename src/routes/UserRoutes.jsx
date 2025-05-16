@@ -45,8 +45,10 @@ function UserRoutes() {
     location.pathname.startsWith("/checkouts/payment");
 
   const shouldShowNavBar = !isAuthPage && !isShippingOrPayment;
+  const isPaymentSuccess = location.pathname.startsWith("/payment/success");
+
   const shouldShowFooter =
-    !isAuthPage && !isAccountPage && !isShippingOrPayment;
+    !isAuthPage && !isAccountPage && !isShippingOrPayment && !isPaymentSuccess;
 
   const handleOpenModal = (content) => {
     setModalContent(content);

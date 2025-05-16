@@ -5,6 +5,8 @@ import ModalCreateCategory from "../../../components/Admin/Modal/Categories/Crea
 import ModalUpdateCategory from "../../../components/Admin/Modal/Categories/UpdateCategory";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
 import ModalDeleteCategory from "../../../components/Admin/Modal/Categories/DeleteCategory";
+import { LuLayers } from "react-icons/lu";
+import { BiLayerPlus } from "react-icons/bi";
 const DataCategories = () => {
   const [categoriesItems, setCategoriesItems] = useState([]);
   const [filteredCategoriesItems, setFilteredCategoriesItems] = useState([]);
@@ -149,8 +151,9 @@ const DataCategories = () => {
             <h1 className="text-2xl font-extrabold">Data Kategori</h1>
             <button
               onClick={handleOpenCreateModal}
-              className=" bg-black rounded-md text-white px-3 py-2 font-normal text-sm"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600/80 duration-200 rounded-md text-white px-4 py-2 font-normal text-base"
             >
+              <BiLayerPlus className="text-lg" />
               Tambah
             </button>
           </div>
@@ -197,8 +200,9 @@ const DataCategories = () => {
                 <thead>
                   <tr>
                     {[
-                      "ID Kategori",
+                      "ID",
                       "Nama",
+                      "Jumlah produk",
                       "Dibuat pada",
                       "Diperbarui pada",
                       "Aksi",
@@ -235,10 +239,20 @@ const DataCategories = () => {
                           </div>
                         </div>
                       </td>
+
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="flex items-center gap-3">
                           <div className="flex flex-col">
                             <p className="text-sm text-blue-gray-900 font-normal">
+                              {category.total_products}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 border-b border-blue-gray-50">
+                        <div className="flex items-center gap-3">
+                          <div className="flex flex-col">
+                            <p className="text-sm text-blue-600 underline font-normal">
                               {formatDate(category.created_at)}
                             </p>
                           </div>
@@ -281,9 +295,7 @@ const DataCategories = () => {
                                 >
                                   Edit
                                 </button>
-                                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                  Detail
-                                </button>
+
                                 <button
                                   onClick={() =>
                                     handleOpenDeleteModal(category.id)
