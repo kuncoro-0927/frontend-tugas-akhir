@@ -2,20 +2,45 @@ import React, { useEffect, useState, useRef } from "react";
 import AdminNavBar from "../../../components/Admin/AdminNavBar";
 import SidebarAdmin from "../../../components/Admin/SidebarAdmin";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
-import FormInput from "../../../components/TextField";
+import { BiSolidOffer } from "react-icons/bi";
+import ModalCreatePromo from "../../../components/Admin/Modal/PromoCode/CreatePromoCode";
+import ModalUpdatePromo from "../../../components/Admin/Modal/PromoCode/UpdatePromoCode";
+import DetailPromo from "../../../components/Admin/Modal/PromoCode/DetailPromoCode";
 const DataPromoCodes = () => {
-  const [users, setUsers] = useState([]);
+  const [promos, setPromos] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]); // Data yang sudah difilter
   const [openDropdown, setOpenDropdown] = useState(null);
   const [searchQuery, setSearchQuery] = useState(""); // Query untuk search
   const dropdownRef = useRef(null);
+  const [selectedPromoId, setSelectedPromoId] = useState(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Sidebar collapsed by default
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+  const [createModal, setCreateModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const handleOpenDrawer = (promoId) => {
+    setSelectedPromoId(promoId);
+    setDrawerOpen(true);
+  };
+
+  const handleOpenCreateModal = () => setCreateModal(true);
+  const handleCloseCreateModal = () => setCreateModal(false);
+
+  const handleCloseEditModal = () => setEditModal(false);
+  const handleOpenEditModal = (promoId) => {
+    setSelectedPromoId(promoId);
+    setEditModal(true);
+  };
+  const handleCreateSuccess = () => {
+    fetchPromos();
+  };
+  const handleEditSuccess = () => {
+    fetchPromos();
+  };
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed); // Toggle state
   };
 
-  // Handle hover effect for sidebar
   const handleSidebarHover = (isHovered) => {
     setIsSidebarHovered(isHovered);
   };
@@ -23,7 +48,7 @@ const DataPromoCodes = () => {
   const fetchPromos = async () => {
     try {
       const response = await instanceAdmin.get("/all/promo");
-      setUsers(response.data);
+      setPromos(response.data);
       setFilteredUsers(response.data);
     } catch (error) {
       console.error("Failed to fetch promos:", error);
@@ -37,9 +62,9 @@ const DataPromoCodes = () => {
   // Filter pengguna berdasarkan search query
   useEffect(() => {
     if (searchQuery === "") {
-      setFilteredUsers(users); // Jika tidak ada query, tampilkan semua pengguna
+      setFilteredUsers(promos); // Jika tidak ada query, tampilkan semua pengguna
     } else {
-      const filtered = users.filter((user) => {
+      const filtered = promos.filter((user) => {
         return (
           user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -54,7 +79,7 @@ const DataPromoCodes = () => {
       });
       setFilteredUsers(filtered); // Update filtered users
     }
-  }, [searchQuery, users]);
+  }, [searchQuery, promos]);
 
   // Handle klik di luar dropdown
   useEffect(() => {
@@ -81,6 +106,22 @@ const DataPromoCodes = () => {
 
   return (
     <section className="flex gap-10">
+      <DetailPromo
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        promoId={selectedPromoId}
+      />
+      <ModalCreatePromo
+        open={createModal}
+        handleClose={handleCloseCreateModal}
+        onUpdate={handleCreateSuccess}
+      />
+      <ModalUpdatePromo
+        open={editModal}
+        handleClose={handleCloseEditModal}
+        promoId={selectedPromoId}
+        onUpdate={handleEditSuccess}
+      />
       <div
         className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
           isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
@@ -102,7 +143,16 @@ const DataPromoCodes = () => {
       >
         <AdminNavBar onToggleSidebar={toggleSidebar} />
         <div className="mt-10 px-5 text-xl font-bold">
-          Data Pengguna
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-extrabold">Data Promo</h1>
+            <button
+              onClick={handleOpenCreateModal}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600/80 duration-200 rounded-md text-white px-4 py-2 font-normal text-base"
+            >
+              <BiSolidOffer className="text-lg" />
+              Tambah
+            </button>
+          </div>
           <div className="border p-5 mt-10">
             <div className="flex  items-start justify-between">
               <p className="font-semibold text-sm">Tabel Data Pengguna</p>
@@ -165,22 +215,22 @@ const DataPromoCodes = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((user) => (
-                    <tr key={user.id}>
+                  {filteredUsers.map((promo) => (
+                    <tr key={promo.id}>
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="flex items-center gap-3">
                           <div className="">
                             <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                              {user.code}
+                              {promo.code}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
                         <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                          {user.discount_type === "fixed"
-                            ? "Rp (Potongan Tetap)"
-                            : user.discount_type === "percentage"
+                          {promo.discount_type === "fixed"
+                            ? "IDR (Potongan Tetap)"
+                            : promo.discount_type === "percentage"
                             ? "% (Diskon Persen)"
                             : "Tidak diketahui"}
                         </p>
@@ -189,16 +239,16 @@ const DataPromoCodes = () => {
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="flex flex-col">
                           <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                            {user.discount_value
-                              ? user.discount_type === "percentage"
-                                ? `${user.discount_value}%${
-                                    user.max_discount
-                                      ? ` (max Rp${user.max_discount.toLocaleString(
+                            {promo.discount_value
+                              ? promo.discount_type === "percentage"
+                                ? `${promo.discount_value}%${
+                                    promo.max_discount
+                                      ? ` (max IDR ${promo.max_discount.toLocaleString(
                                           "id-ID"
                                         )})`
                                       : ""
                                   }`
-                                : `Rp${user.discount_value.toLocaleString(
+                                : `IDR ${promo.discount_value.toLocaleString(
                                     "id-ID"
                                   )}`
                               : "Tidak ada data"}
@@ -207,16 +257,16 @@ const DataPromoCodes = () => {
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
                         <button
-                          onClick={() => handleToggle(user.id)}
+                          onClick={() => handleToggle(promo.id)}
                           className={`w-12 h-6 flex items-center rounded-full p-1 duration-300 ease-in-out ${
-                            user.is_active === 1
+                            promo.is_active === 1
                               ? "bg-green-100 border border-green-400"
                               : "bg-red-100 border border-red-400"
                           }`}
                         >
                           <div
                             className={`border  w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${
-                              user.is_active === 1
+                              promo.is_active === 1
                                 ? "translate-x-6 bg-green-200 border-green-400"
                                 : "translate-x-0 bg-red-200 border-red-400"
                             }`}
@@ -226,8 +276,8 @@ const DataPromoCodes = () => {
 
                       <td className="p-4 border-b border-blue-gray-50">
                         <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal opacity-70">
-                          {user.expiry_date
-                            ? new Date(user.expiry_date).toLocaleDateString(
+                          {promo.expiry_date
+                            ? new Date(promo.expiry_date).toLocaleDateString(
                                 "id-ID",
                                 {
                                   day: "numeric",
@@ -247,7 +297,7 @@ const DataPromoCodes = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setOpenDropdown(user.id);
+                              setOpenDropdown(promo.id);
                             }}
                             type="button"
                             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200"
@@ -255,13 +305,19 @@ const DataPromoCodes = () => {
                             ⋮
                           </button>
 
-                          {openDropdown === user.id && (
+                          {openDropdown === promo.id && (
                             <div className="absolute right-0 mt-2 w-36 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                               <div className="py-1">
-                                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button
+                                  onClick={() => handleOpenEditModal(promo.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
                                   Edit
                                 </button>
-                                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button
+                                  onClick={() => handleOpenDrawer(promo.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
                                   Detail
                                 </button>
                                 <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">

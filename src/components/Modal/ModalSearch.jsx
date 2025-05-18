@@ -44,10 +44,8 @@ export default function ModalSearch({ isOpen, handleClose, onSelect }) {
     }
   }, [isOpen]);
 
-  // Filter products based on selected category (this runs when activeCategory changes)
   useEffect(() => {
     if (activeCategory !== null) {
-      // Filter products to only show products with the active category
       const filtered = productsList.filter(
         (product) => product.category_id === activeCategory
       );
@@ -55,19 +53,15 @@ export default function ModalSearch({ isOpen, handleClose, onSelect }) {
     }
   }, [activeCategory, productsList]);
 
-  // Filter products based on search term
   useEffect(() => {
     if (searchTerm === "") {
-      // If no search term, just show products based on category
       setFilteredProducts(
         productsList.filter((product) => product.category_id === activeCategory)
       );
     } else {
       setFilteredProducts(
-        productsList.filter(
-          (item) =>
-            item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-            item.category_id === activeCategory // Only show products of active category
+        productsList.filter((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }

@@ -241,8 +241,16 @@ const Product = () => {
                     }`}
                     price={Number(product.price).toLocaleString("id-ID")}
                     average_rating={product.rating || "0.0"}
+                    status={product.status}
                   />
                 </Link>
+                {/* {product.status === "sold" ? (
+                  <p className="text-red-500 font-bold absolute top-1 left-1">
+                    TERJUAL
+                  </p>
+                ) : (
+                  <div>Tersedia</div>
+                )} */}
                 <div className="absolute top-1 right-1">
                   <IconButton
                     onClick={() => handleToggleWishlist(product.id)}
@@ -262,21 +270,28 @@ const Product = () => {
                 </div>
 
                 <div className="">
-                  {product.status === "sold" ? (
-                    <p className="text-red-500 font-bold">TERJUAL</p>
-                  ) : (
-                    <button
-                      className="border duration-300 border-black font-medium flex items-center justify-center gap-2 text-sm  px-5  py-2 rounded-full"
-                      onClick={() => addCart(product, 1)}
-                      disabled={loadingProductId === product.id}
-                    >
-                      {loadingProductId === product.id ? (
-                        <span className="animate-pulse">Menambahkan...</span>
-                      ) : (
-                        "Tambah Item"
-                      )}
-                    </button>
-                  )}
+                  <button
+                    className={`border duration-300 border-gray-400 font-medium flex items-center justify-center gap-2 text-sm px-5 py-2 rounded-full
+    ${
+      product.status === "sold"
+        ? " text-black/50 cursor-not-allowed"
+        : "bg-white text-black hover:bg-gray-100"
+    }
+  `}
+                    onClick={() => addCart(product, 1)}
+                    disabled={
+                      loadingProductId === product.id ||
+                      product.status === "sold"
+                    }
+                  >
+                    {product.status === "sold" ? (
+                      <span>Sudah Terjual</span>
+                    ) : loadingProductId === product.id ? (
+                      <span className="animate-pulse">Menambahkan...</span>
+                    ) : (
+                      "Tambah Item"
+                    )}
+                  </button>
                 </div>
               </div>
             ))}

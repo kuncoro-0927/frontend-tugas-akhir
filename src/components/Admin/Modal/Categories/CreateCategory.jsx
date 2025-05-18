@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FormInput from "../../../TextField";
 import { showSnackbar } from "../../../CustomSnackbar";
 import { instanceAdmin } from "../../../../utils/axiosAdmin";
@@ -30,6 +30,19 @@ const ModalCreateCategory = ({ open, handleClose, onUpdate }) => {
       showSnackbar("Gagal menambahkan kategori", "error");
     }
   };
+
+  useEffect(() => {
+    if (!open) {
+      // Reset formData
+      setFormData({
+        name: "",
+      });
+
+      // Kosongkan input file jika masih ada
+      const input = document.getElementById("imageUpload");
+      if (input) input.value = "";
+    }
+  }, [open]);
 
   return (
     <Modal

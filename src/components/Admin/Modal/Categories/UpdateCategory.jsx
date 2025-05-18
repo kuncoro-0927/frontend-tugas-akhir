@@ -60,6 +60,19 @@ const ModalUpdateCategory = ({ open, handleClose, onUpdate, categoryId }) => {
     }
   };
 
+  useEffect(() => {
+    if (!open) {
+      // Reset formData
+      setFormData({
+        name: "",
+      });
+
+      // Kosongkan input file jika masih ada
+      const input = document.getElementById("imageUpload");
+      if (input) input.value = "";
+    }
+  }, [open]);
+
   return (
     <Modal
       open={open}

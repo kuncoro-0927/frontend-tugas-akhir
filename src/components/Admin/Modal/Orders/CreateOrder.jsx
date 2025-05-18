@@ -240,6 +240,7 @@ const ModalCreateOrder = ({ open, handleClose }) => {
         const response = await instanceAdmin.get("/all/products");
 
         setProducts(response.data);
+        console.log("products:", products); // untuk cek isinya
       } catch (error) {
         console.error("Failed to fetch users:", error);
       }
@@ -295,6 +296,27 @@ const ModalCreateOrder = ({ open, handleClose }) => {
     setFormData((prev) => ({ ...prev, promoCode: "" }));
     setPromoError("");
   };
+
+  const resetForm = () => {
+    setActiveStep(0);
+    setFormData({});
+    setSelectedUserId("");
+    setSelectedUser(null);
+    setSelectedItems([]);
+    setDestinationResults([]);
+    setShippingOptions([]);
+    setSelectedShippingOption(null);
+    setFormErrors({});
+    setOrderResponse(null);
+    setPromo(null);
+    setPromoError("");
+  };
+
+  useEffect(() => {
+    if (!open) {
+      resetForm();
+    }
+  }, [open]);
 
   return (
     <Modal
@@ -452,7 +474,7 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                   />
                   {searchQuery && (
                     <div className="border rounded mt-1 max-h-48 overflow-y-auto bg-white z-10 relative">
-                      {products
+                      {products.data
                         .filter(
                           (p) =>
                             p.name
@@ -460,43 +482,81 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                               .includes(searchQuery.toLowerCase()) &&
                             !selectedItems.some((i) => i.product.id === p.id)
                         )
-                        .map((product) => (
-                          <div
-                            key={product.id}
-                            className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                            onClick={() => {
-                              setSelectedItems([
-                                ...selectedItems,
-                                { product, quantity: 1 },
-                              ]);
-                              setSearchQuery("");
-                            }}
-                          >
-                            <div className="flex gap-5">
-                              <div className="h-[60px] w-[60px]">
-                                <CardImage
-                                  image={`${import.meta.env.VITE_BACKEND_URL}${
-                                    product.image_url
-                                  }`}
-                                  alt={product.name}
-                                />{" "}
+                        .map((product) => {
+                          const isDisabled =
+                            product.stock === 0 || product.status === "sold";
+                          return (
+                            <div
+                              key={product.id}
+                              className={`px-3 py-2 ${
+                                isDisabled
+                                  ? "cursor-not-allowed opacity-50"
+                                  : "hover:bg-gray-100 cursor-pointer"
+                              }`}
+                              onClick={() => {
+                                if (!isDisabled) {
+                                  setSelectedItems([
+                                    ...selectedItems,
+                                    { product, quantity: 1 },
+                                  ]);
+                                  setSearchQuery("");
+                                }
+                              }}
+                              title={
+                                isDisabled
+                                  ? product.stock === 0
+                                    ? "Stok habis"
+                                    : "Produk sudah terjual"
+                                  : ""
+                              }
+                            >
+                              <div className="flex gap-5">
+                                <div className="h-[60px] w-[60px]">
+                                  <CardImage
+                                    image={`${
+                                      import.meta.env.VITE_BACKEND_URL
+                                    }${product.image_url}`}
+                                    alt={product.name}
+                                  />
+                                </div>
+                                <div className="flex-col flex">
+                                  <div className="flex  w-[400px] items-center justify-between">
+                                    <p className="font-semibold">
+                                      {product.name}
+                                    </p>
+                                    <p className="text-sm font-semibold ml-auto">
+                                      IDR{" "}
+                                      {Number(product.price).toLocaleString(
+                                        "id-ID"
+                                      )}
+                                    </p>
+                                  </div>
+                                  <span className="text-xs">
+                                    <span className="font-bold">
+                                      Stok barang:
+                                    </span>{" "}
+                                    {product.stock}
+                                  </span>
+                                  <div className="flex items-center justify-between">
+                                    <p className="text-xs">{product.size}</p>
+                                    <div className="text-xs w-fit">
+                                      {product.status === "sold" ? (
+                                        <p className="bg-red-100 rounded-full px-3 py-0.5 text-red-600">
+                                          Terjual
+                                        </p>
+                                      ) : (
+                                        <p className="bg-green-100 rounded-full px-3 py-0.5 text-green-600">
+                                          Tersedia
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-                              <p className="flex-col flex">
-                                <span className="font-semibold">
-                                  {product.name}
-                                </span>
-                                <span className="text-xs">{product.size}</span>
-                                <span className="text-sm mt-auto">
-                                  IDR{" "}
-                                  {Number(product.price).toLocaleString(
-                                    "id-ID"
-                                  )}
-                                </span>
-                              </p>
                             </div>
-                          </div>
-                        ))}
-                      {products.filter(
+                          );
+                        })}
+                      {products.data.filter(
                         (p) =>
                           p.name
                             .toLowerCase()
@@ -519,9 +579,9 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                     {selectedItems.map((item, index) => (
                       <div
                         key={item.product.id}
-                        className="flex items-center justify-between border-b pb-4 "
+                        className="flex mx-4 items-center justify-between border-b pb-4 "
                       >
-                        <div className="flex gap-5">
+                        <div className="flex  gap-5">
                           <div className="h-[60px] w-[60px]">
                             <CardImage
                               image={`${import.meta.env.VITE_BACKEND_URL}${
@@ -530,69 +590,94 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                               alt={item.product.name}
                             />{" "}
                           </div>
-                          <p className="flex-col flex">
-                            <span className="font-semibold">
-                              {item.product.name}
+                          <div className="flex-col flex">
+                            <div className="flex  w-[400px] items-center justify-between">
+                              <div className="flex gap-2 items-center font-semibold">
+                                <p>{item.product.name}</p>
+                                <span className="flex items-center justify-between">
+                                  <span className="text-xs w-fit">
+                                    {item.product.status === "sold" ? (
+                                      <span className="bg-red-100 rounded-full px-3 py-0.5 text-red-600">
+                                        Terjual
+                                      </span>
+                                    ) : (
+                                      <span className="bg-green-100 rounded-full px-3 py-0.5 text-green-600">
+                                        Tersedia
+                                      </span>
+                                    )}
+                                  </span>
+                                </span>
+                              </div>
+                              <p className="text-sm font-semibold ml-auto">
+                                IDR{" "}
+                                {Number(item.product.price).toLocaleString(
+                                  "id-ID"
+                                )}
+                              </p>
+                            </div>
+                            <span className="text-xs">
+                              <span className="font-bold">Stok barang:</span>{" "}
+                              {item.product.stock}
                             </span>
-                            <span className="text-xs">{item.product.size}</span>
-                            <span className="text-sm mt-auto">
-                              IDR{" "}
-                              {Number(item.product.price).toLocaleString(
-                                "id-ID"
-                              )}
-                            </span>
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-10">
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (item.quantity > 1) {
-                                  setSelectedItems((prev) =>
-                                    prev.map((val, i) =>
-                                      i === index
-                                        ? { ...val, quantity: val.quantity - 1 }
-                                        : val
-                                    )
-                                  );
-                                }
-                              }}
-                              className="py-0.5 px-2 border border-gray-400 rounded-md"
-                            >
-                              −
-                            </button>
-                            <span className="w-6 text-center">
-                              {item.quantity}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setSelectedItems((prev) =>
-                                  prev.map((val, i) =>
-                                    i === index
-                                      ? { ...val, quantity: val.quantity + 1 }
-                                      : val
-                                  )
-                                )
-                              }
-                              className="py-0.5 px-2 border border-gray-400 rounded-md"
-                            >
-                              +
-                            </button>
-                          </div>
+                            <div className="flex items-center justify-between">
+                              {" "}
+                              <span className="text-xs">
+                                {item.product.size}
+                              </span>
+                              <div className="flex items-center gap-10">
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedItems(
+                                        (prev) =>
+                                          prev
+                                            .map((val, i) =>
+                                              i === index
+                                                ? {
+                                                    ...val,
+                                                    quantity: val.quantity - 1,
+                                                  }
+                                                : val
+                                            )
+                                            .filter((item) => item.quantity > 0) // ⬅️ otomatis hapus jika quantity <= 0
+                                      );
+                                    }}
+                                    className="py-0 px-1 text-xs border border-gray-400 rounded-sm"
+                                  >
+                                    −
+                                  </button>
 
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedItems((prev) =>
-                                prev.filter((_, i) => i !== index)
-                              );
-                            }}
-                            className="bg-red-600 px-3 py-2 rounded-md text-white text-sm hover:underline"
-                          >
-                            Hapus
-                          </button>
+                                  <span className="w-6 text-sm text-center">
+                                    {item.quantity}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (item.quantity < item.product.stock) {
+                                        setSelectedItems((prev) =>
+                                          prev.map((val, i) =>
+                                            i === index
+                                              ? {
+                                                  ...val,
+                                                  quantity: val.quantity + 1,
+                                                }
+                                              : val
+                                          )
+                                        );
+                                      }
+                                    }}
+                                    className="py-0 px-1 text-xs border border-gray-400 rounded-sm disabled:opacity-50"
+                                    disabled={
+                                      item.quantity >= item.product.stock
+                                    }
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}

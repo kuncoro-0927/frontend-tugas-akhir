@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Link } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
+import { showSnackbar } from "../components/CustomSnackbar";
 const Cart = () => {
   const dispatch = useDispatch();
   const isOpen = useSelector((state) => state.cartDrawer.isDrawerOpen);
@@ -94,9 +95,15 @@ const Cart = () => {
       navigate(`/shipping/form/${res.data.order_id}`);
     } catch (err) {
       console.error("Gagal melanjutkan pembayaran:", err);
-      alert("Terjadi kesalahan saat melanjutkan pembayaran.");
+
+      // Ambil pesan error dari response
+      const errorMsg =
+        err?.response?.data?.msg ||
+        "Terjadi kesalahan saat melanjutkan pembayaran.";
+
+      showSnackbar(errorMsg, "error");
     } finally {
-      setLoadingCheckout(false); // Sembunyikan loading indikator
+      setLoadingCheckout(false);
     }
   };
 

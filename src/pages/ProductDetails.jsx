@@ -20,7 +20,6 @@ const ProductDetails = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
   const [reviews, setReviews] = useState([]);
-  const [quantity, setQuantity] = useState(1);
   const location = useLocation();
   const from = location.state?.from;
   const [averageRating, setAverageRating] = useState(0);
@@ -57,17 +56,6 @@ const ProductDetails = () => {
   }, [id]);
 
   if (!product) return <p className="mx-14 mt-24">Loading...</p>;
-  const sizeOptions = [
-    "20 x 30",
-    "30 x 40",
-    "40 x 50",
-    "40 x 60",
-    "50 x 60",
-    "60 x 70",
-    "70 x 80",
-  ];
-  const row1 = sizeOptions.slice(0, 4); // ambil 4 ukuran pertama
-  const row2 = sizeOptions.slice(4); // sisanya
 
   const addCart = async (product, quantity) => {
     try {
@@ -94,7 +82,7 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = () => {
-    addCart(product, quantity);
+    addCart(product, 1);
   };
 
   return (
@@ -124,10 +112,23 @@ const ProductDetails = () => {
             />
           </div>
           <div className="flex flex-col md:w-1/2">
-            <div className="border rounded-full px-8 border-gray-400 py-1 w-fit">
-              {product.category}
+            <div className="flex items-center justify-between">
+              <div className="border rounded-full px-8 border-gray-400 py-1 w-fit">
+                {product.category}
+              </div>
+              <div className="text-sm">
+                {" "}
+                {product.status === "sold" ? (
+                  <p className="bg-red-100 rounded-full px-5 py-1.5 text-red-500">
+                    Terjual
+                  </p>
+                ) : (
+                  <p className="bg-green-100 rounded-full px-5 py-1.5 text-green-600">
+                    Tersedia
+                  </p>
+                )}
+              </div>
             </div>
-
             <div className="flex mt-4 items-center gap-3">
               <h1 className="text-2xl font-extrabold">{product.name}</h1>
               <GoShareAndroid className="text-xl" />
@@ -150,26 +151,10 @@ const ProductDetails = () => {
               </span>
             </p>
 
-            <p className=" mt-5 text-gray-700">Ukuran:</p>
+            <p className=" mt-5 font-bold">Ukuran</p>
             <div className="flex flex-col gap-2 mt-3">
-              {/* Baris 1 */}
-              <div className="flex gap-2">
-                {row1.map((size, index) => (
-                  <p
-                    key={index}
-                    className={`rounded-full px-3 py-1 border text-sm ${
-                      size === product.size
-                        ? "bg-black text-white"
-                        : "border-gray-300 text-gray-300"
-                    }`}
-                  >
-                    {size}
-                  </p>
-                ))}
-              </div>
-
               {/* Baris 2 */}
-              <div className="flex gap-2">
+              {/* <div className="flex gap-2">
                 {row2.map((size, index) => (
                   <p
                     key={index}
@@ -183,51 +168,42 @@ const ProductDetails = () => {
                   </p>
                 ))}
               </div>
-            </div>
+            </div> */}
 
-            <p className=" mt-5 text-gray-700">Jumlah:</p>
-            <div className="flex mt-2 items-center gap-2">
-              <button
-                className="px-2.5 py-0.5 border border-gray-400 rounded-lg"
-                onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
-              >
-                -
-              </button>
-              <span>{quantity}</span>
-              <button
-                className="px-2.5 py-0.5 border border-gray-400 rounded-lg"
-                onClick={() => setQuantity((prev) => prev + 1)}
-              >
-                +
-              </button>
-            </div>
+              <div className="flex gap-2">
+                <p className="rounded-md px-3 py-1 border border-gray-400 text-sm">
+                  {product.size}
+                </p>
+              </div>
 
-            <div className="flex mt-10 items-center gap-3">
-              <button
-                onClick={handleAddToCart}
-                className="bg-black w-full rounded-lg text-white py-2"
-              >
-                Pesan
-              </button>
-              <button className="w-full border border-gray-400 py-2 rounded-lg">
-                Tambah ke favorit
-              </button>
-            </div>
-            <div className="mt-10 space-y-3">
-              <AccordionProduct
-                title="Deskripsi Produk"
-                content={product.description}
-                defaultExpanded={true} // auto buka
-              />
-              <AccordionProduct
-                title="Spesifikasi Produk"
-                content={product.specification}
-                defaultExpanded={false} // tertutup
-              />
+              <div className="mt-5 space-y-3">
+                <p className="font-bold text-base">Deskripsi Produk</p>
+                <span className="text-sm font-medium text-black/60">
+                  {" "}
+                  {product.description}
+                </span>
+              </div>
+
+              <div className="flex mt-10 items-center gap-3">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={product.status === "sold"}
+                  className={`w-full rounded-lg py-2  ${
+                    product.status === "sold"
+                      ? "bg-gray-200 text-gray-500 opacity-50 cursor-not-allowed"
+                      : "bg-black text-white hover:bg-gray-800 transition"
+                  }`}
+                >
+                  {product.status === "sold" ? "Sudah terjual" : "Pesan"}
+                </button>
+
+                <button className="w-full border border-gray-400 py-2 rounded-lg">
+                  Tambah ke favorit
+                </button>
+              </div>
             </div>
           </div>
         </div>
-
         <div className="border-t mt-10 pb-10"></div>
       </section>
 

@@ -25,7 +25,7 @@ const DataOrders = () => {
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("paid");
   const handleOpenCreateModal = () => setCreateModal(true);
   const handleCloseCreateModal = () => setCreateModal(false);
   const handleCloseEditModal = () => setEditModal(false);

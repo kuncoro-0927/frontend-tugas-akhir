@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import FormInput from "../../../TextField";
-import { Modal, Box, Button } from "@mui/material";
+import { Modal, Box, FormControlLabel, Checkbox } from "@mui/material";
 import { instanceAdmin } from "../../../../utils/axiosAdmin";
 import { showSnackbar } from "../../../CustomSnackbar";
 import { IoImageOutline } from "react-icons/io5";
@@ -14,16 +14,16 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
     category: "",
     size: "",
     weight: "",
+    stock: "",
+    is_limited: false, // default false
+    status: "available", // default 'available'
   });
-  const [oldImageUrl, setOldImageUrl] = useState("");
 
+  const [oldImageUrl, setOldImageUrl] = useState("");
   const [categories, setCategories] = useState([]);
   const [image, setImage] = useState(null);
-  const [imageInfo, setImageInfo] = useState({
-    name: "",
-    size: 0,
-  });
-  // Handle form data change
+  const [imageInfo, setImageInfo] = useState({ name: "", size: 0 });
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -33,17 +33,15 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
 
   const handleRemoveImage = () => {
     setImage(null);
-    setImageInfo({
-      name: "",
-      size: 0,
-    });
-    document.getElementById("imageUpload").value = ""; // Mengosongkan input file
+    setImageInfo({ name: "", size: 0 });
+    document.getElementById("imageUpload").value = "";
   };
+
   const fetchProductDetails = async () => {
     try {
       const res = await instanceAdmin.get(`/product/${productId}`);
-      const product = res.data.data; // <== penting!
-      console.log("data res", product);
+      const product = res.data.data;
+
       setFormData({
         name: product.name || "",
         description: product.description || "",
@@ -51,6 +49,9 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
         category: product.category_id || "",
         size: product.size || "",
         weight: product.weight_gram || "",
+        stock: product.stock || "",
+        is_limited: !!product.is_limited,
+        status: product.status || "available", // penting!
       });
       setOldImageUrl(product.image_url || "");
     } catch (err) {
@@ -58,7 +59,6 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
     }
   };
 
-  // Fetch categories for select
   const fetchCategories = async () => {
     try {
       const res = await instanceAdmin.get("/all/category");
@@ -69,12 +69,10 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
   };
 
   useEffect(() => {
-    console.log("Product ID:", productId); // <== tambahkan ini
     if (open) {
       fetchProductDetails();
       fetchCategories();
     } else {
-      // Reset form ketika modal ditutup
       setFormData({
         name: "",
         description: "",
@@ -82,26 +80,41 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
         category: "",
         size: "",
         weight: "",
+        stock: "",
+        is_limited: false,
+        status: "available",
       });
       setImage(null);
+      setImageInfo({ name: "", size: 0 });
+      setOldImageUrl("");
     }
   }, [open]);
 
-  // Handle image change
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    const file = e.target.files[0];
+    setImage(file);
+    if (file) {
+      setImageInfo({ name: file.name, size: file.size });
+    } else {
+      setImageInfo({ name: "", size: 0 });
+    }
   };
 
-  // Handle product update
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const data = new FormData();
-      for (const key in formData) {
-        data.append(key, formData[key]);
-      }
-      if (image) data.append("image", image);
 
+      for (const key in formData) {
+        if (key === "is_limited") {
+          data.append(key, formData[key] ? 1 : 0); // convert boolean to 1/0
+        } else {
+          data.append(key, formData[key]);
+        }
+      }
+      if (image) {
+        data.append("image", image);
+      }
       const res = await instanceAdmin.put(
         `/update/product/${productId}`,
         data,
@@ -110,12 +123,10 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
         }
       );
       console.error(res);
-
       showSnackbar("Produk berhasil diperbarui", "success");
       handleClose();
       onUpdate();
     } catch (err) {
-      console.error("Failed to update product", err);
       console.error(
         "Failed to update product",
         err.response?.data || err.message
@@ -231,6 +242,53 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
                   onChange={handleChange}
                 />
               </div>
+              <div className="flex gap-5">
+                <FormInput
+                  label="Stok"
+                  name="stock"
+                  type="number"
+                  value={formData.stock}
+                  onChange={handleChange}
+                />
+
+                <FormInput
+                  label="Status"
+                  name="status"
+                  type="select"
+                  value={formData.status}
+                  onChange={handleChange}
+                  options={[
+                    { label: "Tersedia", value: "available" },
+                    { label: "Terjual", value: "sold" },
+                  ]}
+                />
+              </div>
+              <div className="mt-5">
+                <h1 className="font-bold text-lg">
+                  Apakah produk ini terbatas?
+                </h1>
+                <p className="text-sm text-graytext">
+                  Produk terbatas artinya hanya tersedia 1 unit saja dan tidak
+                  akan diisi ulang. Jika produk tidak terbatas, maka stok
+                  tersedia dalam jumlah banyak.
+                </p>
+              </div>
+              <label className="inline-flex w-fit items-center space-x-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-blue-600 rounded focus:ring-0"
+                  checked={formData.is_limited}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      is_limited: e.target.checked,
+                    }))
+                  }
+                />
+                <span className="text-graytext">
+                  Produk terbatas (Limited Edition)
+                </span>
+              </label>
 
               <label
                 htmlFor="imageUpload"
@@ -273,6 +331,7 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
               <input
                 id="imageUpload"
                 type="file"
+                name="image"
                 accept="image/*"
                 onChange={handleImageChange}
                 className="hidden"
@@ -296,7 +355,7 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
             <div className="text-right mt-10 ">
               <button
                 type="submit"
-                className="bg-black px-4 py-2 text-white rounded-md hover:bg-black/80 duration-300"
+                className="bg-blue-600 px-4 py-2 text-white rounded-md hover:bg-blue-600/60 duration-300"
                 variant="contained"
                 color="primary"
               >

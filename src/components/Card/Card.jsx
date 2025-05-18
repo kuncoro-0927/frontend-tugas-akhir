@@ -8,6 +8,8 @@ export default function Card({
   price,
   average_rating,
   isLoading,
+  status,
+  stock,
 }) {
   return (
     <>
@@ -49,21 +51,25 @@ export default function Card({
         )}
       </div>
 
-      {isLoading ? (
-        <Skeleton
-          variant="text"
-          width="50%"
-          height={30}
-          className="backdrop-blur-lg text-black rounded-tr-lg text-sm font-medium flex items-center"
-        />
-      ) : (
+      <div className="flex items-center justify-between">
         <div className="backdrop-blur-lg justify-between mb-3 text-black rounded-tr-lg text-sm font-medium flex items-center">
           <span className="mr-1 flex items-center gap-1">
             <FaStar className="text-yellow-300" /> {average_rating || "5.0"} (0
             ulasan)
           </span>
         </div>
-      )}
+        <div className="text-xs ">
+          {status === "sold" ? (
+            <p className="bg-red-100 rounded-full px-3 py-1 text-red-600">
+              Stok habis
+            </p>
+          ) : (
+            <p className="bg-green-100 rounded-full px-3 py-1 text-green-600">
+              Tersedia ({stock})
+            </p>
+          )}
+        </div>
+      </div>
     </>
   );
 }

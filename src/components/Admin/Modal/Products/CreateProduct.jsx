@@ -15,6 +15,8 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
     category: "",
     size: "",
     weight: "",
+    stock: "",
+    is_limited: false,
   });
   const [image, setImage] = useState(null);
   const [imageInfo, setImageInfo] = useState({
@@ -85,6 +87,33 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    if (!open) {
+      // Reset formData
+      setFormData({
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        size: "",
+        weight: "",
+        stock: "",
+        is_limited: false,
+      });
+
+      // Reset image
+      setImage(null);
+      setImageInfo({
+        name: "",
+        size: 0,
+      });
+
+      // Kosongkan input file jika masih ada
+      const input = document.getElementById("imageUpload");
+      if (input) input.value = "";
+    }
+  }, [open]);
+
   return (
     <Modal
       open={open}
@@ -139,12 +168,21 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
 
           <form className="px-6 mt-5 pb-6" onSubmit={handleSubmit}>
             <div className="grid gap-4">
-              <FormInput
-                name="name"
-                type="text"
-                label="Nama Produk"
-                onChange={handleChange}
-              />
+              <div className="flex gap-5">
+                <FormInput
+                  name="name"
+                  type="text"
+                  label="Nama Produk"
+                  onChange={handleChange}
+                />{" "}
+                <FormInput
+                  label="Stok"
+                  name="stock"
+                  type="number"
+                  value={formData.stock}
+                  onChange={handleChange}
+                />
+              </div>
               <div className="flex gap-5">
                 <FormInput
                   name="category"
@@ -186,6 +224,32 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                   onChange={handleChange}
                 />
               </div>
+              <div className="">
+                <h1 className="font-bold text-lg">
+                  Apakah produk ini terbatas?
+                </h1>
+                <p className="text-sm text-graytext">
+                  Produk terbatas artinya hanya tersedia 1 unit saja dan tidak
+                  akan diisi ulang. Jika produk tidak terbatas, maka stok
+                  tersedia dalam jumlah banyak.
+                </p>
+              </div>
+              <label className="inline-flex w-fit items-center space-x-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 accent-blue-600 rounded focus:ring-0"
+                  checked={formData.is_limited}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      is_limited: e.target.checked,
+                    }))
+                  }
+                />
+                <span className="text-graytext text-sm">
+                  Produk terbatas (Limited Edition)
+                </span>
+              </label>
 
               <label
                 htmlFor="imageUpload"

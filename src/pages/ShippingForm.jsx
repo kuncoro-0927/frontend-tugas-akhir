@@ -455,6 +455,10 @@ const ShippingForm = () => {
             </button>
           </div>
 
+          {promoError && (
+            <p className="text-red-500 text-sm mt-1">{promoError}</p>
+          )}
+
           <div className="w-full pt-3 text-sm h-fit">
             <div className="">
               <div className="flex justify-between">
@@ -488,9 +492,6 @@ const ShippingForm = () => {
                 </div>
               </>
 
-              {promoError && (
-                <p className="text-red-500 text-sm mt-1">{promoError}</p>
-              )}
               {promo && (
                 <p className="text-green-600 flex items-center justify-between text-sm mt-1">
                   <span>

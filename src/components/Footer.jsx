@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <div>
       <footer className="mt-20 mx-14">
-        <div className="flex gap-24 Justify-start items-start mx-[14px] text-sm">
+        <div className="md:flex gap-24 Justify-start items-start mx-[14px] text-sm">
           <div className="max-w-sm  w-fit ">
             <h1 className="font-bold text-lg mb-3">Bantuan</h1>
             <p className="font-semibold">Hubungi Kami</p>

@@ -21,6 +21,7 @@ import PaymentSuccess from "../pages/PaymentSuccess";
 import Cart from "../pages/Cart";
 import FloatingButton from "../components/FloatingButton";
 import ModalSearch from "../components/Modal/ModalSearch";
+import FrameWithPhoto from "../pages/CustomPhoto";
 function UserRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -99,6 +100,7 @@ function UserRoutes() {
         <Route path="/product" element={<Product />} />
         <Route path="/help/center" element={<Faqs />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/custom" element={<FrameWithPhoto />} />
         <Route path="/product/detail/:id" element={<ProductDetails />} />
         <Route path="/account/profile" element={<Profile />} />
         <Route path="/account/order" element={<Order />} />

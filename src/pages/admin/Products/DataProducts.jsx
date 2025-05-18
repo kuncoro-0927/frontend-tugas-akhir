@@ -216,6 +216,7 @@ const DataProducts = () => {
                       "Ukuran / cm",
                       "Berat / gram",
                       "Kategori",
+                      "Stok",
                       "Harga",
                       "Status",
                       "Aksi",
@@ -273,6 +274,14 @@ const DataProducts = () => {
                         <div className="">
                           <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
                             {product.category_name}
+                          </p>
+                        </div>
+                      </td>
+
+                      <td className="p-4 border-b border-blue-gray-50">
+                        <div className="">
+                          <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
+                            {product.stock}
                           </p>
                         </div>
                       </td>

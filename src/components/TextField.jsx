@@ -60,6 +60,7 @@ export default function FormInput({
             fontSize: "0.78rem",
             pointerEvents: "none",
           },
+          shrink: type === "date" ? true : undefined,
         }}
         InputProps={{
           startAdornment:
@@ -75,6 +76,9 @@ export default function FormInput({
           },
         }}
         sx={{
+          "& .MuiSelect-select": {
+            fontSize: "0.87rem", // <-- ukuran font yang tampil saat select sudah dipilih
+          },
           "& .MuiOutlinedInput-root": {
             height: type === "textarea" ? "auto" : "49px", // auto height untuk textarea
             fontSize: "1rem",
@@ -114,7 +118,11 @@ export default function FormInput({
       >
         {type === "select" &&
           options.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
+            <MenuItem
+              key={option.value}
+              sx={{ fontSize: "1rem" }}
+              value={option.value}
+            >
               {option.label}
             </MenuItem>
           ))}
