@@ -87,7 +87,7 @@ const ProductDetails = () => {
 
   return (
     <>
-      <section className="mx-[75px] mt-10">
+      <section className="md:mx-[75px] mx-7 mt-10">
         <Breadcrumbs
           aria-label="breadcrumb"
           separator={<GoChevronRight style={{ fontSize: "small" }} />}
@@ -105,15 +105,15 @@ const ProductDetails = () => {
           <div className="text-sm font-medium text-black">{product.name}</div>
         </Breadcrumbs>
 
-        <div className="mt-10 flex gap-20">
-          <div className="w-1/2 h-[550px]">
+        <div className="md:mt-10 mt-5 md:flex gap-20">
+          <div className="md:w-1/2 md:h-[550px] w-full h-[300px]">
             <CardImage
               image={`${import.meta.env.VITE_BACKEND_URL}${product.image_url}`}
             />
           </div>
           <div className="flex flex-col md:w-1/2">
-            <div className="flex items-center justify-between">
-              <div className="border rounded-full px-8 border-gray-400 py-1 w-fit">
+            <div className="flex mt-5 items-center justify-between">
+              <div className="text-black/60 font-bold  py-1 w-fit">
                 {product.category}
               </div>
               <div className="text-sm">
@@ -129,10 +129,12 @@ const ProductDetails = () => {
                 )}
               </div>
             </div>
-            <div className="flex mt-4 items-center gap-3">
-              <h1 className="text-2xl font-extrabold">{product.name}</h1>
-              <GoShareAndroid className="text-xl" />
-              <p className="text-2xl  ml-auto">
+            <div className="md:flex mt-3 items-center gap-3">
+              <div className="flex items-start md:items-center gap-2">
+                <h1 className="text-2xl font-extrabold">{product.name}</h1>
+                <GoShareAndroid className="md:text-xl text-2xl" />
+              </div>
+              <p className="text-2xl mt-2 md:mt-0 ml-auto">
                 <span className="font-bold">
                   IDR {Number(product.price).toLocaleString("id-ID")}
                 </span>
@@ -204,19 +206,19 @@ const ProductDetails = () => {
             </div>
           </div>
         </div>
-        <div className="border-t mt-10 pb-10"></div>
+        <div className="border-t mt-10 md:pb-10"></div>
       </section>
 
-      <section className="mx-[75px] pb-20">
+      <section className="md:mx-[75px] mx-7 pb-20">
         <div className="mt-7">
           <h2 className="text-2xl text-hitam2 font-extrabold">
             Ulasan Pengguna
           </h2>
         </div>
 
-        <div className="flex items-start justify-start gap-10">
+        <div className="md:flex items-start justify-start md:gap-10">
           {/* Bagian kiri: Ringkasan rating */}
-          <div className="mt-3 flex-col gap-10 flex items-start justify-between text-hitam2 w-fit p-5 rounded-md">
+          <div className="mt-3 flex-col md:gap-10 flex items-start justify-between text-hitam2 w-fit p-5 rounded-md">
             <div className="items-end gap-3">
               <h1 className="flex items-center text-3xl md:text-5xl font-extrabold text-hitam2">
                 <Rating

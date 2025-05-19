@@ -16,24 +16,33 @@ import { toggleWishlist } from "../redux/wishlistSlice";
 import { fetchWishlist } from "../redux/wishlistSlice";
 import { addToCart } from "../redux/cartSlice";
 import { fetchCartItemCount } from "../redux/cartSlice";
+import DrawerProduct from "../components/DrawerProduct";
+import { IoFilterOutline } from "react-icons/io5";
+
 const Product = () => {
   const { isLoggedIn, user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const [dropdownStates, setDropdownStates] = useState([false]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedPrice, setSelectedPrice] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [products, setProducts] = useState([]);
   const [loadingProductId, setLoadingProductId] = useState(null);
   const wishlist = useSelector((state) => state.wishlist.wishlist);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
 
-  const toggleDropdown = (index) => {
-    setDropdownStates((prevStates) => {
-      const newStates = [...prevStates];
-      newStates[index] = !newStates[index];
-      return newStates;
-    });
-  };
+  // Hitung index awal dan akhir
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  // Ambil produk yang akan ditampilkan saat ini
+  const currentProducts = products.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Total halaman
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
   const handleToggleWishlist = (productId) => {
     if (!isLoggedIn) {
       showSnackbar("Silakan login terlebih dahulu", "warning");
@@ -64,10 +73,11 @@ const Product = () => {
     );
   };
 
-  const handleFilterChange = ({ category, price, size }) => {
+  const handleFilterChange = ({ category, price, size, keyword }) => {
     setSelectedCategory(category);
     setSelectedPrice(price);
     setSelectedSize(size);
+    setSearchKeyword(keyword); // tambahkan ini
   };
 
   const filterApplied = selectedCategory || selectedPrice || selectedSize;
@@ -78,15 +88,18 @@ const Product = () => {
         params: {
           category: selectedCategory,
           size: selectedSize,
-          min_price: selectedPrice?.min ?? null,
-          max_price: selectedPrice?.max ?? null,
+          min_price: selectedPrice?.[0] ?? null,
+          max_price: selectedPrice?.[1] ?? null,
+          keyword: searchKeyword || null, // tambahkan ini
         },
       });
+
       console.log("Data filter:", {
         category: selectedCategory,
         size: selectedSize,
         min_price: selectedPrice?.min,
         max_price: selectedPrice?.max,
+        keyword: searchKeyword,
       });
 
       setProducts(res.data.data);
@@ -97,7 +110,7 @@ const Product = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [selectedCategory, selectedPrice, selectedSize]);
+  }, [selectedCategory, selectedPrice, selectedSize, searchKeyword]);
 
   const addCart = async (product, quantity) => {
     try {
@@ -131,7 +144,12 @@ const Product = () => {
   };
 
   return (
-    <section className="mx-14 mt-10 pb-20">
+    <section className="md:mx-14 mx-7 mt-10 md:pb-10">
+      <DrawerProduct
+        open={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onFilterChange={handleFilterChange}
+      />
       <Breadcrumbs
         aria-label="breadcrumb"
         separator={<GoChevronRight style={{ fontSize: "small" }} />}
@@ -142,7 +160,7 @@ const Product = () => {
         <div className="text-sm font-medium text-black">Produk</div>
       </Breadcrumbs>
 
-      <div className="flex mt-10 gap-10">
+      <div className="flex mt-3 md:mt-10 md:gap-10">
         <div className="hidden sm:block md:block lg:block">
           <div className="sticky top-24">
             <SidebarProduct onFilterChange={handleFilterChange} />
@@ -152,83 +170,28 @@ const Product = () => {
         <div className="w-full">
           <h1 className="text-4xl font-extrabold">List Produk</h1>
 
-          <div className="flex items-center justify-between mt-5 mb-5">
+          <div className="md:flex items-center justify-between mt-2 md:mt-5 mb-5">
             <p>
               {filterApplied
                 ? `Menampilkan ${products.length} produk sesuai filter`
                 : "Menampilkan semua produk"}
             </p>
 
-            <div className="relative inline-block">
-              <div className="flex items-center gap-2">
-                <p>Urutkan</p>
+            <div className="relative md:inline-block">
+              <div className="flex md:hidden mt-3 items-center justify-between">
                 <button
-                  onClick={() => toggleDropdown(0)}
-                  className="border px-3 py-2 rounded-full border-gray-400 flex items-center gap-1"
+                  onClick={() => setIsDrawerOpen(true)}
+                  className="py-2 font-semibold gap-2 flex items-center justify-between border px-5 rounded-lg "
                 >
-                  Terbaru
-                  {dropdownStates[0] ? (
-                    <MdKeyboardArrowDown />
-                  ) : (
-                    <MdKeyboardArrowRight />
-                  )}
+                  <span>Filter</span>
+                  <IoFilterOutline />
                 </button>
               </div>
-
-              {dropdownStates[0] && (
-                <div className="absolute z-10 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg">
-                  <ul>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      Terlaris
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      Termurah
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                      Termahal
-                    </li>
-                  </ul>
-                </div>
-              )}
             </div>
           </div>
 
-          {selectedCategory || selectedPrice || selectedSize ? (
-            <div className="flex items-center mb-6">
-              <span className="mr-3">Yang dipilih:</span>
-              {selectedCategory && (
-                <div className="border flex items-center border-gray-400 pl-3 pr-2 py-2 rounded-full mr-2">
-                  <span className="mr-1">{selectedCategory}</span>
-                  <IoIosClose
-                    className="cursor-pointer text-xl"
-                    onClick={() => setSelectedCategory("")}
-                  />
-                </div>
-              )}
-              {selectedPrice && (
-                <div className="border flex items-center border-gray-400 pl-3 pr-2 py-2 rounded-full  mr-2">
-                  <span className="mr-1">{selectedPrice.label}</span>
-                  <IoIosClose
-                    className="cursor-pointer text-xl"
-                    onClick={() => setSelectedPrice(null)}
-                  />
-                </div>
-              )}
-
-              {selectedSize && (
-                <div className="border flex items-center border-gray-400 pl-3 pr-2 py-2 rounded-full mr-2">
-                  <span className="mr-1">{selectedSize}</span>
-                  <IoIosClose
-                    className="cursor-pointer text-xl"
-                    onClick={() => setSelectedSize("")}
-                  />
-                </div>
-              )}
-            </div>
-          ) : null}
-
-          <div className="grid lg:grid-cols-3 gap-10">
-            {products.map((product) => (
+          <div className="lg:grid grid lg:grid-cols-3 gap-10">
+            {currentProducts.map((product) => (
               <div key={product.id} className="relative">
                 <Link
                   to={`/product/detail/${product.id}`}
@@ -242,15 +205,10 @@ const Product = () => {
                     price={Number(product.price).toLocaleString("id-ID")}
                     average_rating={product.rating || "0.0"}
                     status={product.status}
+                    stock={product.stock}
                   />
                 </Link>
-                {/* {product.status === "sold" ? (
-                  <p className="text-red-500 font-bold absolute top-1 left-1">
-                    TERJUAL
-                  </p>
-                ) : (
-                  <div>Tersedia</div>
-                )} */}
+
                 <div className="absolute top-1 right-1">
                   <IconButton
                     onClick={() => handleToggleWishlist(product.id)}
@@ -296,6 +254,46 @@ const Product = () => {
               </div>
             ))}
           </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-center md:justify-end mt-10 gap-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 border rounded ${
+                  currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                Prev
+              </button>
+
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentPage(index + 1)}
+                  className={`px-3 py-1 border rounded ${
+                    currentPage === index + 1 ? "bg-black text-white" : ""
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 border rounded ${
+                  currentPage === totalPages
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>

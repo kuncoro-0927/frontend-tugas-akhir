@@ -225,10 +225,10 @@ const Home = () => {
           </div>
         </div>
       </section> */}
-      <section className="mt-28 mx-7 md:mx-14 ">
+      <section className="md:mt-28 mt-20 mx-7 md:mx-14 ">
         <div className="flex justify-center md:justify-between items-center">
           <div>
-            <h1 className="font-extrabold text-3xl">Galeri Kami</h1>
+            <h1 className="font-extrabold text-2xl md:text-3xl">Galeri Kami</h1>
           </div>
 
           <button className="border hidden md:block border-gray-300 py-2 px-5 rounded-full text-sm hover:-translate-y-1 duration-300">
@@ -367,7 +367,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="mt-52 md:flex justify-center mx-14 gap-32">
+      <section className="md:mt-52 mt-20 md:flex justify-center mx-7  md:mx-14 gap-32">
         <div>
           <img
             src="/public/images/bg-4.jpg"
@@ -375,8 +375,10 @@ const Home = () => {
             alt=""
           />
         </div>
-        <div className="">
-          <h1 className="text-3xl font-bold">Kenapa Faza Frame?</h1>
+        <div className="mt-10">
+          <h1 className=" text-2xl md:text-3xl font-extrabold">
+            Kenapa Faza Frame?
+          </h1>
           <p className="border-b pb-4 mt-3">
             Lorem ipsum dolor sit amet consectetur, adipisicing elit. Veniam,
             nam?
@@ -388,14 +390,14 @@ const Home = () => {
       </section>
 
       <section className="mx-7 md:mx-6 lg:mx-14 bg-cover 2xl:mx-32 mt-10 justify-center lg:mt-20">
-        <h1 className="text-xl sm:text-3xl font-bold md:text-4xl mb-7 md:mb-10 lg:mb-20 text-hitam">
+        <h1 className="text-2xl font-extrabold md:text-4xl mb-7 md:mb-10 lg:mb-20 text-hitam">
           Apa kata pelanggan
         </h1>
 
         <SwiperCardReview />
       </section>
 
-      <section className="mt-20 mx-14">
+      {/* <section className="mt-20 mx-14">
         <div className="text-center font-medium text-3xl">
           Berlangganan untuk mendapatkan{" "}
           <span className="font-bold">berita</span> dan <br /> penawaran{" "}
@@ -417,7 +419,7 @@ const Home = () => {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
     </>
   );
 };

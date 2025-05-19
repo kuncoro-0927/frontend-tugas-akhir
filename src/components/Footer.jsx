@@ -4,13 +4,13 @@ import { TiSocialFacebook } from "react-icons/ti";
 const Footer = () => {
   return (
     <div>
-      <footer className="mt-20 mx-14">
-        <div className="md:flex gap-24 Justify-start items-start mx-[14px] text-sm">
+      <footer className="mt-20 mx-7 md:mx-14">
+        <div className="md:flex space-y-4 md:space-y-0 gap-24 Justify-start items-start md:mx-[14px] text-sm">
           <div className="max-w-sm  w-fit ">
             <h1 className="font-bold text-lg mb-3">Bantuan</h1>
             <p className="font-semibold">Hubungi Kami</p>
             <p className="font-semibold">Faqs</p>
-            <div className="mt-10">
+            <div className="hidden md:block mt-10">
               <h1 className="mb-3 text-sm text-gray-600">Ikuti Kami</h1>
               <div className="flex items-center gap-3">
                 <div className="rounded-full bg-black text-white text-2xl inline-block p-2">
@@ -58,6 +58,17 @@ const Footer = () => {
                     />
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+          <div className=" md:hidden mt-10">
+            <h1 className="mb-3 text-sm text-gray-600">Ikuti Kami</h1>
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-black text-white text-2xl inline-block p-2">
+                <FaInstagram />
+              </div>
+              <div className="rounded-full bg-black text-white text-2xl inline-block p-2">
+                <TiSocialFacebook />
               </div>
             </div>
           </div>

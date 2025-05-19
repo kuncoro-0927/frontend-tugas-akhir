@@ -13,13 +13,13 @@ export default function Card({
 }) {
   return (
     <>
-      <div className=" bg-abu  rounded-lg h-full max-h-[280px]  lg:max-h-[250px] md:max-h-[300px] relative overflow-hidden group flex flex-col">
+      <div className=" bg-abu p-5 rounded-lg h-[300px] w-[320px] md:w-auto lg:max-h-[250px] md:max-h-[300px] relative overflow-hidden group flex flex-col">
         <div className="relative justify-center items-center flex w-full   h-full overflow-hidden flex-shrink-0">
           {isLoading ? (
             <Skeleton variant="rectangular" width="100%" height={200} />
           ) : (
             <img
-              className=" w-40 items-center flex  justify-center object-cover rounded-t-lg transform transition-transform duration-300 group-hover:scale-105"
+              className="w-full h-full object-contain rounded-t-lg transform transition-transform duration-300 group-hover:scale-105"
               src={image}
               alt="Image"
             />
@@ -34,7 +34,7 @@ export default function Card({
           <Skeleton width="80%" height={20} />
         ) : (
           <h1
-            className="text-sm md:text-base font-bold text-hitam2 truncate max-w-[60%]"
+            className="md:text-base text-lg font-bold text-hitam2 truncate max-w-[60%]"
             title={title}
           >
             {title}
@@ -45,7 +45,7 @@ export default function Card({
         {isLoading ? (
           <Skeleton width="30%" height={20} />
         ) : (
-          <p className="text-sm font-extrabold text-right  ml-2 whitespace-nowrap">
+          <p className="md:text-sm text-base  font-extrabold text-right  ml-2 whitespace-nowrap">
             IDR {price}
           </p>
         )}
@@ -53,19 +53,19 @@ export default function Card({
 
       <div className="flex items-center justify-between">
         <div className="backdrop-blur-lg justify-between mb-3 text-black rounded-tr-lg text-sm font-medium flex items-center">
-          <span className="mr-1 flex items-center gap-1">
+          <span className="mr-1  flex items-center gap-1">
             <FaStar className="text-yellow-300" /> {average_rating || "5.0"} (0
             ulasan)
           </span>
         </div>
-        <div className="text-xs ">
+        <div className="text-xs md:flex">
           {status === "sold" ? (
             <p className="bg-red-100 rounded-full px-3 py-1 text-red-600">
-              Stok habis
+              <span className="">Stok habis</span> <span>({stock})</span>
             </p>
           ) : (
             <p className="bg-green-100 rounded-full px-3 py-1 text-green-600">
-              Tersedia ({stock})
+              <span className="">Tersedia </span>({stock})
             </p>
           )}
         </div>

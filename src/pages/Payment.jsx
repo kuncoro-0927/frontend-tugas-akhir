@@ -170,7 +170,7 @@ const Payment = () => {
   return (
     <>
       <section className=" h-screen">
-        <div className="border-b flex items-center justify-between px-[75px] py-4">
+        <div className="border-b flex items-center justify-between px-7 md:px-[75px] py-4">
           <Link to="/">
             <img className="w-10" src="/logoindex.svg" alt="" />
           </Link>
@@ -181,8 +181,8 @@ const Payment = () => {
             <CiShoppingCart className="text-3xl" />
           </button>
         </div>
-        <div className="flex space-x-20 mx-[75px] justify-between">
-          <div className="max-w-[700px]  mt-10  w-full">
+        <div className="flex flex-col-reverse md:flex-row md:space-x-20 mx-7 md:mx-[75px] justify-between">
+          <div className="max-w-[700px] mb-10 md:mt-10  w-full">
             <div className="border-b pb-2 flex items-start justify-between border-gray-400 max-w-[700px]">
               <div>
                 <h1 className="font-bold text-2xl ">Layanan/Kurir</h1>
@@ -231,11 +231,17 @@ const Payment = () => {
 
               <div className="rounded-xl border border-gray-300 bg-gray-100/50">
                 <div className="rounded-t-xl px-3 py-4 border border-black/50 items-center justify-between flex">
-                  <h1>Pembayaran via Midtrans</h1>
+                  <h1 className="text-xs md:text-sm">
+                    Pembayaran via Midtrans
+                  </h1>
                   <div className="flex items-center gap-3">
-                    <img className="w-12" src="/images/bni.svg" alt="" />
-                    <img className="w-14" src="/images/bri.svg" alt="" />
-                    <img className="w-14" src="/images/mandiri.svg" alt="" />
+                    <img className="md:w-12 w-8" src="/images/bni.svg" alt="" />
+                    <img className="md:w-14 w-8" src="/images/bri.svg" alt="" />
+                    <img
+                      className="md:w-14 w-8"
+                      src="/images/mandiri.svg"
+                      alt=""
+                    />
                   </div>
                 </div>
 
@@ -244,7 +250,7 @@ const Payment = () => {
                   src="/images/creditcard2.svg"
                   alt=""
                 />
-                <p className="text-sm max-w-sm mb-5 text-center mx-auto mt-7">
+                <p className="text-sm px-5 max-w-sm mb-5 text-center mx-auto mt-7">
                   Setelah klik 'Bayar Sekarang', Anda akan diarahkan ke halaman
                   pembayaran Midtrans untuk menyelesaikan transaksi dengan aman.
                 </p>
@@ -292,12 +298,12 @@ const Payment = () => {
                     </div>
                   </div>
                   <div className="flex  justify-center mx-5 items-center">
-                    <div className=" overflow-y-auto max-h-[40vh] text-black w-full">
+                    <div className=" overflow-y-auto scrollbar-hide max-h-[40vh] text-black w-full">
                       {[...shippingOptions]
                         .sort((a, b) => a.cost - b.cost)
                         .map((service, index) => (
                           <div
-                            className={`py-2 flex justify-start items-start px-5 mt-2 rounded-lg cursor-pointer ${
+                            className={`py-2 flex justify-start items-start pl-2 pr-2 md:pr-5 mt-2 rounded-lg cursor-pointer ${
                               selectedService?.service === service.service
                                 ? "border bg-gray-100 border-gray-500" // Pastikan border terlihat lebih jelas dengan warna yang lebih gelap
                                 : "bg-white border border-gray-300" // Border normal untuk yang tidak dipilih
@@ -308,31 +314,21 @@ const Payment = () => {
                               handleServiceChange(service);
                             }}
                           >
-                            <FormControlLabel
-                              value={service.service}
-                              sx={{
-                                p: 0,
-                              }}
-                              control={
-                                <Radio
-                                  checked={
-                                    selectedService?.service === service.service
-                                  }
-                                  size="small"
-                                  sx={{
-                                    color: "black",
-                                    "&.Mui-checked": {
-                                      color: "black",
-                                    },
-
-                                    paddingTop: 0.4,
-                                  }}
-                                />
+                            <Radio
+                              checked={
+                                selectedService?.service === service.service
                               }
+                              size="small"
+                              sx={{
+                                color: "black",
+                                "&.Mui-checked": {
+                                  color: "black",
+                                },
+                              }}
                             />
 
                             <div className="w-full  items-center justify-between">
-                              <div className="flex items-center justify-between">
+                              <div className="md:flex items-center justify-between">
                                 <h1 className="font-semibold">
                                   {service.name} - {service.service}
                                 </h1>{" "}
@@ -368,8 +364,8 @@ const Payment = () => {
             </button>
           </div>
 
-          <div className="border-r border-gray-300 h-[130vh] mx-4 self-stretch"></div>
-          <div className="space-y-3 sticky top-28 self-start max-w-[380px] w-full">
+          <div className="md:border-r border-b my-5 md:my-0 border-gray-300 md:h-[130vh] md:mx-4 md:self-stretch"></div>
+          <div className="space-y-3 md:sticky mt-5 md:mt-0 md:top-28 md:self-start max-w-[380px] w-full">
             <h1 className="text-xl font-bold mb-5">Ringkasan Pesanan</h1>
             {items.map((item, index) => (
               <div
@@ -387,7 +383,9 @@ const Payment = () => {
                 <div className="max-w-[380px] w-full">
                   <div className="flex justify-between items-center">
                     {" "}
-                    <p className="text-base font-bold ">{item.product_name}</p>
+                    <p className="text-base  max-w-[120px] md:max-w-[180px] font-bold ">
+                      {item.product_name}
+                    </p>
                     <p className="font-semibold text-sm">
                       IDR{" "}
                       {Number(item.price).toLocaleString("id-ID", {
@@ -503,7 +501,7 @@ const Payment = () => {
                     </strong>
                   </p>
                 )}
-                <div className="border-b mt-5"></div>
+                <div className="border-b hidden md:block mt-5"></div>
 
                 <div className="flex mt-5 justify-between font-semibold text-lg">
                   <p>Total</p>

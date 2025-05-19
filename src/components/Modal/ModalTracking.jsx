@@ -57,7 +57,7 @@ const TrackOrderModal = ({ open, onClose }) => {
           maxWidth: "100%",
           paddingBottom: 3,
           overflowY: "auto",
-          height: { md: "130vh" },
+          height: { xs: "80vh", md: "130vh" },
           maxHeight: "90vh",
           // hide scrollbar
           scrollbarWidth: "none", // Firefox
@@ -169,14 +169,14 @@ const TrackOrderModal = ({ open, onClose }) => {
                   Riwayat Pengiriman
                 </span>
               </div>
-              <div className="container w-full py-3 ">
+              <div className="container flexi w-full  py-3 ">
                 <div className="grid w-full gap-4  ">
                   <div className="relative col-span-12 px-4 space-y-6 sm:col-span-9">
-                    <div className="col-span-12 space-y-12 relative px-4 sm:col-span-8 sm:space-y-8 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:dark:bg-gray-200">
+                    <div className=" relative px-4 col-span-8 space-y-8 before:absolute before:top-2 before:bottom-0 before:w-0.5 before:-left-3 before:dark:bg-gray-200">
                       {trackingData.manifest.map((item, idx) => (
                         <div
                           key={idx}
-                          className="flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] before:dark:bg-primary"
+                          className="flex flex-col relative before:absolute before:top-2 before:w-4 before:h-4 before:rounded-full before:left-[-35px] before:z-[1] before:dark:bg-primary"
                         >
                           <h1 className="text-xs font-semibold tracking-wide">
                             {item.manifest_date} {item.manifest_time}

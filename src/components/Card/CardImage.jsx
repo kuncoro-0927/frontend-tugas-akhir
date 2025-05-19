@@ -9,7 +9,7 @@ export default function CardImage({
 }) {
   return (
     <div
-      className={`relative bg-abu border border-gray-300 p-1 rounded-lg overflow-visible group flex flex-col ${width} ${height}`}
+      className={`relative bg-abu p-2.5 md:p-2 border border-gray-300  rounded-lg overflow-visible group flex flex-col ${width} ${height}`}
     >
       {/* Badge jumlah */}
       {quantity && (
@@ -24,7 +24,7 @@ export default function CardImage({
           <Skeleton variant="rectangular" width="100%" height={200} />
         ) : (
           <img
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain "
             src={image}
             alt="Image"
           />

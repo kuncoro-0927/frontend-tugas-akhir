@@ -285,15 +285,46 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
             </div>
           </div>
         </div>
-        <div className="flex  z-0 px-4 py-2 lg:hidden items-center justify-between ">
-          <Link to="/">
-            <div className="flex items-center gap-1">
-              <img src="/images/logofprimary.svg" className="w-6" alt="Logo" />
-              <img src="/images/logotext.svg" className="w-14" alt="Logo" />
-            </div>
-          </Link>
+        <div className="flex   z-0 px-4 py-2 lg:hidden items-center justify-between ">
+          <div className="lg:hidden mx-4 flex items-center justify-between">
+            {scrolling ? (
+              // Search Button (muncul saat scroll)
+              <button
+                onClick={handleSearchOpen}
+                className=" flex items-center border w-52 rounded-full hover:bg-gray-200/15 px-4 py-2"
+              >
+                <CiSearch className="text-2xl  mr-2 font-bold" />
+                <span className="text-xs">Belanja sekarang...</span>
+              </button>
+            ) : (
+              // Logo (muncul saat di atas)
+              <Link onClick={toggleDrawer(false)} to="/">
+                <div className="flex items-center gap-1">
+                  <img
+                    src="/images/logofprimary.svg"
+                    className="w-6"
+                    alt="Logo"
+                  />
+                  <img src="/images/logotext.svg" className="w-14" alt="Logo" />
+                </div>
+              </Link>
+            )}
+          </div>
 
-          <div className="lg:hidden">
+          <div className="lg:hidden flex gap-4">
+            <div className="flex items-center">
+              <button
+                onClick={() => dispatch(openDrawer())}
+                className="relative  rounded-full hover:bg-gray-200/15  px-3 py-1.5"
+              >
+                <CiShoppingCart className="text-2xl" />
+
+                {/* Menampilkan jumlah produk di keranjang */}
+                <span className="absolute top-1 right-1 w-4 h-4 bg-white text-black rounded-full flex items-center justify-center text-[10px]">
+                  {itemCount}
+                </span>
+              </button>
+            </div>
             {navbar ? (
               <IconButton onClick={toggleDrawer(false)} edge="start">
                 <CloseIcon className="text-white" />
@@ -346,6 +377,7 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
                     <ul className="py-2 px-2 text-base text-hitam">
                       <li className="">
                         <NavLink
+                          onClick={toggleDrawer(false)}
                           to="/account/profile"
                           className={({ isActive }) =>
                             isActive
@@ -364,6 +396,7 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
                       </li>
                       <li>
                         <NavLink
+                          onClick={toggleDrawer(false)}
                           to="/account/order"
                           className={({ isActive }) =>
                             isActive
@@ -383,6 +416,7 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
 
                       <li>
                         <NavLink
+                          onClick={toggleDrawer(false)}
                           to="/account/wishlist"
                           className={({ isActive }) =>
                             isActive
@@ -402,6 +436,7 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
 
                       <li>
                         <NavLink
+                          onClick={toggleDrawer(false)}
                           to="/account/review"
                           className={({ isActive }) =>
                             isActive
@@ -440,12 +475,12 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
               ) : (
                 <div className="flex mx-2 bg-birumuda bg-opacity-40 rounded-lg py-4 px-2 items-end gap-3">
                   <div>
-                    <img className="w-36" src="/images/sign-up.svg" alt="" />
+                    <img className="w-44" src="/images/sign-up.svg" alt="" />
                   </div>
                   <div>
                     <div>
                       <span className="text-base font-bold">
-                        Daftar sekarang untuk mulai belanja di Faza Frame
+                        Yuk, mulai pengalaman belanja Anda!
                       </span>
                     </div>
                     <div className="mt-3 py-2">
@@ -472,7 +507,8 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
               <ul className="py-2  text-base text-hitam">
                 <li className="">
                   <NavLink
-                    to="/account/profile"
+                    onClick={toggleDrawer(false)}
+                    to="/products"
                     className={({ isActive }) =>
                       isActive
                         ? "w-full text-black font-bold justify-between flex items-center  py-4 text-left hover:bg-gray-100"
@@ -490,7 +526,8 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
                 </li>
                 <li>
                   <NavLink
-                    to="/account/order"
+                    onClick={toggleDrawer(false)}
+                    to="/contact"
                     className={({ isActive }) =>
                       isActive
                         ? "w-full text-black font-bold justify-between flex items-center  py-4 text-left hover:bg-gray-100"

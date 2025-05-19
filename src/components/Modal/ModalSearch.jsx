@@ -99,10 +99,10 @@ export default function ModalSearch({ isOpen, handleClose, onSelect }) {
           borderRadius: 5,
           width: { xs: "350px", sm: "600px" },
           maxWidth: "100%",
-          maxHeight: { xs: "70vh", md: "90vh" },
+          maxHeight: { xs: "80vh", md: "90vh" },
         }}
       >
-        <div className="p-5 md:p-7 h-screen">
+        <div className="p-6 md:p-7 h-screen">
           {/* Search input */}
           <div className="flex mb-4 items-center gap-10">
             <div className="w-full">
@@ -124,7 +124,7 @@ export default function ModalSearch({ isOpen, handleClose, onSelect }) {
           )}
 
           {/* Button untuk kategori */}
-          <div className="flex items-center gap-5 mb-4">
+          <div className="flex overflow-x-auto scrollbar-hide items-center gap-2 md:gap-5 mb-4">
             {categories.map((category) => (
               <button
                 type="button"
@@ -147,8 +147,8 @@ export default function ModalSearch({ isOpen, handleClose, onSelect }) {
               <CircularProgress />
             </div>
           ) : (
-            <div className="max-h-[300px] md:max-h-[350px] text-hitam2 overflow-y-auto">
-              <div className="flex flex-wrap">
+            <div className="max-h-[350px] md:max-h-[350px] text-hitam2 overflow-y-auto">
+              <div className="md:flex md:flex-wrap">
                 {filteredProducts.map((item) => (
                   <div
                     key={item.id}

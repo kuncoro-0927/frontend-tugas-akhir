@@ -10,6 +10,7 @@ import { FiDownload } from "react-icons/fi";
 import StatusModal from "../../components/Modal/ModalStatus";
 import { HiEye } from "react-icons/hi";
 import FormInput from "../../components/TextField";
+import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import TrackOrderModal from "../../components/Modal/ModalTracking";
 const Order = () => {
   const [orders, setOrders] = useState([]);
@@ -17,8 +18,11 @@ const Order = () => {
   const [openModal, setOpenModal] = useState(false);
   const [modalData, setModalData] = useState(null);
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("delivery"); // Tab aktif berdasarkan metode pengiriman
-
+  const [activeTab, setActiveTab] = useState("delivery");
+  const [isExpanded, setIsExpanded] = useState(false);
+  const toggleDetails = () => {
+    setIsExpanded(!isExpanded);
+  };
   const showModal = (order) => {
     setModalData({
       totalAmount: order.total_amount,
@@ -88,7 +92,7 @@ const Order = () => {
       <div className="hidden sm:block md:block lg:block ">
         <SidebarAccount />
       </div>
-      <div className="mt-5  md:p-8 mx-4 w-full text-hitam">
+      <div className="mt-5  md:p-8 mx-7 w-full text-hitam">
         <h1 className="font-extrabold text-2xl md:text-3xl mb-5">
           Riwayat Pesanan
         </h1>
@@ -142,84 +146,176 @@ const Order = () => {
               key={order.order_id}
               className="ticket-card max-w-[800px] mb-8 mt-10"
             >
-              <div className="border shadow-md border-gray-200 w-full rounded-lg">
+              <div className="border  border-gray-200 w-full rounded-lg">
                 {/* Header Order: ID, Status, Invoice Button */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 border-b">
-                  <div className="flex">
-                    <div className="text-sm space-y-1 grid ">
-                      <p className="font-semibold">ID Pesanan</p>{" "}
-                      <p className="text-gray-950/50 text-xs">
-                        {" "}
-                        {order.order_code}
-                      </p>
-                    </div>
-                    <div className="ml-4 space-y-1">
-                      {" "}
-                      <p className="font-semibold">Tanggal Pesanan</p>{" "}
-                      <p className="text-gray-950/50 text-xs">
-                        {formatDate(order.created_at)}
-                      </p>
-                    </div>
-                    <div className="ml-4 space-y-1">
-                      {" "}
-                      <p className="font-semibold">
-                        Total{" "}
-                        <span className="text-xs font-normal">
-                          (incl. biaya)
-                        </span>
-                      </p>{" "}
-                      <p className="text-gray-950/50 text-xs font-semibold">
-                        IDR {Number(order.total_amount).toLocaleString("id-ID")}
-                      </p>
-                    </div>
-                    <div
-                      className={`font-bold space-y-1 ml-4 text-sm ${
-                        order.status === "paid"
-                          ? "text-green-500"
-                          : order.status === "processed"
-                          ? "text-orange-500"
-                          : order.status === "shipped"
-                          ? "text-blue-500"
-                          : order.status === "completed"
-                          ? "text-green-600"
-                          : order.status === "cancelled"
-                          ? "text-red-500"
-                          : "text-gray-600"
-                      }`}
-                    >
-                      <p className="font-semibold text-black">Status</p>
-                      <button
-                        onClick={() => showModal(order)}
-                        className="flex items-center gap-1 hover:underline hover:text-blue-600 transition"
-                        title="Lihat status pengiriman"
+                <div className="border-b p-4">
+                  <div className="flex  justify-between items-start md:items-center">
+                    <div className="flex w-full md:w-auto md:gap-2 flex-col md:flex-row md:items-center">
+                      <div
+                        className="text-sm hidden md:flex md:flex-col  space-y-1 cursor-pointer"
+                        onClick={toggleDetails}
                       >
-                        {order.status === "paid" && "Sedang Dikemas"}
-                        {order.status === "processed" && "Sedang Dikemas"}
-                        {order.status === "shipped" && "Sedang Dikirim"}
-                        {order.status === "completed" && "Pesanan Diterima"}
-                        {order.status === "cancelled" && "Pesanan Dibatalkan"}
+                        <p className="font-semibold">ID Pesanan</p>
+                        <p className="text-gray-950/50 text-xs">
+                          {order.order_code}
+                        </p>
+                      </div>
+                      <div
+                        className="text-sm md:hidden flex gap-2 items-center md:items-start w-full justify-between space-y-1 cursor-pointer"
+                        onClick={toggleDetails}
+                      >
+                        <div>
+                          <p className="font-semibold">ID Pesanan</p>
+                          <p className="text-gray-950/50 text-xs">
+                            {order.order_code}
+                          </p>
+                        </div>
+                        <div>
+                          {/* Ganti ikon berdasarkan kondisi isExpanded */}
+                          {isExpanded ? (
+                            <IoIosArrowUp className="text-base" />
+                          ) : (
+                            <IoIosArrowDown className="text-base" />
+                          )}
+                        </div>
+                      </div>
 
-                        {/* Icon */}
-                        <HiEye className="inline-block text-lg text-gray-950/50" />
-                      </button>
+                      {/* Detail hanya tampil di desktop */}
+                      <div className="ml-4 hidden md:block space-y-1">
+                        <p className="font-semibold">Tanggal Pesanan</p>
+                        <p className="text-gray-950/50 text-xs">
+                          {formatDate(order.created_at)}
+                        </p>
+                      </div>
+
+                      <div className="ml-4 hidden md:block space-y-1">
+                        <p className="font-semibold">
+                          Total{" "}
+                          <span className="text-xs font-normal">
+                            (incl. biaya)
+                          </span>
+                        </p>
+                        <p className="text-gray-950/50 text-xs font-semibold">
+                          IDR{" "}
+                          {Number(order.total_amount).toLocaleString("id-ID")}
+                        </p>
+                      </div>
+
+                      <div
+                        className={`ml-4 hidden md:block font-bold space-y-1 text-sm ${
+                          order.status === "paid"
+                            ? "text-green-500"
+                            : order.status === "processed"
+                            ? "text-orange-500"
+                            : order.status === "shipped"
+                            ? "text-blue-500"
+                            : order.status === "completed"
+                            ? "text-green-600"
+                            : order.status === "cancelled"
+                            ? "text-red-500"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        <p className="font-semibold text-black">Status</p>
+                        <button
+                          onClick={() => showModal(order)}
+                          className="flex items-center gap-1 hover:underline hover:text-blue-600 transition"
+                          title="Lihat status pengiriman"
+                        >
+                          {order.status === "paid" && "Sedang Dikemas"}
+                          {order.status === "processed" && "Sedang Dikemas"}
+                          {order.status === "shipped" && "Sedang Dikirim"}
+                          {order.status === "completed" && "Pesanan Diterima"}
+                          {order.status === "cancelled" && "Pesanan Dibatalkan"}
+                          <HiEye className="inline-block text-lg text-gray-950/50" />
+                        </button>
+                      </div>
                     </div>
+
+                    {/* Tombol Cetak Invoice */}
+                    <button
+                      onClick={() => handleDownloadInvoice(order.order_id)}
+                      disabled={loadingOrderId === order.order_id}
+                      className=" hidden md:block items-center border border-gray-400 rounded-md px-3 py-2 hover:border-black hover:-translate-y-1 duration-300"
+                    >
+                      {loadingOrderId === order.order_id ? (
+                        <CircularProgress size={15} color="inherit" />
+                      ) : (
+                        <span className="flex items-center text-sm font-medium">
+                          Cetak Invoice <FiDownload className="ml-2" />
+                        </span>
+                      )}
+                    </button>
                   </div>
 
-                  <button
-                    onClick={() => handleDownloadInvoice(order.order_id)}
-                    disabled={loadingOrderId === order.order_id}
-                    className="mt-2 md:mt-0 flex items-center border border-gray-400 rounded-md px-3 py-2 hover:border-black hover:-translate-y-1 duration-300"
-                  >
-                    {loadingOrderId === order.order_id ? (
-                      <CircularProgress size={15} color="inherit" />
-                    ) : (
-                      <span className="flex items-center text-sm font-medium">
-                        Cetak Invoice <FiDownload className="ml-2" />
-                      </span>
-                    )}
-                  </button>
+                  {/* Detail expand di mobile */}
+                  {isExpanded && (
+                    <div className="mt-4 space-y-3 md:hidden text-sm border-t pt-4">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="font-semibold">Tanggal Pesanan</p>
+                          <p className="text-gray-950/50 text-xs">
+                            {formatDate(order.created_at)}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleDownloadInvoice(order.order_id)}
+                          disabled={loadingOrderId === order.order_id}
+                          className=" md:mt-0 flex items-center border border-gray-400 rounded-md px-3 py-2 hover:border-black hover:-translate-y-1 duration-300"
+                        >
+                          {loadingOrderId === order.order_id ? (
+                            <CircularProgress size={15} color="inherit" />
+                          ) : (
+                            <span className="flex items-center text-sm font-medium">
+                              Cetak Invoice <FiDownload className="ml-2" />
+                            </span>
+                          )}
+                        </button>
+                      </div>
+                      <div>
+                        <p className="font-semibold">
+                          Total{" "}
+                          <span className="text-xs font-normal">
+                            (incl. biaya)
+                          </span>
+                        </p>
+                        <p className="text-gray-950/50 text-xs font-semibold">
+                          IDR{" "}
+                          {Number(order.total_amount).toLocaleString("id-ID")}
+                        </p>
+                      </div>
+                      <div
+                        className={` md:hidden font-bold space-y-1 text-sm ${
+                          order.status === "paid"
+                            ? "text-green-500"
+                            : order.status === "processed"
+                            ? "text-orange-500"
+                            : order.status === "shipped"
+                            ? "text-blue-500"
+                            : order.status === "completed"
+                            ? "text-green-600"
+                            : order.status === "cancelled"
+                            ? "text-red-500"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        <p className="font-semibold text-black">Status</p>
+                        <button
+                          onClick={() => showModal(order)}
+                          className="flex items-center gap-1 hover:underline hover:text-blue-600 transition"
+                          title="Lihat status pengiriman"
+                        >
+                          {order.status === "paid" && "Sedang Dikemas"}
+                          {order.status === "processed" && "Sedang Dikemas"}
+                          {order.status === "shipped" && "Sedang Dikirim"}
+                          {order.status === "completed" && "Pesanan Diterima"}
+                          {order.status === "cancelled" && "Pesanan Dibatalkan"}
+                          <HiEye className="inline-block text-lg text-gray-950/50" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-
                 {/* Item List */}
                 {order.items.map((ticket, i) => (
                   <div
@@ -227,15 +323,46 @@ const Order = () => {
                     className="lg:flex border-b p-5 last:border-none"
                   >
                     <div className="flex items-start justify-start w-full">
-                      <div className="lg:h-[150px] h-[120px] lg:w-[150px] overflow-hidden flex items-center justify-center">
+                      <div className="lg:h-[150px] hidden  h-[120px] lg:w-[150px] overflow-hidden md:flex items-center justify-center">
                         <CardImage
                           image={`${import.meta.env.VITE_BACKEND_URL}${
                             ticket.image_url
                           }`}
                         />
                       </div>
+                      {/* mobile */}
+                      <div className="flex md:hidden items-center gap-x-4">
+                        <div className=" h-[120px] w-[120px]">
+                          <CardImage
+                            image={`${import.meta.env.VITE_BACKEND_URL}${
+                              ticket.image_url
+                            }`}
+                          />
+                        </div>
+                        <div>
+                          <h1 className="font-bold text-xs text-black/60">
+                            {" "}
+                            {ticket.category_name}
+                          </h1>
+                          <h1 className="font-bold text-sm ">
+                            {ticket.quantity} x {ticket.product_name}{" "}
+                          </h1>
+                          <p className="text-xs  flex items-center">
+                            <span className="mr-1"> {ticket.size}</span>{" "}
+                          </p>
 
-                      <div className="pl-4 max-w-[350px]  flex flex-col">
+                          <div className="mt-2">
+                            <Link
+                              to={`/product/details/${ticket.product_id}`}
+                              className="bg-black rounded-md text-white px-3 py-1.5 text-xs hover:bg-gray-800"
+                            >
+                              Pesan Lagi
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                      {/* desktop */}
+                      <div className="pl-4 max-w-[350px] hidden md:flex flex-col">
                         <h1 className="font-bold text-lg ">
                           {ticket.product_name}{" "}
                           <span className="font-normal">-</span>{" "}
@@ -256,7 +383,7 @@ const Order = () => {
                           <span>{formatDate(order.created_at)}</span>
                         </p>
                       </div>
-                      <div className="ml-auto flex flex-col justify-between items-end h-full">
+                      <div className="ml-auto hidden md:flex flex-col justify-between items-end h-full">
                         <div className="text-base font-bold">
                           IDR {Number(ticket.price).toLocaleString("id-ID")}
                         </div>

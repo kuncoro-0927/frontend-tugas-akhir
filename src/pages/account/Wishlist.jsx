@@ -107,14 +107,18 @@ const Wishlist = () => {
   };
   return (
     <>
-      <section className="flex h-screen 2xl:mx-32">
+      <section className="flex  mb-10 md:md-0 md:h-screen 2xl:mx-32">
         <div className="hidden sm:block md:block lg:block">
           <SidebarAccount />
         </div>
-        <div className="mt-5 md:p-8 mx-4 w-full text-hitam">
-          <h1 className="font-extrabold text-2xl md:text-3xl  mb-5">
+        <div className="mt-5  md:p-8 mx-7 w-full  text-hitam">
+          <h1 className="font-extrabold text-2xl md:text-3xl ">
             Produk yang Anda sukai
           </h1>
+          <p className="text-sm mt-1  mb-5 text-black/60">
+            Yuk, lihat kembali produk yang sempat Anda sukai dan lanjutkan
+            belanja sebelum kehabisan!
+          </p>
 
           {wishlist.length === 0 ? (
             <div className="mt-10 w-full flex flex-col items-center">
@@ -186,34 +190,6 @@ const Wishlist = () => {
                 ))}
             </div>
           )}
-
-          <div className="lg:hidden md:carousel md:carousel-center md:space-x-3 md:px-8 md:py-3  md:max-w-full ">
-            <div className="md:carousel-item justify-between grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {Array.isArray(wishlist) &&
-                wishlist.map((product) => (
-                  <div key={product.id} className="relative">
-                    <Link to={`/wisata/detail/${product.id}`}>
-                      <CardImage
-                        title={product.name}
-                        image={`${import.meta.env.VITE_BACKEND_URL}${
-                          product.image_url
-                        }`}
-                        price={Number(product.price).toLocaleString("id-ID")}
-                        average_rating={product.rating || "0.0"}
-                      />
-                    </Link>
-                    <div className="absolute top-2 right-2">
-                      <IconButton className="p-2">
-                        <FavoriteIcon
-                          className=""
-                          sx={{ width: 28, height: 28 }}
-                        />
-                      </IconButton>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
         </div>
       </section>
     </>

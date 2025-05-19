@@ -186,7 +186,7 @@ const ShippingForm = () => {
 
   return (
     <section className=" h-screen ">
-      <div className="border-b flex items-center justify-between px-[75px] py-4">
+      <div className="border-b flex items-center justify-between px-7 md:px-[75px] py-4">
         <Link to="/">
           <img className="w-10" src="/logoindex.svg" alt="" />
         </Link>
@@ -197,10 +197,12 @@ const ShippingForm = () => {
           <CiShoppingCart className="text-3xl" />
         </button>
       </div>
-      <div className="flex mx-[75px] justify-between items-start gap-6">
+      <div className="flex flex-col-reverse md:flex-row mx-7 md:mx-[75px] justify-between items-start gap-6">
         {/* Kiri: Info User + Form */}
-        <div className="max-w-[600px] h-full my-10 overflow-y-auto w-full">
-          <h1 className="font-extrabold text-3xl">Lengkapi Alamat Penerima</h1>
+        <div className="max-w-[600px] h-full mb-10 md:my-10 overflow-y-auto w-full">
+          <h1 className="font-extrabold text-2xl md:text-3xl">
+            Lengkapi Alamat Penerima
+          </h1>
           <p className="mt-2">
             Mohon isi alamat lengkap untuk pengiriman barang ke tempat yang
             tepat. Pastikan data yang dimasukkan benar dan sesuai.
@@ -396,15 +398,16 @@ const ShippingForm = () => {
             <button
               disabled={loadingOngkir}
               onClick={handleSubmit}
-              className="border mt-5 py-2 rounded-lg bg-black text-white px-3 w-full"
+              className="border mt-5 py-3 hover:bg-black/80 rounded-lg bg-black text-white px-3 w-full"
             >
               Bayar
             </button>
           </form>
         </div>
-        <div className="border-r border-gray-300 h-[115vh] mx-4 self-stretch"></div>
+
+        <div className="md:border-r border-b my-5 md:my-0 border-gray-300 md:h-[115vh] md:mx-4 block self-stretch"></div>
         {/* Kanan: Produk dan Ringkasan */}
-        <div className="space-y-3 mt-10 sticky top-28 self-start max-w-[380px] w-full">
+        <div className="space-y-3 mt-10 md:sticky md:top-28 md:self-start max-w-[380px] w-full">
           <h1 className="text-xl font-bold mb-5">Ringkasan Pesanan</h1>
           {orderItems.map((item, index) => (
             <div
@@ -449,7 +452,7 @@ const ShippingForm = () => {
             />
             <button
               onClick={handleApplyPromo}
-              className="bg-black text-white py-3 px-4 rounded-md"
+              className="bg-black hover:bg-black/80 text-white py-3 px-4 rounded-md"
             >
               Klaim
             </button>
@@ -507,7 +510,7 @@ const ShippingForm = () => {
                 </p>
               )}
 
-              <div className="border-b mt-5"></div>
+              <div className="border-b hidden md:block mt-5"></div>
 
               <div className="flex mt-5 justify-between font-semibold text-lg">
                 <p>Total</p>

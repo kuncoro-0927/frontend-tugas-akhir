@@ -62,7 +62,7 @@ const Review = () => {
 
   return (
     <>
-      <section className="flex h-screen  2xl:mx-32">
+      <section className="flex min-h-screen  2xl:mx-32">
         <ModalReview
           open={modalOpen}
           handleClose={handleCloseReviewModal}
@@ -72,7 +72,7 @@ const Review = () => {
         <div className="hidden sm:block md:block lg:block">
           <SidebarAccount />
         </div>
-        <div className="mt-5 md:p-8 mx-4 w-full text-hitam">
+        <div className="mt-5  md:p-8 mx-7 w-full text-hitam">
           <h1 className="font-extrabold text-2xl md:text-3xl ">Ulasan</h1>
           <p className="text-sm mb-5 flex items-center gap-1">
             Hanya produk yang sudah diterima yang bisa diulas.
@@ -105,7 +105,7 @@ const Review = () => {
 
           {activeTab === "products" ? (
             products.length === 0 ? (
-              <div className="mt-10 w-full flex flex-col items-center">
+              <div className="mt-10 w-full flex flex-col  items-center">
                 <p className="text-hitam text-xl lg:text-2xl font-extrabold">
                   Anda belum memiliki produk
                 </p>
@@ -128,9 +128,9 @@ const Review = () => {
               products.map((product) => (
                 <div
                   key={product.id}
-                  className=" max-w-[800px] md:h-[200px] h-[150px]  mb-4 mt-10 border flex border-gray-200 w-full rounded-lg shadow-sm"
+                  className=" max-w-[800px] md:h-[200px] h-[120px]  mb-4 mt-5 md:mt-10 border flex border-gray-200 w-full rounded-lg shadow-sm"
                 >
-                  <div className="lg:h-[200px]  h-[120px] lg:w-[300px] ">
+                  <div className="lg:h-[200px] h-[120px]  w-[160px] lg:w-[300px] ">
                     <CardImage
                       image={`${import.meta.env.VITE_BACKEND_URL}${
                         product.image_url
@@ -138,16 +138,19 @@ const Review = () => {
                     />
                   </div>
                   <div className="p-4 w-full md:p-4 flex flex-col justify-start">
-                    <h1 className="font-bold text-xl">{product.name}</h1>
-                    <p className="mt-3 text-sm flex items-center">
-                      <CiCalendar className="text-lg mr-1" />
-                      <span className="mr-1">Tanggal Pesanan:</span>{" "}
+                    <h1 className="font-bold text-xs text-black/60 md:text-sm">
+                      {product.category_name}
+                    </h1>
+                    <h1 className="font-bold text-sm md:text-xl">
+                      {product.name}
+                    </h1>
+                    <p className="md:mt-3 mt-1 text-xs md:text-sm flex items-center">
+                      <CiCalendar className="md:text-lg text-base mr-1" />
+                      <span className="mr-1">Pesanan:</span>{" "}
                       <span>{formatDate(product.ordered_at)}</span>
                     </p>
-                    <h1 className="mt-1 text-sm">{product.size}</h1>
 
-                    <p className="mt-auto">Beri ulasan untuk produk ini</p>
-                    <div className="mt-auto flex justify-between items-end">
+                    <div className="mt-2 md:mt-auto flex justify-between items-end">
                       <button
                         onClick={() => handleOpenReviewModal(product.id)}
                         disabled={hasReviewedProduct(product)}
@@ -155,13 +158,15 @@ const Review = () => {
                           hasReviewedProduct(product)
                             ? "bg-gray-100/70 text-gray-500/50 cursor-not-allowed"
                             : "bg-black text-white"
-                        } px-4 w-fit py-2 rounded-md  text-xs md:text-sm`}
+                        } md:px-4 px-2.5 w-fit py-1.5 rounded-md  text-xs md:text-sm`}
                       >
                         {hasReviewedProduct(product)
                           ? "Selesai"
                           : "Beri Ulasan"}
                       </button>
-                      <button className="underline">Lihat produk</button>
+                      <button className="underline md:text-sm text-xs">
+                        Lihat produk
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -178,22 +183,27 @@ const Review = () => {
                   key={`review-content-${review.id}`}
                   className="max-w-[800px] md:h-[180px] h-[120px] mt-10 border flex border-gray-200 w-full rounded-t-lg shadow-sm"
                 >
-                  <div className=" w-[150px] md:w-[230px] flex items-center justify-center overflow-hidden">
+                  <div className=" h-[120px] md:h-[180px] w-[160px] md:w-[230px] flex items-center justify-center overflow-hidden">
                     <CardImage
                       image={`${import.meta.env.VITE_BACKEND_URL}${
                         review.image_url
                       }`}
                     />
                   </div>
-                  <div className="p-4 md:p-4 w-full flex flex-col justify-start">
+                  <div className="px-4 py-2 md:p-4 w-full flex flex-col justify-start">
+                    <h1 className="font-bold text-xs text-black/60 md:text-sm">
+                      {review.category_name}
+                    </h1>
                     <h1 className="font-bold text-sm md:text-xl">
                       {review.product_name}
                     </h1>
-                    <p className="mt-3 text-xs md:text-sm flex items-center text-hitam2 font-semibold ">
-                      {review.size}
-                    </p>
-                    <p className="font-extrabold text-xs md:text-base flex items-center">
-                      IDR {Number(review.price).toLocaleString("id-ID")}
+
+                    <p className="font-bold md:mt-0 text-xs md:text-sm ">
+                      {" "}
+                      IDR{" "}
+                      {Number(review.price).toLocaleString("id-ID", {
+                        minimumFractionDigits: 2,
+                      })}
                     </p>
 
                     <div className="flex mt-auto justify-between items-end">
@@ -201,7 +211,9 @@ const Review = () => {
                       <p className="mt-2 text-xs hidden md:flex md:text-sm items-center text-hitam2 font-semibold ">
                         Diberikan pada: {formatDate(review.created_at)}
                       </p>
-                      <button className="underline">Lihat produk</button>
+                      <button className="underline text-xs md:text-sm">
+                        Lihat produk
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -210,14 +222,14 @@ const Review = () => {
                   key={`review-details-${review.id}`}
                   className="product-card p-2 max-w-[800px] mb-4 border border-gray-200 w-full rounded-b-lg shadow-sm"
                 >
-                  <p className="mt-2 text-xs md:hidden md:text-sm items-center text-hitam2 font-semibold ">
+                  <p className="mt-2 mb-2 text-xs md:hidden md:text-sm items-center text-hitam2 font-semibold ">
                     Diberikan pada: {formatDate(review.created_at)}
                   </p>
                   <Rating
                     name="read-only"
                     value={review.rating}
                     readOnly
-                    sx={{ fontSize: "1.7rem" }}
+                    sx={{ fontSize: "1.5rem" }}
                   />
                   <p className="text-sm md:text-base mt-1 md:mt-0 text-hitam2">
                     {review.comment}

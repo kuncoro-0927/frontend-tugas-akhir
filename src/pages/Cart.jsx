@@ -138,7 +138,7 @@ const Cart = () => {
 
         {cartItems && cartItems.length > 0 ? (
           <>
-            <div className="flex-1 overflow-y-auto pb-5  px-10 space-y-4">
+            <div className="flex-1 overflow-y-auto pb-5 px-7 md:px-10 space-y-4">
               {cartItems.map((item) => (
                 <div
                   key={item.id}
@@ -177,7 +177,7 @@ const Cart = () => {
                 </div>
               ))}
             </div>
-            <div className="border-t py-6 mx-10 ">
+            <div className="border-t py-6 px-7 md:mx-10 ">
               <div className="space-y-2">
                 <div className="flex font-semibold justify-between">
                   <p>Subtotal</p>
