@@ -101,24 +101,24 @@ const Home = () => {
   };
   return (
     <>
-      <section className="mt-2 md:mt-10 mx-7  md:mx-14">
-        <div className="md:flex md:justify-between md:gap-20">
+      <section className="mt-16 md:mt-10 mx-7 md:mx-10  lg:mx-14">
+        <div className="md:flex  md:justify-between md:gap-8 lg:gap-20">
           <div className=" w-full py-5 rounded-2xl">
-            <h1 className="font-bold text-5xl md:text-6xl max-w-lg">
+            <h1 className="font-bold text-5xl md:text-5xl lg:text-6xl max-w-lg">
               <span>
                 Buat Sudut Rumah <PiAngleBold className="inline text-6xl " />{" "}
                 Anda Lebih elegan
               </span>{" "}
             </h1>
 
-            <p className="mt-7 text-base font-medium">
+            <p className="lg:mt-7 md:mt-5 text-base md:text-sm lg:text-base font-medium">
               Hadirkan kesan rapi dan berkelas di ruangan Anda dengan berbagai
               pilihan figura yang sesuai untuk beragam gaya penataan interior.
             </p>
 
             <div className="flex items-center  mt-7">
               <Link
-                to="/product"
+                to="/products/list"
                 className="bg-black rounded-full text-sm text-white text-center px-4 py-2.5"
               >
                 Beli Sekarang
@@ -128,12 +128,12 @@ const Home = () => {
               </button>
             </div>
 
-            <div className=" flex mt-5 md:mt-20 items-start md:items-center justify-between w-full bg-white rounded-md text-sm py-3">
+            <div className=" flex mt-5 lg:mt-20 lg:px-10 items-start md:items-center justify-between w-full bg-white rounded-md text-sm py-3">
               <div className="pr-2 md:pr-4">
-                <p className="font-semibold text-base md:text-base">
+                <p className="font-semibold text-base md:text-sm lg:text-base">
                   Pengiriman
                 </p>
-                <p className="flex text-sm   items-center gap-2">
+                <p className="flex text-sm md:text-xs  items-center gap-2">
                   {" "}
                   <FaShippingFast className="text-primary text-base" />
                   Cepat
@@ -143,8 +143,10 @@ const Home = () => {
               <div className="w-[0.5px] h-10 bg-gray-300"></div>
 
               <div className="px-2 md:px-4">
-                <p className="font-semibold text-base md:text-base">Status</p>
-                <p className="flex text-sm  items-center gap-2">
+                <p className="font-semibold text-base md:text-sm lg:text-base">
+                  Status
+                </p>
+                <p className="flex text-sm md:text-xs items-center gap-2">
                   {" "}
                   <FaLocationDot className="text-primary text-base" />
                   Real-time
@@ -154,10 +156,10 @@ const Home = () => {
               <div className="w-[0.5px] h-10 bg-gray-300"></div>
 
               <div className="pl-2 md:pl-4">
-                <p className="font-semibold text-base md:text-base">
+                <p className="font-semibold text-base md:text-sm lg:text-base">
                   Pembayaran
                 </p>
-                <p className="flex text-sm  items-center gap-2">
+                <p className="flex text-sm md:text-xs  items-center gap-2">
                   {" "}
                   <FaCircleCheck className="text-primary text-base" />
                   Aman
@@ -166,10 +168,10 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-b from-coklat to-birulaut w-full flex justify-center p-14 md:p-20 rounded-2xl">
+          <div className="bg-gradient-to-b from-coklat to-birulaut w-full flex justify-center p-14 md:p-14 lg:p-20 rounded-2xl">
             <img
               src="/public/images/bg-home-new3.png"
-              className="w-[320px]"
+              className="md:w-full  lg:w-[320px]"
               alt=""
             />
           </div>
@@ -225,7 +227,7 @@ const Home = () => {
           </div>
         </div>
       </section> */}
-      <section className="md:mt-28 mt-20 mx-7 md:mx-14 ">
+      <section className="lg:mt-28 mt-20 mx-7 md:mx-10 lg:mx-14 ">
         <div className="flex justify-center md:justify-between items-center">
           <div>
             <h1 className="font-extrabold text-2xl md:text-3xl">Galeri Kami</h1>
@@ -303,7 +305,7 @@ const Home = () => {
         </div>
 
         {/* Desktop Grid */}
-        <div className="hidden md:grid mt-10 justify-between  md:grid-cols-4 gap-10">
+        <div className="hidden md:grid mt-10 justify-between md:grid-cols-3 lg:grid-cols-4 gap-10">
           {products.map((product) => (
             <div key={product.id} className="relative">
               <Link
@@ -367,7 +369,7 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="md:mt-52 mt-20 md:flex justify-center mx-7  md:mx-14 gap-32">
+      <section className="lg:mt-32 md:mt-16 md:flex justify-center mx-7 lg:mx-14  md:mx-10 md:gap-10 lg:gap-32">
         <div>
           <img
             src="/public/images/bg-4.jpg"
@@ -375,7 +377,7 @@ const Home = () => {
             alt=""
           />
         </div>
-        <div className="mt-10">
+        <div className="mt-10 md:mt-0">
           <h1 className=" text-2xl md:text-3xl font-extrabold">
             Kenapa Faza Frame?
           </h1>
@@ -383,13 +385,13 @@ const Home = () => {
             Lorem ipsum dolor sit amet consectetur, adipisicing elit. Veniam,
             nam?
           </p>
-          <div className="md:w-[500px]">
+          <div className="lg:w-[500px]">
             <AccordionTransition />
           </div>
         </div>
       </section>
 
-      <section className="mx-7 md:mx-6 lg:mx-14 bg-cover 2xl:mx-32 mt-10 justify-center lg:mt-20">
+      <section className="mx-7 md:mx-10 lg:mx-14 bg-cover 2xl:mx-32 mt-10 justify-center lg:mt-20">
         <h1 className="text-2xl font-extrabold md:text-4xl mb-7 md:mb-10 lg:mb-20 text-hitam">
           Apa kata pelanggan
         </h1>

@@ -51,10 +51,10 @@ const Contact = () => {
   };
   return (
     <>
-      <section className="py-32 px-14 bg-gradient-to-l from-white to-birumuda">
+      <section className="py-32 mt-16 md:mt-0 px-7 md:px-14 bg-gradient-to-l from-white to-birumuda">
         <div className="text-center space-y-2">
-          <p className="font-bold text-4xl">Hubungi kami</p>
-          <p className="text-6xl font-semibold ">
+          <p className="font-bold text-2xl md:text-4xl">Hubungi kami</p>
+          <p className="md:text-6xl text-5xl font-semibold ">
             Ada yang bisa <span className="font-extrabold">dibantu?</span>
           </p>
           <p className="text-base mt-2 text-graytext font-semibold">
@@ -122,7 +122,7 @@ const Contact = () => {
           </div>
         </div>
         <div className="p-4  h-fit w-full">
-          <h1 className="text-xl font-semibold">Hubungi Kami</h1>
+          <h1 className="text-xl font-semibold">Pusat Bantuan</h1>
           <p className="text-sm mt-2 text-gray-700">
             Kami senang dapat mendengar Anda, Jangan ragu untuk menghubungi kami
             melalui cara berikut.

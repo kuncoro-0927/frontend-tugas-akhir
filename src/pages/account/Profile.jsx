@@ -84,7 +84,7 @@ const Profile = () => {
   }, []);
 
   return (
-    <section className="flex md:mb-0 mb-10 2xl:mx-32 ">
+    <section className="flex mt-16 md:mt-0 md:mb-0 mb-10 2xl:mx-32 ">
       <div className="hidden sm:block md:block lg:block ">
         <SidebarAccount />
       </div>
@@ -92,7 +92,7 @@ const Profile = () => {
         <span className="font-extrabold text-3xl">Informasi Akun</span>
         <p>Lengkapi data akun anda untuk pemesanan</p>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="mt-6 space-y-6  md:w-[650px] lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-10 lg:mt-7">
+          <div className="mt-6 space-y-6  lg:w-[650px] lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-10 lg:mt-7">
             <FormInput
               type="text"
               name="firstname"

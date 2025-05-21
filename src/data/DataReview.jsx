@@ -1,33 +1,26 @@
 export const ServiceData = [
   {
     content:
-      "Pengalaman yang tak terlupakan! Pemandu wisatanya sangat ramah dan berpengetahuan. Kami belajar banyak tentang cara bertani, dan bahkan anak-anak pun sangat antusias belajar menanam. Tempat yang sempurna untuk rekreasi sekaligus edukasi.",
-    name: "Hasri",
-    wisata: "Kampoeng Karet",
+      "Sangat puas dengan kualitas figurnya! Bingkai kayunya kokoh dan hasil cetaknya tajam. Adminnya juga responsif dan ramah. Sudah beberapa kali order dan selalu memuaskan.",
+    name: "Budi Santoso",
+    wisata: "Faza Frame Pacitan",
   },
   {
     content:
-      "Pengalaman yang seru banget! Pemandu wisatanya ramah dan tahu banyak. Kami belajar banyak tentang bertani, dan anak-anak juga senang belajar menanam. Tempat yang asyik buat santai sambil belajar. Sangat rekomended!",
-    name: "Dzakiansyah",
-    wisata: "Tani Kota",
-  },
-  {
-    content:
-      "Sangat menyenangkan bisa menikmati udara segar dan pemandangan hijau sepanjang mata memandang. Wisata peternakan juga menarik, bisa berinteraksi langsung dengan hewan-hewan. Agrowisata ini tidak hanya seru, tapi juga mendidik.",
+      "Figuranya benar-benar menambah kesan estetik di ruang tamu saya. Proses desain customnya fleksibel dan hasil akhirnya sesuai harapan. Terima kasih Faza Frame!",
     name: "Kuncoro",
-    wisata: "Scientia Square Park",
+    wisata: "Faza Frame Pacitan",
   },
   {
     content:
-      "Pengalaman yang luar biasa! Saya dan keluarga sangat menikmati wisata petik apel ini. Apelnya segar, manis, dan bisa langsung dimakan dari pohonnya. Udara di sini juga sejuk, cocok untuk liburan keluarga!",
-    name: "Qaulan Tsaqila",
-    wisata: "Petik Apel, Green Garden",
+      "Saya pesan untuk hadiah wisuda, dan hasilnya luar biasa! Packing-nya aman, kualitas figurnya premium, dan sangat cocok untuk hadiah spesial. Recommended banget!",
+    name: "Vannelasa",
+    wisata: "Faza Frame Pacitan",
   },
-
   {
     content:
-      "Pemandangannya indah dan suasananya sangat menyenangkan. Saya menikmati tur edukasi tentang cara menanam dan memanen buah beri. Tidak hanya itu, kami juga bisa mencicipi langsung hasil panennya. Highly recommended!",
-    name: "Adeenda",
-    wisata: "Vin's Berry Park",
+      "Produk berkualitas dengan harga terjangkau. Saya suka karena banyak pilihan desain dan bisa request ukuran sendiri. Faza Frame benar-benar solusi untuk dekorasi rumah yang personal.",
+    name: "Eprison",
+    wisata: "Faza Frame Pacitan",
   },
 ];

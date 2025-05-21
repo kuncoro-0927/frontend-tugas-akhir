@@ -186,20 +186,20 @@ const ShippingForm = () => {
 
   return (
     <section className=" h-screen ">
-      <div className="border-b flex items-center justify-between px-7 md:px-[75px] py-4">
+      <div className="border-b  flex items-center justify-between px-7 md:px-32 lg:px-[75px] py-4">
         <Link to="/">
           <img className="w-10" src="/logoindex.svg" alt="" />
         </Link>
         <button
           onClick={() => dispatch(openDrawer())}
-          className="relative  rounded-full hover:bg-gray-200/15  px-3 py-1.5"
+          className="relative   rounded-full hover:bg-gray-200/15 "
         >
           <CiShoppingCart className="text-3xl" />
         </button>
       </div>
-      <div className="flex flex-col-reverse md:flex-row mx-7 md:mx-[75px] justify-between items-start gap-6">
+      <div className="flex flex-col-reverse lg:flex-row mx-7 md:mx-32 lg:mx-[75px] justify-between items-start gap-6">
         {/* Kiri: Info User + Form */}
-        <div className="max-w-[600px] h-full mb-10 md:my-10 overflow-y-auto w-full">
+        <div className="max-w-[600px] h-full mb-10 lg:my-10 overflow-y-auto w-full">
           <h1 className="font-extrabold text-2xl md:text-3xl">
             Lengkapi Alamat Penerima
           </h1>
@@ -405,9 +405,9 @@ const ShippingForm = () => {
           </form>
         </div>
 
-        <div className="md:border-r border-b my-5 md:my-0 border-gray-300 md:h-[115vh] md:mx-4 block self-stretch"></div>
+        <div className="lg:border-r border-b my-5 md:my-0 border-gray-300 lg:h-[115vh] lg:mx-4 block self-stretch"></div>
         {/* Kanan: Produk dan Ringkasan */}
-        <div className="space-y-3 mt-10 md:sticky md:top-28 md:self-start max-w-[380px] w-full">
+        <div className="space-y-3 mt-10 lg:sticky lg:top-28 lg:self-start lg:max-w-[380px] w-full">
           <h1 className="text-xl font-bold mb-5">Ringkasan Pesanan</h1>
           {orderItems.map((item, index) => (
             <div
@@ -422,7 +422,7 @@ const ShippingForm = () => {
                 height="h-[64px]"
                 quantity={item.quantity}
               />
-              <div className="max-w-[380px] w-full">
+              <div className="lg:max-w-[380px] w-full">
                 <div className="flex justify-between items-center">
                   {" "}
                   <p className="text-base font-bold ">{item.product_name}</p>

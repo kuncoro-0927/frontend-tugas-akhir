@@ -83,7 +83,7 @@ const Order = () => {
   };
 
   return (
-    <section className="flex min-h-screen 2xl:mx-32">
+    <section className="flex mt-16 md:mt-0 min-h-screen 2xl:mx-32">
       <StatusModal
         open={openModal}
         onClose={() => setOpenModal(false)}
@@ -92,7 +92,7 @@ const Order = () => {
       <div className="hidden sm:block md:block lg:block ">
         <SidebarAccount />
       </div>
-      <div className="mt-5  md:p-8 mx-7 w-full text-hitam">
+      <div className="mt-5 md:pt-8 lg:p-8 mx-7 w-full text-hitam">
         <h1 className="font-extrabold text-2xl md:text-3xl mb-5">
           Riwayat Pesanan
         </h1>
@@ -150,9 +150,9 @@ const Order = () => {
                 {/* Header Order: ID, Status, Invoice Button */}
                 <div className="border-b p-4">
                   <div className="flex  justify-between items-start md:items-center">
-                    <div className="flex w-full md:w-auto md:gap-2 flex-col md:flex-row md:items-center">
+                    <div className="flex w-full lg:w-auto lg:gap-2 flex-col lg:flex-row md:items-center">
                       <div
-                        className="text-sm hidden md:flex md:flex-col  space-y-1 cursor-pointer"
+                        className="text-sm hidden lg:flex lg:flex-col  space-y-1 cursor-pointer"
                         onClick={toggleDetails}
                       >
                         <p className="font-semibold">ID Pesanan</p>
@@ -161,7 +161,7 @@ const Order = () => {
                         </p>
                       </div>
                       <div
-                        className="text-sm md:hidden flex gap-2 items-center md:items-start w-full justify-between space-y-1 cursor-pointer"
+                        className="text-sm lg:hidden flex gap-2 items-center lg:items-start w-full justify-between space-y-1 cursor-pointer"
                         onClick={toggleDetails}
                       >
                         <div>
@@ -181,15 +181,15 @@ const Order = () => {
                       </div>
 
                       {/* Detail hanya tampil di desktop */}
-                      <div className="ml-4 hidden md:block space-y-1">
-                        <p className="font-semibold">Tanggal Pesanan</p>
+                      <div className="ml-4 hidden lg:block space-y-1">
+                        <p className="font-semibold text-sm">Tanggal Pesanan</p>
                         <p className="text-gray-950/50 text-xs">
                           {formatDate(order.created_at)}
                         </p>
                       </div>
 
-                      <div className="ml-4 hidden md:block space-y-1">
-                        <p className="font-semibold">
+                      <div className="ml-4 hidden lg:block space-y-1">
+                        <p className="font-semibold text-sm">
                           Total{" "}
                           <span className="text-xs font-normal">
                             (incl. biaya)
@@ -202,7 +202,7 @@ const Order = () => {
                       </div>
 
                       <div
-                        className={`ml-4 hidden md:block font-bold space-y-1 text-sm ${
+                        className={`ml-4 hidden lg:block font-bold space-y-1 text-sm ${
                           order.status === "paid"
                             ? "text-green-500"
                             : order.status === "processed"
@@ -216,7 +216,9 @@ const Order = () => {
                             : "text-gray-600"
                         }`}
                       >
-                        <p className="font-semibold text-black">Status</p>
+                        <p className="font-semibold text-sm text-black">
+                          Status
+                        </p>
                         <button
                           onClick={() => showModal(order)}
                           className="flex items-center gap-1 hover:underline hover:text-blue-600 transition"
@@ -236,7 +238,7 @@ const Order = () => {
                     <button
                       onClick={() => handleDownloadInvoice(order.order_id)}
                       disabled={loadingOrderId === order.order_id}
-                      className=" hidden md:block items-center border border-gray-400 rounded-md px-3 py-2 hover:border-black hover:-translate-y-1 duration-300"
+                      className=" hidden lg:block items-center border border-gray-400 rounded-md px-3 py-2 hover:border-black hover:-translate-y-1 duration-300"
                     >
                       {loadingOrderId === order.order_id ? (
                         <CircularProgress size={15} color="inherit" />
@@ -250,7 +252,7 @@ const Order = () => {
 
                   {/* Detail expand di mobile */}
                   {isExpanded && (
-                    <div className="mt-4 space-y-3 md:hidden text-sm border-t pt-4">
+                    <div className="mt-4 space-y-3 lg:hidden text-sm border-t pt-4">
                       <div className="flex items-start justify-between">
                         <div>
                           <p className="font-semibold">Tanggal Pesanan</p>
@@ -261,7 +263,7 @@ const Order = () => {
                         <button
                           onClick={() => handleDownloadInvoice(order.order_id)}
                           disabled={loadingOrderId === order.order_id}
-                          className=" md:mt-0 flex items-center border border-gray-400 rounded-md px-3 py-2 hover:border-black hover:-translate-y-1 duration-300"
+                          className=" lg:mt-0 flex items-center border border-gray-400 rounded-md px-3 py-2 hover:border-black hover:-translate-y-1 duration-300"
                         >
                           {loadingOrderId === order.order_id ? (
                             <CircularProgress size={15} color="inherit" />
@@ -285,7 +287,7 @@ const Order = () => {
                         </p>
                       </div>
                       <div
-                        className={` md:hidden font-bold space-y-1 text-sm ${
+                        className={` lg:hidden font-bold space-y-1 text-sm ${
                           order.status === "paid"
                             ? "text-green-500"
                             : order.status === "processed"
@@ -322,12 +324,13 @@ const Order = () => {
                     key={`${order.order_id}-${i}`}
                     className="lg:flex border-b p-5 last:border-none"
                   >
-                    <div className="flex items-start justify-start w-full">
-                      <div className="lg:h-[150px] hidden  h-[120px] lg:w-[150px] overflow-hidden md:flex items-center justify-center">
+                    <div className="flex items-center justify-start w-full">
+                      <div className="lg:h-[150px] hidden p-2 md:w-[120px] h-[120px] lg:w-[150px] overflow-hidden md:flex items-center justify-center">
                         <CardImage
                           image={`${import.meta.env.VITE_BACKEND_URL}${
                             ticket.image_url
                           }`}
+                          isCustom={ticket.is_custom}
                         />
                       </div>
                       {/* mobile */}
@@ -337,6 +340,7 @@ const Order = () => {
                             image={`${import.meta.env.VITE_BACKEND_URL}${
                               ticket.image_url
                             }`}
+                            isCustom={ticket.is_custom}
                           />
                         </div>
                         <div>
@@ -344,11 +348,16 @@ const Order = () => {
                             {" "}
                             {ticket.category_name}
                           </h1>
-                          <h1 className="font-bold text-sm ">
+                          <h1 className="font-bold  w-fit max-w-[100px] text-sm ">
                             {ticket.quantity} x {ticket.product_name}{" "}
                           </h1>
                           <p className="text-xs  flex items-center">
-                            <span className="mr-1"> {ticket.size}</span>{" "}
+                            <span className="mr-1">
+                              {" "}
+                              {ticket.is_custom
+                                ? `${ticket.custom_width} x ${ticket.custom_height}`
+                                : `${ticket.width} x ${ticket.height}`}
+                            </span>{" "}
                           </p>
 
                           <div className="mt-2">
@@ -363,27 +372,26 @@ const Order = () => {
                       </div>
                       {/* desktop */}
                       <div className="pl-4 max-w-[350px] hidden md:flex flex-col">
-                        <h1 className="font-bold text-lg ">
+                        <span className="font-bold text-black/60 text-xs">
+                          {ticket.category_name}
+                        </span>
+                        <h1 className="font-bold text-base md:max-w-[170px] lg:max-w-max lg:text-lg ">
                           {ticket.product_name}{" "}
-                          <span className="font-normal">-</span>{" "}
-                          <span className="font-normal text-sm">
-                            {ticket.category_name}
-                          </span>
                         </h1>
                         <p className="text-sm mt-4 flex items-center">
-                          <span className="mr-1"> {ticket.size}</span>{" "}
+                          <span className="mr-1">
+                            {ticket.is_custom
+                              ? `${ticket.custom_width} x ${ticket.custom_height}`
+                              : `${ticket.width} x ${ticket.height}`}
+                          </span>
                         </p>
+
                         <p className="text-sm mt-1 flex items-center">
                           <span className="mr-1">Jumlah item:</span>{" "}
                           <span>{ticket.quantity}</span>
                         </p>
-                        <p className="mt-1 text-sm flex items-center">
-                          <CiCalendar className="text-lg mr-1" />
-                          <span className="mr-1">Tanggal Pesanan:</span>{" "}
-                          <span>{formatDate(order.created_at)}</span>
-                        </p>
                       </div>
-                      <div className="ml-auto hidden md:flex flex-col justify-between items-end h-full">
+                      <div className="ml-auto hidden  md:flex md:flex-col md:gap-y-10  justify-between items-end h-full">
                         <div className="text-base font-bold">
                           IDR {Number(ticket.price).toLocaleString("id-ID")}
                         </div>

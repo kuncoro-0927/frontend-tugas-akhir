@@ -140,13 +140,13 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
 
   return (
     <>
-      <nav className="sticky py-0.5 md:py-2 2xl:px-32  w-full bg-black text-white top-0 md:px-[75px] transition-colors duration-300 z-50">
-        <div className="justify-start hidden md:block  lg:ml-0 lg:max-w-7xl xl:max-w-full lg:items-center lg:flex md:px-0">
+      <nav className="sticky md:py-2 2xl:px-32  w-full bg-black text-white top-0 md:px-14 transition-colors duration-300 z-50">
+        <div className="justify-start hidden  lg:ml-0 lg:max-w-7xl xl:max-w-full md:items-center md:flex md:px-0">
           <div className="flex 2xl:-ml-4 lg:ml-0 md:ml-0 items-center">
             <Link
               to="/"
               className={`${
-                scrolling ? "scrolled hidden lg:block" : "lg:ml-0"
+                scrolling ? "scrolled hidden md:block" : "lg:ml-0"
               }`}
             >
               <div className="flex items-center gap-1">
@@ -164,10 +164,8 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
             </Link>
           </div>
 
-          <div className="lg:items-center  gap-7 items-baseline lg:px-5 lg:py-4 lg:rounded-full justify-start lg:flex lg:space-x-1"></div>
-
-          <div className="hidden  ml-auto space-x-2 lg:inline-block">
-            <div className="hidden lg:flex items-center space-x-2 ml-auto">
+          <div className="hidden ml-auto space-x-2 md:inline-block">
+            <div className="hidden md:flex items-center space-x-2 ml-auto">
               <button
                 onClick={handleSearchOpen}
                 className="mr-3 flex items-center gap-2 border w-80   rounded-full hover:bg-gray-200/15  px-4 py-2 "
@@ -193,7 +191,7 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
                 </span>
               </button>
 
-              <div className="hidden  px-2 ml-auto space-x-2 lg:inline-block">
+              <div className="hidden  ml-auto md:inline-block">
                 {isLoggedIn ? (
                   <>
                     <div
@@ -285,8 +283,8 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
             </div>
           </div>
         </div>
-        <div className="flex   z-0 px-4 py-2 lg:hidden items-center justify-between ">
-          <div className="lg:hidden mx-4 flex items-center justify-between">
+        <div className="flex fixed bg-black w-full top-0  z-0 px-4 py-2 md:hidden items-center justify-between ">
+          <div className="md:hidden mx-4 flex items-center justify-between">
             {scrolling ? (
               // Search Button (muncul saat scroll)
               <button
@@ -508,7 +506,7 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
                 <li className="">
                   <NavLink
                     onClick={toggleDrawer(false)}
-                    to="/products"
+                    to="/products/list"
                     className={({ isActive }) =>
                       isActive
                         ? "w-full text-black font-bold justify-between flex items-center  py-4 text-left hover:bg-gray-100"
@@ -524,25 +522,6 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
                     </span>
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    onClick={toggleDrawer(false)}
-                    to="/contact"
-                    className={({ isActive }) =>
-                      isActive
-                        ? "w-full text-black font-bold justify-between flex items-center  py-4 text-left hover:bg-gray-100"
-                        : "w-full flex items-center justify-between  text-black py-4 text-left hover:bg-gray-100"
-                    }
-                  >
-                    <span className="flex items-center">
-                      <CiShoppingTag className="text-base mr-2" />
-                      Kontak
-                    </span>
-                    <span>
-                      <IoIosArrowForward />
-                    </span>
-                  </NavLink>
-                </li>
               </ul>
             </div>
 
@@ -551,7 +530,8 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
               <ul className="py-2  text-base text-hitam">
                 <li className="">
                   <NavLink
-                    to="/faqs"
+                    onClick={toggleDrawer(false)}
+                    to="/contact"
                     className={({ isActive }) =>
                       isActive
                         ? "w-full text-black font-bold justify-between flex items-center  py-4 text-left hover:bg-gray-100"
@@ -569,7 +549,8 @@ export default function NavBar({ handleOpenModal, handleSearchOpen }) {
                 </li>
                 <li>
                   <NavLink
-                    to="/account/order"
+                    onClick={toggleDrawer(false)}
+                    to="/help/center"
                     className={({ isActive }) =>
                       isActive
                         ? "w-full text-black font-bold justify-between flex items-center  py-4 text-left hover:bg-gray-100"

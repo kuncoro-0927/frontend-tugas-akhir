@@ -21,7 +21,6 @@ import PaymentSuccess from "../pages/PaymentSuccess";
 import Cart from "../pages/Cart";
 import FloatingButton from "../components/FloatingButton";
 import ModalSearch from "../components/Modal/ModalSearch";
-import FrameWithPhoto from "../pages/CustomPhoto";
 function UserRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -45,9 +44,9 @@ function UserRoutes() {
     location.pathname.startsWith("/shipping/form") ||
     location.pathname.startsWith("/checkouts/payment");
 
-  const shouldShowNavBar = !isAuthPage && !isShippingOrPayment;
   const isPaymentSuccess = location.pathname.startsWith("/payment/success");
 
+  const shouldShowNavBar = !isAuthPage && !isShippingOrPayment;
   const shouldShowFooter =
     !isAuthPage && !isAccountPage && !isShippingOrPayment && !isPaymentSuccess;
 
@@ -97,10 +96,9 @@ function UserRoutes() {
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/product" element={<Product />} />
+        <Route path="/products/list" element={<Product />} />
         <Route path="/help/center" element={<Faqs />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/custom" element={<FrameWithPhoto />} />
         <Route path="/product/detail/:id" element={<ProductDetails />} />
         <Route path="/account/profile" element={<Profile />} />
         <Route path="/account/order" element={<Order />} />

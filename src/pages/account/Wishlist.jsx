@@ -107,7 +107,7 @@ const Wishlist = () => {
   };
   return (
     <>
-      <section className="flex  mb-10 md:md-0 md:h-screen 2xl:mx-32">
+      <section className="flex mt-16 md:mt-0 mb-10 md:mb-0 md:md-0 min-h-screen 2xl:mx-32">
         <div className="hidden sm:block md:block lg:block">
           <SidebarAccount />
         </div>
@@ -142,11 +142,11 @@ const Wishlist = () => {
               </Link>
             </div>
           ) : (
-            <div className="grid lg:grid-cols-3 gap-10">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
               {Array.isArray(wishlist) &&
                 wishlist.map((product) => (
                   <div key={product.id} className="relative">
-                    <Link to={`/wisata/detail/${product.id}`}>
+                    <Link to={`/product/detail/${product.id}`}>
                       <Card
                         title={product.name}
                         image={`${import.meta.env.VITE_BACKEND_URL}${
@@ -154,6 +154,7 @@ const Wishlist = () => {
                         }`}
                         price={Number(product.price).toLocaleString("id-ID")}
                         average_rating={product.rating || "0.0"}
+                        stock={product.stock}
                       />
                     </Link>
                     <div className="absolute top-1 right-1">

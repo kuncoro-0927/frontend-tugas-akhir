@@ -60,9 +60,13 @@ const Cart = () => {
       console.error("Gagal update quantity:", err);
     }
   };
-
   const calculateSubtotal = () => {
-    return cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    return cartItems.reduce((acc, item) => {
+      const price = item.is_custom
+        ? Number(item.custom_price)
+        : Number(item.price);
+      return acc + price * item.quantity;
+    }, 0);
   };
 
   const handleRemoveItem = async (id) => {
@@ -84,34 +88,56 @@ const Cart = () => {
     }
 
     setLoadingCheckout(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    // transform cartItems sebelum dikirim
+    const itemsToSend = cartItems.map((item) => {
+      if (item.is_custom) {
+        return {
+          id: item.id,
+          product_id: item.product_id,
+          product_name: item.product_name,
+          quantity: item.quantity,
+          custom_image: item.custom_image_url || item.custom_image || null, // sesuaikan nama di frontend
+          custom_width: Number(item.custom_width) || null,
+          custom_height: Number(item.custom_height) || null,
+          custom_notes: item.custom_notes || item.notes || null,
+          custom_price: Number(item.custom_price),
+          is_custom: 1,
+        };
+      } else {
+        return {
+          product_id: item.product_id,
+          product_name: item.product_name,
+          quantity: item.quantity,
+          price: Number(item.price),
+          total: Number(item.total),
+          weight_gram: Number(item.weight_gram) || 0,
+          width: Number(item.width) || null,
+          height: Number(item.height) || null,
+          is_custom: 0,
+        };
+      }
+    });
 
     try {
+      console.log("Isi itemsToSend sebelum dikirim:", itemsToSend);
+
       const res = await instance.post("/checkout", {
-        items: cartItems,
+        items: itemsToSend,
       });
 
       handleCloseDrawer();
       navigate(`/shipping/form/${res.data.order_id}`);
     } catch (err) {
       console.error("Gagal melanjutkan pembayaran:", err);
-
-      // Ambil pesan error dari response
       const errorMsg =
         err?.response?.data?.msg ||
         "Terjadi kesalahan saat melanjutkan pembayaran.";
-
       showSnackbar(errorMsg, "error");
     } finally {
       setLoadingCheckout(false);
     }
   };
-
-  // const handleSelectMethod = async (method) => {
-  //   setShippingMethod(method);
-  //   handleClose();
-  //   await handleCheckout(method);
-  // };
 
   return (
     <>
@@ -138,24 +164,40 @@ const Cart = () => {
 
         {cartItems && cartItems.length > 0 ? (
           <>
-            <div className="flex-1 overflow-y-auto pb-5 px-7 md:px-10 space-y-4">
+            <div className="flex-1 overflow-y-auto  pt-2  pb-5 px-7 md:px-10 space-y-4">
               {cartItems.map((item) => (
                 <div
                   key={item.id}
                   className="flex items-start gap-4 mb-10 rounded-lg transition"
                 >
-                  <div className="h-[90px] w-[90px] flex-shrink-0">
+                  <div className="h-[90px] w-[90px] flex-shrink-0 relative">
                     <CardImage
                       image={`${import.meta.env.VITE_BACKEND_URL}${
-                        item.image_url
+                        item.product_image
                       }`}
                       alt={item.name}
+                      isCustom={item.is_custom}
                     />
                   </div>
                   <div className="flex flex-col  justify-between w-full h-[110px]">
-                    <p className="font-bold max-w-[250px]">{item.name}</p>
+                    <p className="font-bold max-w-[250px]">
+                      {item.product_name}
+                    </p>
 
-                    <p className="text-sm">{item.size}</p>
+                    {item.is_custom === 1 ? (
+                      <div className="text-sm">
+                        <p>
+                          {item.custom_width} x {item.custom_height} (cm)
+                        </p>
+                        {item.custom_notes && (
+                          <p className="italic text-gray-500">
+                            "{item.custom_notes}"
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm">{item.size} (cm)</p>
+                    )}
 
                     <div className="flex justify-between items-end mt-auto">
                       <div className="border-b-2 border-black px-2">
@@ -170,14 +212,17 @@ const Cart = () => {
                         />
                       </div>
                       <p className="font-medium">
-                        IDR {Number(item.price).toLocaleString("id-ID")}
+                        IDR{" "}
+                        {Number(
+                          item.is_custom ? item.custom_price : item.price
+                        ).toLocaleString("id-ID")}
                       </p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="border-t py-6 px-7 md:mx-10 ">
+            <div className="border-t py-6 px-7 lg:px-0  md:mx-10 ">
               <div className="space-y-2">
                 <div className="flex font-semibold justify-between">
                   <p>Subtotal</p>

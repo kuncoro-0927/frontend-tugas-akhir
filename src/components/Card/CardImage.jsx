@@ -6,10 +6,11 @@ export default function CardImage({
   width = "w-full",
   height = "h-full",
   quantity = null,
+  isCustom,
 }) {
   return (
     <div
-      className={`relative bg-abu p-2.5 md:p-2 border border-gray-300  rounded-lg overflow-visible group flex flex-col ${width} ${height}`}
+      className={`relative bg-abu p-2.5 md:p-2 border border-gray-300 rounded-lg overflow-visible group flex flex-col ${width} ${height}`}
     >
       {/* Badge jumlah */}
       {quantity && (
@@ -18,13 +19,19 @@ export default function CardImage({
         </div>
       )}
 
+      {isCustom === 1 && (
+        <div className="absolute -top-2 -left-2 z-50 bg-black px-2 py-0.5 text-white text-xs">
+          Custom
+        </div>
+      )}
+
       {/* Kontainer gambar */}
-      <div className="w-full h-full flex items-center justify-center overflow-hidden">
+      <div className="w-full h-full flex items-center justify-center overflow-visible">
         {isLoading ? (
           <Skeleton variant="rectangular" width="100%" height={200} />
         ) : (
           <img
-            className="w-full h-full object-contain "
+            className="w-full h-full object-contain"
             src={image}
             alt="Image"
           />

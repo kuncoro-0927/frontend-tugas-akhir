@@ -170,19 +170,19 @@ const Payment = () => {
   return (
     <>
       <section className=" h-screen">
-        <div className="border-b flex items-center justify-between px-7 md:px-[75px] py-4">
+        <div className="border-b flex items-center justify-between px-7 md:px-32 lg:px-[75px] py-4">
           <Link to="/">
             <img className="w-10" src="/logoindex.svg" alt="" />
           </Link>
           <button
             onClick={() => dispatch(openDrawer())}
-            className="relative  rounded-full hover:bg-gray-200/15  px-3 py-1.5"
+            className="relative  rounded-full hover:bg-gray-200/15"
           >
             <CiShoppingCart className="text-3xl" />
           </button>
         </div>
-        <div className="flex flex-col-reverse md:flex-row md:space-x-20 mx-7 md:mx-[75px] justify-between">
-          <div className="max-w-[700px] mb-10 md:mt-10  w-full">
+        <div className="flex flex-col-reverse lg:flex-row lg:space-x-20 mx-7 md:mx-32 lg:mx-[75px] justify-between">
+          <div className="max-w-[700px] mb-10 lg:mt-10  w-full">
             <div className="border-b pb-2 flex items-start justify-between border-gray-400 max-w-[700px]">
               <div>
                 <h1 className="font-bold text-2xl ">Layanan/Kurir</h1>
@@ -364,8 +364,8 @@ const Payment = () => {
             </button>
           </div>
 
-          <div className="md:border-r border-b my-5 md:my-0 border-gray-300 md:h-[130vh] md:mx-4 md:self-stretch"></div>
-          <div className="space-y-3 md:sticky mt-5 md:mt-0 md:top-28 md:self-start max-w-[380px] w-full">
+          <div className="lg:border-r border-b my-5 lg:my-0 border-gray-300 lg:h-[130vh] lg:mx-4 lg:self-stretch"></div>
+          <div className="space-y-3 lg:sticky mt-5 md:mt-10 lg:mt-0 lg:top-28 md:self-start lg:max-w-[380px] w-full">
             <h1 className="text-xl font-bold mb-5">Ringkasan Pesanan</h1>
             {items.map((item, index) => (
               <div

@@ -17,7 +17,7 @@ const AccordionFaqs = ({ title, content, defaultExpanded = false }) => {
   };
   return (
     <>
-      <div className="accordion-container  w-[800px]">
+      <div className="accordion-container lg:w-[800px]">
         <Accordion
           disableGutters
           elevation={0}

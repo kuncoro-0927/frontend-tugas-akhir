@@ -62,7 +62,7 @@ const Review = () => {
 
   return (
     <>
-      <section className="flex min-h-screen  2xl:mx-32">
+      <section className="flex min-h-screen mt-16 md:mt-0 2xl:mx-32">
         <ModalReview
           open={modalOpen}
           handleClose={handleCloseReviewModal}
@@ -72,7 +72,7 @@ const Review = () => {
         <div className="hidden sm:block md:block lg:block">
           <SidebarAccount />
         </div>
-        <div className="mt-5  md:p-8 mx-7 w-full text-hitam">
+        <div className="mt-5 md:pt-8 lg:p-8 mx-7 w-full text-hitam">
           <h1 className="font-extrabold text-2xl md:text-3xl ">Ulasan</h1>
           <p className="text-sm mb-5 flex items-center gap-1">
             Hanya produk yang sudah diterima yang bisa diulas.
@@ -128,9 +128,9 @@ const Review = () => {
               products.map((product) => (
                 <div
                   key={product.id}
-                  className=" max-w-[800px] md:h-[200px] h-[120px]  mb-4 mt-5 md:mt-10 border flex border-gray-200 w-full rounded-lg shadow-sm"
+                  className=" max-w-[800px] md:h-[150px] h-[120px] lg:h-[200px] mb-4 mt-5 md:mt-10 border flex border-gray-200 w-full rounded-lg shadow-sm"
                 >
-                  <div className="lg:h-[200px] h-[120px]  w-[160px] lg:w-[300px] ">
+                  <div className="lg:h-[200px] h-[120px] md:h-[150px] md:w-[220px]  w-[160px] lg:w-[300px] ">
                     <CardImage
                       image={`${import.meta.env.VITE_BACKEND_URL}${
                         product.image_url
@@ -141,7 +141,7 @@ const Review = () => {
                     <h1 className="font-bold text-xs text-black/60 md:text-sm">
                       {product.category_name}
                     </h1>
-                    <h1 className="font-bold text-sm md:text-xl">
+                    <h1 className="font-bold text-sm lg:text-xl">
                       {product.name}
                     </h1>
                     <p className="md:mt-3 mt-1 text-xs md:text-sm flex items-center">
@@ -181,9 +181,9 @@ const Review = () => {
               <div key={`review-${review.id}`}>
                 <div
                   key={`review-content-${review.id}`}
-                  className="max-w-[800px] md:h-[180px] h-[120px] mt-10 border flex border-gray-200 w-full rounded-t-lg shadow-sm"
+                  className=" md:h-[150px] lg:h-[200px] lg:max-w-[800px]  h-[120px] mt-10 border flex border-gray-200 w-full rounded-t-lg shadow-sm"
                 >
-                  <div className=" h-[120px] md:h-[180px] w-[160px] md:w-[230px] flex items-center justify-center overflow-hidden">
+                  <div className="lg:h-[200px] h-[120px] md:h-[150px] md:w-[220px]  w-[160px] lg:w-[300px] ">
                     <CardImage
                       image={`${import.meta.env.VITE_BACKEND_URL}${
                         review.image_url
@@ -198,7 +198,7 @@ const Review = () => {
                       {review.product_name}
                     </h1>
 
-                    <p className="font-bold md:mt-0 text-xs md:text-sm ">
+                    <p className="font-bold md:mt-0 lg:mt-5 text-xs md:text-sm ">
                       {" "}
                       IDR{" "}
                       {Number(review.price).toLocaleString("id-ID", {
@@ -231,7 +231,7 @@ const Review = () => {
                     readOnly
                     sx={{ fontSize: "1.5rem" }}
                   />
-                  <p className="text-sm md:text-base mt-1 md:mt-0 text-hitam2">
+                  <p className="text-sm  w-full md:max-w-[400px] lg:max-w-[700px]  break-words md:text-base mt-1 md:mt-0 text-hitam2">
                     {review.comment}
                   </p>
                 </div>

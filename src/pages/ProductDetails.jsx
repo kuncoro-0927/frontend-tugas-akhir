@@ -12,8 +12,6 @@ import { addToCart } from "../redux/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { showSnackbar } from "../components/CustomSnackbar";
 import { fetchCartItemCount } from "../redux/cartSlice";
-//import { setCheckoutItems } from "../redux/checkoutSlice";
-
 const ProductDetails = () => {
   const { id } = useParams(); // ambil id dari URL
   const [product, setProduct] = useState(null);
@@ -23,6 +21,10 @@ const ProductDetails = () => {
   const location = useLocation();
   const from = location.state?.from;
   const [averageRating, setAverageRating] = useState(0);
+  const [file, setFile] = useState(null);
+  const [width, setWidth] = useState("");
+  const [height, setHeight] = useState("");
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -55,13 +57,48 @@ const ProductDetails = () => {
     fetchDetail();
   }, [id]);
 
-  if (!product) return <p className="mx-14 mt-24">Loading...</p>;
+  const [customPrice, setCustomPrice] = useState(0);
+
+  useEffect(() => {
+    if (
+      width &&
+      height &&
+      product?.width &&
+      product?.height &&
+      product?.price
+    ) {
+      const baseWidth = Number(product.width);
+      const baseHeight = Number(product.height);
+      const basePrice = Number(product.price);
+
+      const baseArea = baseWidth * baseHeight;
+      const pricePerCm2 = basePrice / baseArea;
+
+      const customArea = Number(width) * Number(height);
+      const newPriceRaw = pricePerCm2 * customArea;
+
+      // Pembulatan ke 1.000 terdekat
+      const newPrice = Math.round(newPriceRaw / 1000) * 1000;
+
+      setCustomPrice(newPrice);
+    } else if (product?.price) {
+      setCustomPrice(Number(product.price));
+    }
+  }, [width, height, product]);
 
   const addCart = async (product, quantity) => {
     try {
-      await instance.post("/add/to/cart", {
-        product_id: product.id,
-        quantity,
+      const formData = new FormData();
+      formData.append("product_id", product.id);
+      formData.append("quantity", quantity);
+      if (file) formData.append("image", file);
+      if (width) formData.append("width", width);
+      if (height) formData.append("height", height);
+      if (notes) formData.append("notes", notes);
+      formData.append("custom_price", customPrice);
+
+      await instance.post("/add/to/cart", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       dispatch(
@@ -70,11 +107,16 @@ const ProductDetails = () => {
           name: product.name,
           weight: product.weight,
           quantity,
+          image: file ? URL.createObjectURL(file) : null,
+          width,
+          height,
+          notes,
+          custom_price: customPrice,
         })
       );
 
-      dispatch(fetchCartItemCount(user.id)); // 🔥 langsung update icon cart
-      showSnackbar("Produk berhasil ditambahkan ke keranjang!", "success"); // 🔔 notif manis
+      dispatch(fetchCartItemCount(user.id));
+      showSnackbar("Produk berhasil ditambahkan ke keranjang!", "success");
     } catch (err) {
       console.error("Gagal menambahkan produk ke cart:", err.message);
       showSnackbar("Gagal menambahkan produk ke keranjang", "error");
@@ -84,6 +126,13 @@ const ProductDetails = () => {
   const handleAddToCart = () => {
     addCart(product, 1);
   };
+
+  function formattedPrice(price) {
+    return price.toLocaleString("id-ID", {
+      style: "currency",
+      currency: "IDR",
+    });
+  }
 
   return (
     <>
@@ -97,28 +146,28 @@ const ProductDetails = () => {
           </Link>
 
           {from === "produk" && (
-            <Link to="/product">
+            <Link to="/products/list">
               <span className="text-sm font-normal text-gray-600">Produk</span>
             </Link>
           )}
 
-          <div className="text-sm font-medium text-black">{product.name}</div>
+          <div className="text-sm font-medium text-black">{product?.name}</div>
         </Breadcrumbs>
 
-        <div className="md:mt-10 mt-5 md:flex gap-20">
-          <div className="md:w-1/2 md:h-[550px] w-full h-[300px]">
+        <div className="md:mt-10 mt-5 md:flex md:gap-10 lg:gap-20">
+          <div className="md:w-1/2 lg:h-[550px] w-full h-[300px]">
             <CardImage
-              image={`${import.meta.env.VITE_BACKEND_URL}${product.image_url}`}
+              image={`${import.meta.env.VITE_BACKEND_URL}${product?.image_url}`}
             />
           </div>
           <div className="flex flex-col md:w-1/2">
             <div className="flex mt-5 items-center justify-between">
               <div className="text-black/60 font-bold  py-1 w-fit">
-                {product.category}
+                {product?.category}
               </div>
               <div className="text-sm">
                 {" "}
-                {product.status === "sold" ? (
+                {product?.status === "sold" ? (
                   <p className="bg-red-100 rounded-full px-5 py-1.5 text-red-500">
                     Terjual
                   </p>
@@ -131,12 +180,12 @@ const ProductDetails = () => {
             </div>
             <div className="md:flex mt-3 items-center gap-3">
               <div className="flex items-start md:items-center gap-2">
-                <h1 className="text-2xl font-extrabold">{product.name}</h1>
+                <h1 className="text-2xl font-extrabold">{product?.name}</h1>
                 <GoShareAndroid className="md:text-xl text-2xl" />
               </div>
               <p className="text-2xl mt-2 md:mt-0 ml-auto">
                 <span className="font-bold">
-                  IDR {Number(product.price).toLocaleString("id-ID")}
+                  IDR {formattedPrice(customPrice)}
                 </span>
               </p>
             </div>
@@ -174,7 +223,7 @@ const ProductDetails = () => {
 
               <div className="flex gap-2">
                 <p className="rounded-md px-3 py-1 border border-gray-400 text-sm">
-                  {product.size}
+                  {product?.width} x {product?.height}
                 </p>
               </div>
 
@@ -182,21 +231,69 @@ const ProductDetails = () => {
                 <p className="font-bold text-base">Deskripsi Produk</p>
                 <span className="text-sm font-medium text-black/60">
                   {" "}
-                  {product.description}
+                  {product?.description}
                 </span>
               </div>
+
+              {[3, 4, 5].includes(product?.category_id) && (
+                <div className="mt-4 space-y-4 border p-4 rounded-lg bg-gray-50">
+                  <div>
+                    <label className="block font-semibold mb-1">
+                      Upload Foto
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setFile(e.target.files[0])}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold mb-1">
+                      Ukuran (cm)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Lebar"
+                      value={width}
+                      onChange={(e) => setWidth(e.target.value)}
+                      className="mr-2 p-1 border rounded w-20"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Tinggi"
+                      value={height}
+                      onChange={(e) => setHeight(e.target.value)}
+                      className="p-1 border rounded w-20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold mb-1">
+                      Catatan Tambahan
+                    </label>
+                    <textarea
+                      rows={3}
+                      placeholder="Contoh: Tambahkan peci"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="flex mt-10 items-center gap-3">
                 <button
                   onClick={handleAddToCart}
-                  disabled={product.status === "sold"}
+                  disabled={product?.status === "sold"}
                   className={`w-full rounded-lg py-2  ${
-                    product.status === "sold"
+                    product?.status === "sold"
                       ? "bg-gray-200 text-gray-500 opacity-50 cursor-not-allowed"
-                      : "bg-black text-white hover:bg-gray-800 transition"
+                      : "bg-black text-white hover:bg-black/85 transition"
                   }`}
                 >
-                  {product.status === "sold" ? "Sudah terjual" : "Pesan"}
+                  {product?.status === "sold" ? "Sudah terjual" : "Pesan"}
                 </button>
 
                 <button className="w-full border border-gray-400 py-2 rounded-lg">
@@ -216,9 +313,9 @@ const ProductDetails = () => {
           </h2>
         </div>
 
-        <div className="md:flex items-start justify-start md:gap-10">
+        <div className="lg:flex items-start justify-start md:gap-10">
           {/* Bagian kiri: Ringkasan rating */}
-          <div className="mt-3 flex-col md:gap-10 flex items-start justify-between text-hitam2 w-fit p-5 rounded-md">
+          <div className="mt-3 lg:flex-col md:flex-row md:flex md:gap-20  lg:gap-10 lg:flex items-start justify-between text-hitam2 w-fit p-5 rounded-md">
             <div className="items-end gap-3">
               <h1 className="flex items-center text-3xl md:text-5xl font-extrabold text-hitam2">
                 <Rating
@@ -266,7 +363,7 @@ const ProductDetails = () => {
           </div>
 
           {/* Bagian kanan: List review */}
-          <div className="w-full mt-5">
+          <div className="w-full  mt-5">
             {reviews.length === 0 ? (
               <p className="text-gray-600">
                 Belum ada ulasan untuk produk ini.

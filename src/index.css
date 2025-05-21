@@ -12,6 +12,14 @@
 .timeline-item-custom {
   margin-bottom: 0.3rem;
 }
+/* global.css atau style.css */
+.cropper-container .reactEasyCrop_CropArea {
+  box-shadow: none !important;
+}
+
+.cropper-container .reactEasyCrop_Overlay {
+  background: transparent !important;
+}
 
 body {
   @apply font-nunito text-base text-darkgray;

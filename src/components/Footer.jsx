@@ -4,8 +4,8 @@ import { TiSocialFacebook } from "react-icons/ti";
 const Footer = () => {
   return (
     <div>
-      <footer className="mt-20 mx-7 md:mx-14">
-        <div className="md:flex space-y-4 md:space-y-0 gap-24 Justify-start items-start md:mx-[14px] text-sm">
+      <footer className="mt-20 mx-7 lg:mx-14">
+        <div className="md:flex space-y-4 md:space-y-0 md:gap-10 lg:gap-24 Justify-start items-start md:mx-10 lg:mx-[14px] text-sm">
           <div className="max-w-sm  w-fit ">
             <h1 className="font-bold text-lg mb-3">Bantuan</h1>
             <p className="font-semibold">Hubungi Kami</p>
@@ -23,7 +23,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="space-y-2 w-72">
+          <div className="space-y-2 md:w-44 lg:w-72">
             <p className="font-bold text-base mb-3">Customer Service</p>
             <p className="text-sm font-semibold text-gray-700">
               Jangan sungkan untuk hubungi tim kami di <br />
@@ -49,7 +49,7 @@ const Footer = () => {
                 ].map((img, index) => (
                   <div
                     key={index}
-                    className="bg-white border w-20 h-12 flex items-center justify-center p-3"
+                    className="bg-white border w-16 h-10 md:w-20 md:h-10 lg:w-20 lg:h-12 flex items-center justify-center p-3"
                   >
                     <img
                       src={`/images/${img}`}
