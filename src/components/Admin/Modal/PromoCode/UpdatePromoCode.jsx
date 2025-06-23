@@ -141,7 +141,7 @@ const ModalUpdatePromo = ({ open, handleClose, onUpdate, promoId }) => {
               <IoClose />
             </button>
             <div className="px-5 pb-2">
-              <h2 className="text-2xl font-bold text-hitam2">Tambah Promo</h2>
+              <h2 className="text-2xl font-bold text-hitam2">Edit Promo</h2>
             </div>
           </div>
           <div className="mx-5 mt-5 mb-7">

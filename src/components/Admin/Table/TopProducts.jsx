@@ -21,7 +21,7 @@ const TopProduct = () => {
 
   return (
     <>
-      <div className="w-full border shadow-md  rounded-lg">
+      <div className="w-full border  rounded-lg">
         <table className="w-full mb-3 rounded-lg min-w-max table-auto text-left">
           <thead>
             <tr>
@@ -69,7 +69,7 @@ const TopProduct = () => {
 
                 <td className="p-4 border-t border-blue-gray-50">
                   <p className="block antialiased text-sm leading-normal text-blue-gray-900 font-extrabold">
-                    IDR: {formatNumber(product.total_amount)}
+                    IDR: {formatNumber(product.product_price)}
                   </p>
                 </td>
               </tr>

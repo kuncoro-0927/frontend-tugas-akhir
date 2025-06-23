@@ -214,7 +214,9 @@ const AccordionTransition = () => {
           id="panel4-header"
           sx={{ padding: 0 }}
         >
-          <span className="font-semibold">Pengiriman Cepat dan Aman</span>
+          <Typography component="span" sx={{ fontWeight: "bold" }}>
+            Pengiriman Cepat dan Aman
+          </Typography>
         </AccordionSummary>
         <AccordionDetails sx={{ paddingX: 0 }}>
           <p className="text-sm">

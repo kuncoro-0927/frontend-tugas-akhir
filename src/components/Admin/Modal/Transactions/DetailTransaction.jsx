@@ -4,27 +4,30 @@ import { IconButton, CircularProgress } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { instanceAdmin } from "../../../../utils/axiosAdmin";
 import CardImage from "../../../Card/CardImage";
-const DetailProduct = ({ open, onClose, productId }) => {
-  const [product, setProduct] = useState(null);
+const DetailTransaction = ({ open, onClose, transactionId }) => {
+  const [promo, setPromo] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (open && productId) {
-      fetchProductDetails();
-    }
-  }, [open, productId]);
-
-  const fetchProductDetails = async () => {
+  const fetchPromoDetails = async () => {
     try {
       setLoading(true);
-      const response = await instanceAdmin.get(`/product/${productId}`);
-      setProduct(response.data.data);
+      const response = await instanceAdmin.get(
+        `/get/transaction/${transactionId}`
+      );
+      setPromo(response.data);
+      console.log("data", response.data);
     } catch (error) {
       console.error("Gagal mengambil detail produk:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (open && transactionId) {
+      fetchPromoDetails();
+    }
+  }, [open, transactionId]);
 
   useEffect(() => {
     if (open) {
@@ -74,12 +77,12 @@ const DetailProduct = ({ open, onClose, productId }) => {
           <div className="flex-1 flex items-center justify-center">
             <CircularProgress />
           </div>
-        ) : product ? (
+        ) : promo ? (
           <>
             <div className="flex  items-center justify-between p-4 border-b">
               <div>
-                <p className="font-bold text-base">#{product.id}</p>
-                <p className="text-sm font-semibold">Detail Product</p>
+                <p className="font-bold text-base">#{promo.order_id}</p>
+                <p className="text-sm font-semibold">Detail Transaksi</p>
               </div>
               <IconButton onClick={onClose}>
                 <CloseIcon />
@@ -87,83 +90,104 @@ const DetailProduct = ({ open, onClose, productId }) => {
             </div>
 
             <div className="p-4 text-sm text-graytext overflow-y-auto scrollbar-hide">
-              <h1 className="font-bold flex items-center justify-between text-base">
-                {" "}
-                <span>{product.name}</span>
-                <span
-                  className={`font-normal text-xs px-4 py-1 ${
-                    product.status === "available"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
-                  } px-2 py-1 rounded-full`}
-                >
-                  {product.status === "available" ? "Tersedia" : "Terjual"}
-                </span>
-              </h1>
-              <p className="font-normal mt-3">{product.description}</p>
-
-              <h1 className="border-b mt-5 mb-5"></h1>
-
-              <h1 className="mt-3 mb-3 font-bold">Ringkasan Produk</h1>
+              <h1 className="mt-3 mb-3 font-bold">Ringkasan Transaksi</h1>
               <div className="flex justify-between  py-2 w-full">
                 <p className="font-normal w-1/2">Tanggal ditambahkan</p>
                 <div className="w-1/2 break-words">
-                  <p className="font-bold">{formatDate(product.created_at)}</p>
+                  <p className="font-bold">{formatDate(promo.created_at)}</p>
                 </div>
               </div>
 
               <div className="flex justify-between  py-2 w-full">
                 <p className="font-normal w-1/2">Tanggal diperbarui</p>
                 <div className="w-1/2 break-words">
-                  <p className="font-bold">{formatDate(product.updated_at)}</p>
+                  <p className="font-bold">{formatDate(promo.updated_at)}</p>
                 </div>
               </div>
 
               <div className="flex justify-between  py-2 w-full">
-                <p className="font-normal w-1/2">Lebar / cm</p>
+                <p className="font-normal w-1/2">Kode Pesanan</p>
                 <div className="w-1/2 break-words">
-                  <p className="font-bold">{product.width}</p>
+                  <p className="font-bold">{promo.order_code}</p>
                 </div>
               </div>
               <div className="flex justify-between  py-2 w-full">
-                <p className="font-normal w-1/2">Tinggi / cm</p>
+                <p className="font-normal w-1/2">Payment Token</p>
                 <div className="w-1/2 break-words">
-                  <p className="font-bold">{product.height}</p>
-                </div>
-              </div>
-              <div className="flex justify-between  py-2 w-full">
-                <p className="font-normal w-1/2">Berat / gram</p>
-                <div className="w-1/2 break-words">
-                  <p className="font-bold">{product.weight_gram}</p>
+                  <p className="font-bold">{promo.payment_token}</p>
                 </div>
               </div>
 
               <div className="flex justify-between  py-2 w-full">
-                <p className="font-normal w-1/2">Harga</p>
+                <p className="font-normal w-1/2">ID Transaksi</p>
                 <div className="w-1/2 break-words">
-                  <p className="font-bold">
+                  <p className="font-bold">{promo.transaction_id}</p>
+                </div>
+              </div>
+
+              <div className="flex justify-between  py-2 w-full">
+                <p className="font-normal w-1/2">Status</p>
+                <div className="w-1/2 break-words">
+                  <p className="font-bold">{promo.transaction_status}</p>
+                </div>
+              </div>
+
+              <div className="flex justify-between  py-2 w-full">
+                <p className="font-normal w-1/2">Tipe Pembayaran</p>
+                <div className="w-1/2 break-words">
+                  <p className="font-bold">{promo.payment_type}</p>
+                </div>
+              </div>
+
+              <div className="flex justify-between  py-2 w-full">
+                <p className="font-normal w-1/2">Nama bank</p>
+                <div className="w-1/2 break-words">
+                  <p className="font-bold">{promo.bank}</p>
+                </div>
+              </div>
+
+              <div className="flex justify-between  py-2 w-full">
+                <p className="font-normal w-1/2">Total Pembayaran</p>
+                <div className="w-1/2 break-words">
+                  <p className="font-bold ">
                     {" "}
                     IDR{" "}
-                    {Number(product.price).toLocaleString("id-ID", {
+                    {Number(promo.gross_amount).toLocaleString("id-ID", {
                       minimumFractionDigits: 2,
                     })}
                   </p>
                 </div>
               </div>
-              <h1 className="border-b mt-5 mb-5"></h1>
-              <h1 className="mt-3 mb-3 font-bold">Gambar Produk</h1>
-              <CardImage
-                image={`${import.meta.env.VITE_BACKEND_URL}${
-                  product.image_url
-                }`}
-                width="w-[150px]"
-                height="h-[150px]"
-              />
+
+              <div className="flex justify-between  py-2 w-full">
+                <p className="font-normal w-1/2">Tanggal pembayaran</p>
+                <div className="w-1/2 break-words">
+                  <p className="font-bold">
+                    {formatDate(promo.transaction_time)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-between  py-2 w-full">
+                <p className="font-normal w-1/2">Tanggal pelunasan</p>
+                <div className="w-1/2 break-words">
+                  <p className="font-bold">
+                    {formatDate(promo.settlement_time)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex justify-between  py-2 w-full">
+                <p className="font-normal w-1/2">Tanggal kadaluwarsa</p>
+                <div className="w-1/2 break-words">
+                  <p className="font-bold">{formatDate(promo.expiry_time)}</p>
+                </div>
+              </div>
             </div>
           </>
         ) : (
           <div className="p-4">
-            <p className="text-red-600">Data order tidak ditemukan.</p>
+            <p className="text-red-600">Data Promo tidak ditemukan.</p>
           </div>
         )}
       </div>
@@ -171,4 +195,4 @@ const DetailProduct = ({ open, onClose, productId }) => {
   );
 };
 
-export default DetailProduct;
+export default DetailTransaction;

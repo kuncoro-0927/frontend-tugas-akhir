@@ -18,6 +18,15 @@ export default {
         montserrat: ["Montserrat", "sans-serif"],
         nunito: ['"Nunito Sans"', "sans-serif"],
       },
+      animation: {
+        blink: "blink 1s linear infinite",
+      },
+      keyframes: {
+        blink: {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.3" },
+        },
+      },
       colors: {
         coklat: "#D0CCC7",
         birulaut: "#C4E0E9",

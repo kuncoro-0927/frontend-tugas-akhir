@@ -939,17 +939,16 @@ const ModalCreateOrder = ({ open, handleClose }) => {
           </form>
 
           <div className="flex justify-between px-6 pb-4">
-            <Button disabled={activeStep === 0} onClick={handleBack}>
+            <button disabled={activeStep === 0} onClick={handleBack}>
               Kembali
-            </Button>
+            </button>
             {activeStep === steps.length - 1 ? (
-              <Button
-                variant="contained"
-                color="primary"
+              <button
+                className="bg-black px-4 py-2 rounded-md text-white hover:bg-black/80"
                 onClick={handleSubmit}
               >
                 Submit
-              </Button>
+              </button>
             ) : (
               <button
                 className="bg-black px-4 py-2 rounded-md text-white hover:bg-black/80"

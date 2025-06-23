@@ -31,7 +31,7 @@ const Product = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
+  const itemsPerPage = 9;
 
   // Hitung index awal dan akhir
   const indexOfLastItem = currentPage * itemsPerPage;

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import AdminNavBar from "../../../components/Admin/AdminNavBar";
 import SidebarAdmin from "../../../components/Admin/SidebarAdmin";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
+import DetailTransaction from "../../../components/Admin/Modal/Transactions/DetailTransaction";
 const DataTransactions = () => {
   const [orderItems, setOrderItems] = useState([]);
   const [filteredOrderItems, setFilteredOrderItems] = useState([]);
@@ -10,7 +11,12 @@ const DataTransactions = () => {
   const dropdownRef = useRef(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Sidebar collapsed by default
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
-
+  const [selectedTransactionId, setSelectedTransactionId] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const handleOpenDrawer = (id) => {
+    setSelectedTransactionId(id);
+    setDrawerOpen(true);
+  };
   // Toggle sidebar state
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed); // Toggle state
@@ -75,8 +81,13 @@ const DataTransactions = () => {
 
   return (
     <section className="flex gap-10">
+      <DetailTransaction
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        transactionId={selectedTransactionId}
+      />
       <div
-        className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
+        className={`h-screen  fixed top-0 left-0 z-40 transition-all duration-300 ${
           isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
         }`}
       >
@@ -96,10 +107,10 @@ const DataTransactions = () => {
       >
         <AdminNavBar onToggleSidebar={toggleSidebar} />
         <div className="mt-10 px-5 text-xl font-bold">
-          Data Pengguna
+          Data Transaksi
           <div className="border p-5 mt-10">
             <div className="flex  items-start justify-between">
-              <p className="font-semibold text-sm">Tabel Data Pengguna</p>
+              <p className="font-semibold text-sm">Tabel Data Transaksi</p>
 
               {/* Search Input */}
               <div className=" mb-4">
@@ -244,10 +255,10 @@ const DataTransactions = () => {
                           {openDropdown === order.id && (
                             <div className="absolute right-0 mt-2 w-36 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                               <div className="py-1">
-                                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                  Edit
-                                </button>
-                                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <button
+                                  onClick={() => handleOpenDrawer(order.id)}
+                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                >
                                   Detail
                                 </button>
                                 <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">

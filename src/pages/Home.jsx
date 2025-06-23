@@ -169,11 +169,7 @@ const Home = () => {
           </div>
 
           <div className="bg-gradient-to-b from-coklat to-birulaut w-full flex justify-center p-14 md:p-14 lg:p-20 rounded-2xl">
-            <img
-              src="/public/images/bg-home-new3.png"
-              className="md:w-full  lg:w-[320px]"
-              alt=""
-            />
+            <img src="/kuda.png" className="md:w-full  lg:w-[320px]" alt="" />
           </div>
         </div>
       </section>
@@ -240,132 +236,140 @@ const Home = () => {
 
         {/* Mobile Carousel */}
         <div className="flex  md:hidden mt-10 pb-16 gap-4 overflow-x-auto scrollbar-hide">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="min-w-[250px] flex-shrink-0 relative"
-            >
-              <Link
-                to={`/product/detail/${product.id}`}
-                state={{ from: "produk" }}
+          {products
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // urutkan terbaru dulu
+            .slice(0, 8) // ambil 10 item pertama
+            .map((product) => (
+              <div
+                key={product.id}
+                className="min-w-[250px] flex-shrink-0 relative"
               >
-                <Card
-                  title={product.name}
-                  stock={product.stock}
-                  image={`${import.meta.env.VITE_BACKEND_URL}${
-                    product.image_url
-                  }`}
-                  price={Number(product.price).toLocaleString("id-ID")}
-                  average_rating={product.rating || "0.0"}
-                  status={product.status}
-                />
-              </Link>
-
-              <div className="absolute top-1 right-1">
-                <IconButton
-                  onClick={() => handleToggleWishlist(product.id)}
-                  className="p-2"
+                <Link
+                  to={`/product/detail/${product.id}`}
+                  state={{ from: "produk" }}
                 >
-                  {isProductInWishlist(product.id) ? (
-                    <div className="bg-white pt-2 pb-2 px-2 rounded-full">
-                      <RiPokerHeartsFill className="text-red-500 text-xl" />
-                    </div>
-                  ) : (
-                    <div className="bg-white pt-2 pb-2 px-2 rounded-full">
-                      <RiPokerHeartsLine className="text-xl" />
-                    </div>
-                  )}
-                </IconButton>
-              </div>
+                  <Card
+                    title={product.name}
+                    stock={product.stock}
+                    image={`${import.meta.env.VITE_BACKEND_URL}${
+                      product.image_url
+                    }`}
+                    price={Number(product.price).toLocaleString("id-ID")}
+                    average_rating={product.rating || "0.0"}
+                    status={product.status}
+                  />
+                </Link>
 
-              <div className="">
-                <button
-                  className={`border duration-300 border-gray-400 font-medium flex items-center justify-center gap-2 text-sm px-5 py-2 rounded-full
+                <div className="absolute top-1 right-1">
+                  <IconButton
+                    onClick={() => handleToggleWishlist(product.id)}
+                    className="p-2"
+                  >
+                    {isProductInWishlist(product.id) ? (
+                      <div className="bg-white pt-2 pb-2 px-2 rounded-full">
+                        <RiPokerHeartsFill className="text-red-500 text-xl" />
+                      </div>
+                    ) : (
+                      <div className="bg-white pt-2 pb-2 px-2 rounded-full">
+                        <RiPokerHeartsLine className="text-xl" />
+                      </div>
+                    )}
+                  </IconButton>
+                </div>
+
+                <div className="">
+                  <button
+                    className={`border duration-300 border-gray-400 font-medium flex items-center justify-center gap-2 text-sm px-5 py-2 rounded-full
               ${
                 product.status === "sold"
                   ? " text-black/50 cursor-not-allowed"
                   : "bg-white text-black hover:bg-gray-100"
               }`}
-                  onClick={() => addCart(product, 1)}
-                  disabled={
-                    loadingProductId === product.id || product.status === "sold"
-                  }
-                >
-                  {product.status === "sold" ? (
-                    <span>Sudah Terjual</span>
-                  ) : loadingProductId === product.id ? (
-                    <span className="animate-pulse">Menambahkan...</span>
-                  ) : (
-                    "Tambah Item"
-                  )}
-                </button>
+                    onClick={() => addCart(product, 1)}
+                    disabled={
+                      loadingProductId === product.id ||
+                      product.status === "sold"
+                    }
+                  >
+                    {product.status === "sold" ? (
+                      <span>Sudah Terjual</span>
+                    ) : loadingProductId === product.id ? (
+                      <span className="animate-pulse">Menambahkan...</span>
+                    ) : (
+                      "Tambah Item"
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
 
         {/* Desktop Grid */}
         <div className="hidden md:grid mt-10 justify-between md:grid-cols-3 lg:grid-cols-4 gap-10">
-          {products.map((product) => (
-            <div key={product.id} className="relative">
-              <Link
-                to={`/product/detail/${product.id}`}
-                state={{ from: "produk" }}
-              >
-                <Card
-                  title={product.name}
-                  stock={product.stock}
-                  image={`${import.meta.env.VITE_BACKEND_URL}${
-                    product.image_url
-                  }`}
-                  price={Number(product.price).toLocaleString("id-ID")}
-                  average_rating={product.rating || "0.0"}
-                  status={product.status}
-                />
-              </Link>
-              <div className="absolute top-1 right-1">
-                <IconButton
-                  onClick={() => handleToggleWishlist(product.id)}
-                  className="p-2"
+          {products
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // urutkan terbaru dulu
+            .slice(0, 8) // ambil 10 item pertama
+            .map((product) => (
+              <div key={product.id} className="relative">
+                <Link
+                  to={`/product/detail/${product.id}`}
+                  state={{ from: "produk" }}
                 >
-                  {" "}
-                  {isProductInWishlist(product.id) ? (
-                    <div className="bg-white pt-2 pb-2 px-2 rounded-full">
-                      <RiPokerHeartsFill className="text-red-500 text-xl" />
-                    </div>
-                  ) : (
-                    <div className="bg-white pt-2 pb-2 px-2 rounded-full">
-                      <RiPokerHeartsLine className="text-xl" />
-                    </div>
-                  )}
-                </IconButton>
-              </div>
+                  <Card
+                    title={product.name}
+                    stock={product.stock}
+                    image={`${import.meta.env.VITE_BACKEND_URL}${
+                      product.image_url
+                    }`}
+                    price={Number(product.price).toLocaleString("id-ID")}
+                    average_rating={product.rating || "0.0"}
+                    status={product.status}
+                  />
+                </Link>
+                <div className="absolute top-1 right-1">
+                  <IconButton
+                    onClick={() => handleToggleWishlist(product.id)}
+                    className="p-2"
+                  >
+                    {" "}
+                    {isProductInWishlist(product.id) ? (
+                      <div className="bg-white pt-2 pb-2 px-2 rounded-full">
+                        <RiPokerHeartsFill className="text-red-500 text-xl" />
+                      </div>
+                    ) : (
+                      <div className="bg-white pt-2 pb-2 px-2 rounded-full">
+                        <RiPokerHeartsLine className="text-xl" />
+                      </div>
+                    )}
+                  </IconButton>
+                </div>
 
-              <div className="">
-                <button
-                  className={`border duration-300 border-gray-400 font-medium flex items-center justify-center gap-2 text-sm px-5 py-2 rounded-full
+                <div className="">
+                  <button
+                    className={`border duration-300 border-gray-400 font-medium flex items-center justify-center gap-2 text-sm px-5 py-2 rounded-full
     ${
       product.status === "sold"
         ? " text-black/50 cursor-not-allowed"
         : "bg-white text-black hover:bg-gray-100"
     }
   `}
-                  onClick={() => addCart(product, 1)}
-                  disabled={
-                    loadingProductId === product.id || product.status === "sold"
-                  }
-                >
-                  {product.status === "sold" ? (
-                    <span>Sudah Terjual</span>
-                  ) : loadingProductId === product.id ? (
-                    <span className="animate-pulse">Menambahkan...</span>
-                  ) : (
-                    "Tambah Item"
-                  )}
-                </button>
+                    onClick={() => addCart(product, 1)}
+                    disabled={
+                      loadingProductId === product.id ||
+                      product.status === "sold"
+                    }
+                  >
+                    {product.status === "sold" ? (
+                      <span>Sudah Terjual</span>
+                    ) : loadingProductId === product.id ? (
+                      <span className="animate-pulse">Menambahkan...</span>
+                    ) : (
+                      "Tambah Item"
+                    )}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </section>
 
@@ -382,8 +386,8 @@ const Home = () => {
             Kenapa Faza Frame?
           </h1>
           <p className="border-b pb-4 mt-3">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Veniam,
-            nam?
+            Setiap foto, karya, dan momen punya cerita. Kami bantu kamu
+            membingkainya jadi lebih berarti.
           </p>
           <div className="lg:w-[500px]">
             <AccordionTransition />

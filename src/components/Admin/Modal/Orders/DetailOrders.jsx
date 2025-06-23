@@ -126,29 +126,56 @@ const DetailOrders = ({ open, onClose, orderId }) => {
                         }`}
                         width="w-[50px]"
                         height="h-[50px]"
+                        isCustom={item.is_custom}
                       />
                       <p className="flex gap-0.5 flex-col">
                         <span className="font-bold">
-                          {" "}
-                          <span className="font-normal">
-                            {item.quantity} x
-                          </span>{" "}
+                          <span className="font-normal">{item.quantity} x</span>{" "}
                           {item.product_name}
                         </span>
 
                         <span className="text-xs">{item.category_name}</span>
                       </p>
                     </div>
-
-                    <p className="text-sm font-bold ">
+                    <p className="text-sm font-bold">
                       IDR{" "}
                       {Number(item.price).toLocaleString("id-ID", {
                         minimumFractionDigits: 2,
                       })}
                     </p>
                   </div>
+
+                  {/* Tambahan jika item custom */}
+                  {item.is_custom === 1 && (
+                    <div className="mt-2 ml-14 bg-gray-50 p-3 rounded-md border text-sm">
+                      <p className="font-medium text-sm mb-1">
+                        Ringkasan Custom:
+                      </p>
+                      <span className="text-xs">
+                        {item.custom_width} x {item.custom_height}
+                      </span>
+                      <p className="mb-2 whitespace-pre-wrap">
+                        {item.note || "-"}
+                      </p>
+
+                      {item.custom_image_url && (
+                        <a
+                          href={`${import.meta.env.VITE_BACKEND_URL}${
+                            item.custom_image_url
+                          }`}
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline"
+                        >
+                          Download Gambar Custom
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
+
               <h1 className="border-b mt-5 mb-5"></h1>
 
               <h1 className="mt-3 mb-3 font-bold">Status Pesanan</h1>

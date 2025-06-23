@@ -9,6 +9,8 @@ import cartDrawerReducer from "./cartDrawer";
 import checkoutReducer from "./checkoutSlice";
 import { combineReducers } from "redux";
 import wishlistReducer from "./wishlistSlice";
+import notificationReducer from "./notificationSlice";
+
 // Konfigurasi Redux Persist untuk seluruh reducer
 const persistConfig = {
   key: "root", // Ganti dengan 'root' agar seluruh state dipersistensikan
@@ -23,6 +25,7 @@ const rootReducer = combineReducers({
   cartDrawer: cartDrawerReducer,
   checkout: checkoutReducer,
   wishlist: wishlistReducer,
+  notification: notificationReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

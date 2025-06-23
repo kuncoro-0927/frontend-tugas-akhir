@@ -196,7 +196,10 @@ const Cart = () => {
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm">{item.size} (cm)</p>
+                      <p className="text-sm">
+                        {" "}
+                        {item.width} x {item.height} (cm)
+                      </p>
                     )}
 
                     <div className="flex justify-between items-end mt-auto">

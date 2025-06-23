@@ -123,7 +123,7 @@ const DataPromoCodes = () => {
         onUpdate={handleEditSuccess}
       />
       <div
-        className={`h-screen  fixed top-0 left-0 z-50 transition-all duration-300 ${
+        className={`h-screen  fixed top-0 left-0 z-40 transition-all duration-300 ${
           isSidebarCollapsed ? "w-[100px]" : "w-[250px]"
         }`}
       >
@@ -155,7 +155,7 @@ const DataPromoCodes = () => {
           </div>
           <div className="border p-5 mt-10">
             <div className="flex  items-start justify-between">
-              <p className="font-semibold text-sm">Tabel Data Pengguna</p>
+              <p className="font-semibold text-sm">Tabel Data Promo</p>
 
               {/* Search Input */}
               <div className=" mb-4">

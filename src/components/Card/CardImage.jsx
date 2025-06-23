@@ -20,7 +20,7 @@ export default function CardImage({
       )}
 
       {isCustom === 1 && (
-        <div className="absolute -top-2 -left-2 z-50 bg-black px-2 py-0.5 text-white text-xs">
+        <div className="absolute -top-2 -left-2 z-50 bg-black px-1 py-0 text-white text-[10px]">
           Custom
         </div>
       )}

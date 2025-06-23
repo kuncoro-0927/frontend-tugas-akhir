@@ -213,8 +213,8 @@ const DataProducts = () => {
                   <tr>
                     {[
                       "Nama",
-                      "Ukuran / cm",
-                      "Berat / gram",
+                      "Lebar / cm",
+                      "Tinggi / cm",
                       "Kategori",
                       "Stok",
                       "Harga",
@@ -233,7 +233,7 @@ const DataProducts = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((product) => (
+                  {filteredUsers.slice(0, 10).map((product) => (
                     <tr key={product.id}>
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="flex items-center gap-3">
@@ -260,13 +260,14 @@ const DataProducts = () => {
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
                         <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                          {product.size}
+                          {product.width}
                         </p>
                       </td>
+
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="">
                           <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                            {product.weight_gram}
+                            {product.height}
                           </p>
                         </div>
                       </td>

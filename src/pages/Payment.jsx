@@ -64,7 +64,7 @@ const Payment = () => {
     0
   );
   const discount = promo?.discount || promocode?.discount || 0;
-  const admin = Number(admin_fee) || 0;
+  const admin = Number(orderDetails.admin_fee) || 0;
   const shipping = selectedService ? parseInt(selectedService.cost) : 0;
 
   const finalTotal = subtotal - discount + admin + shipping;
@@ -129,7 +129,7 @@ const Payment = () => {
         order_id: orderId,
         formData,
         selectedService: service,
-        admin_fee: admin_fee,
+        admin_fee: admin,
         promo: promo,
         promocode: promocode,
         total_amount: finalTotal,
@@ -446,11 +446,14 @@ const Payment = () => {
                 <div className="flex mt-2 justify-between">
                   <p className="text-sm">Biaya admin</p>
                   <span>
-                    {admin_fee && admin_fee != null
-                      ? `IDR ${Number(admin_fee).toLocaleString("id-ID", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}`
+                    {orderDetails.admin_fee && orderDetails.admin_fee != null
+                      ? `IDR ${Number(orderDetails.admin_fee).toLocaleString(
+                          "id-ID",
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}`
                       : "Loading..."}
                   </span>
                 </div>

@@ -5,7 +5,7 @@ import { FaChevronDown } from "react-icons/fa";
 import { logoutAdmin } from "../../redux/adminSlice";
 import AvatarAdmin from "./Avatar";
 import { useState } from "react";
-
+import NotificationBell from "./NotificationBell";
 const AdminNavBar = ({ onToggleSidebar }) => {
   const { admin } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
@@ -26,14 +26,18 @@ const AdminNavBar = ({ onToggleSidebar }) => {
           <HiOutlineMenuAlt1 className="text-xl" />
         </button>
 
-        <button className="border text-graytext flex items-center gap-3 px-3 pr-20 py-2.5 rounded-md text-sm border-gray-300">
+        {/* <button className="border text-graytext flex items-center gap-3 px-3 pr-20 py-2.5 rounded-md text-sm border-gray-300">
           <CiSearch className="text-xl" />
           Pencarian...
-        </button>
+        </button> */}
       </div>
 
       <div className="relative">
         <div className="flex items-center gap-2 cursor-pointer">
+          <div className="relative">
+            <NotificationBell />
+          </div>
+
           <AvatarAdmin
             firstname={admin?.firstname}
             lastname={admin?.lastname}

@@ -12,6 +12,7 @@ import { addToCart } from "../redux/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { showSnackbar } from "../components/CustomSnackbar";
 import { fetchCartItemCount } from "../redux/cartSlice";
+import FormInput from "../components/TextField";
 const ProductDetails = () => {
   const { id } = useParams(); // ambil id dari URL
   const [product, setProduct] = useState(null);
@@ -22,9 +23,9 @@ const ProductDetails = () => {
   const from = location.state?.from;
   const [averageRating, setAverageRating] = useState(0);
   const [file, setFile] = useState(null);
-  const [width, setWidth] = useState("");
-  const [height, setHeight] = useState("");
-  const [notes, setNotes] = useState("");
+  const [custom_width, setWidth] = useState("");
+  const [custom_height, setHeight] = useState("");
+  const [custom_notes, setNotes] = useState("");
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -61,8 +62,8 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (
-      width &&
-      height &&
+      custom_width &&
+      custom_height &&
       product?.width &&
       product?.height &&
       product?.price
@@ -74,7 +75,7 @@ const ProductDetails = () => {
       const baseArea = baseWidth * baseHeight;
       const pricePerCm2 = basePrice / baseArea;
 
-      const customArea = Number(width) * Number(height);
+      const customArea = Number(custom_width) * Number(custom_height);
       const newPriceRaw = pricePerCm2 * customArea;
 
       // Pembulatan ke 1.000 terdekat
@@ -84,7 +85,7 @@ const ProductDetails = () => {
     } else if (product?.price) {
       setCustomPrice(Number(product.price));
     }
-  }, [width, height, product]);
+  }, [custom_width, custom_height, product]);
 
   const addCart = async (product, quantity) => {
     try {
@@ -92,9 +93,9 @@ const ProductDetails = () => {
       formData.append("product_id", product.id);
       formData.append("quantity", quantity);
       if (file) formData.append("image", file);
-      if (width) formData.append("width", width);
-      if (height) formData.append("height", height);
-      if (notes) formData.append("notes", notes);
+      if (custom_width) formData.append("custom_width", custom_width);
+      if (custom_height) formData.append("custom_height", custom_height);
+      if (custom_notes) formData.append("custom_notes", custom_notes);
       formData.append("custom_price", customPrice);
 
       await instance.post("/add/to/cart", formData, {
@@ -108,9 +109,9 @@ const ProductDetails = () => {
           weight: product.weight,
           quantity,
           image: file ? URL.createObjectURL(file) : null,
-          width,
-          height,
-          notes,
+          custom_width,
+          custom_height,
+          custom_notes,
           custom_price: customPrice,
         })
       );
@@ -127,12 +128,12 @@ const ProductDetails = () => {
     addCart(product, 1);
   };
 
-  function formattedPrice(price) {
-    return price.toLocaleString("id-ID", {
-      style: "currency",
-      currency: "IDR",
-    });
-  }
+  // function formattedPrice(price) {
+  //   return price.toLocaleString("id-ID", {
+  //     style: "currency",
+  //     currency: "IDR",
+  //   });
+  // }
 
   return (
     <>
@@ -180,12 +181,18 @@ const ProductDetails = () => {
             </div>
             <div className="md:flex mt-3 items-center gap-3">
               <div className="flex items-start md:items-center gap-2">
-                <h1 className="text-2xl font-extrabold">{product?.name}</h1>
+                <h1 className="text-2xl font-extrabold max-w-[250px]">
+                  {product?.name}
+                </h1>
                 <GoShareAndroid className="md:text-xl text-2xl" />
               </div>
               <p className="text-2xl mt-2 md:mt-0 ml-auto">
                 <span className="font-bold">
-                  IDR {formattedPrice(customPrice)}
+                  IDR{" "}
+                  {Number(customPrice).toLocaleString("id-ID", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
                 </span>
               </p>
             </div>
@@ -236,51 +243,70 @@ const ProductDetails = () => {
               </div>
 
               {[3, 4, 5].includes(product?.category_id) && (
-                <div className="mt-4 space-y-4 border p-4 rounded-lg bg-gray-50">
-                  <div>
-                    <label className="block font-semibold mb-1">
-                      Upload Foto
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setFile(e.target.files[0])}
-                    />
-                  </div>
+                <>
+                  <h1 className="font-bold text-base">Mau Custom?</h1>
+                  <span className="text-sm font-medium text-black/60">
+                    Sesuaikan desain bingkai sesuai keinginanmu.
+                  </span>
 
-                  <div>
-                    <label className="block font-semibold mb-1">
-                      Ukuran (cm)
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="Lebar"
-                      value={width}
-                      onChange={(e) => setWidth(e.target.value)}
-                      className="mr-2 p-1 border rounded w-20"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Tinggi"
-                      value={height}
-                      onChange={(e) => setHeight(e.target.value)}
-                      className="p-1 border rounded w-20"
-                    />
-                  </div>
+                  <div className="mt-4 max-w-md space-y-4 border p-4 rounded-lg bg-gray-50">
+                    <div>
+                      <label className="block font-semibold mb-1">
+                        Upload Foto
+                      </label>
 
-                  <div>
-                    <label className="block font-semibold mb-1">
-                      Catatan Tambahan
-                    </label>
-                    <textarea
-                      rows={3}
-                      placeholder="Contoh: Tambahkan peci"
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      className="w-full p-2 border rounded"
-                    />
+                      {/* Hidden input file */}
+                      <input
+                        type="file"
+                        id="fileUpload"
+                        accept="image/*"
+                        onChange={(e) => setFile(e.target.files[0])}
+                        className="hidden"
+                      />
+
+                      {/* Custom button */}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          document.getElementById("fileUpload").click()
+                        }
+                        className="px-4 py-2 bg-black text-sm text-white rounded hover:bg-black/80"
+                      >
+                        Pilih Gambar
+                      </button>
+
+                      {file && (
+                        <p className="mt-2 text-sm text-gray-700">
+                          {file.name}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <FormInput
+                        type="number"
+                        label="Lebar"
+                        value={custom_width}
+                        onChange={(e) => setWidth(e.target.value)}
+                      />
+                      <FormInput
+                        type="number"
+                        label="Tinggi"
+                        value={custom_height}
+                        onChange={(e) => setHeight(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <FormInput
+                        type="textarea"
+                        label="Catatan"
+                        value={custom_notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                      />
+                    </div>
                   </div>
-                </div>
+                </>
               )}
 
               <div className="flex mt-10 items-center gap-3">

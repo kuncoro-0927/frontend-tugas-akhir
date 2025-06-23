@@ -115,15 +115,14 @@ const ModalUpdateCategory = ({ open, handleClose, onUpdate, categoryId }) => {
               <IoClose />
             </button>
             <div className="px-5 pb-2">
-              <h2 className="text-2xl font-bold text-hitam2">
-                Tambah Kategori
-              </h2>
+              <h2 className="text-2xl font-bold text-hitam2">Edit Kategori</h2>
             </div>
           </div>
           <div className="mx-5 mt-5 mb-7">
-            <h1 className="font-bold text-lg">Buat Nama Kategori</h1>
+            <h1 className="font-bold text-lg">Edit Nama Kategori</h1>
             <p className="text-sm text-graytext">
-              Isi nama kategori agar mudah dikenali dan menarik bagi pelanggan.
+              Perbarui nama kategori agar mudah dikenali dan menarik bagi
+              pelanggan.
             </p>
           </div>
 

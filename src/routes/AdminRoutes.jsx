@@ -1,3 +1,5 @@
+import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { Routes, Route } from "react-router-dom";
 import LoginAdmin from "../pages/admin/LoginAdmin";
 import Dashboard from "../pages/admin/DashboardAdmin";
@@ -9,7 +11,20 @@ import DataOrderItems from "../pages/admin/Orders/DataOrderItems";
 import DataOrderShipping from "../pages/admin/Orders/DataOrderShipping";
 import DataTransactions from "../pages/admin/Orders/DataTransactions";
 import DataPromoCodes from "../pages/admin/Promo_Codes/DataPromoCodes";
+import socket from "../utils/socket";
+import { setHasNewNotification } from "../redux/notificationSlice";
 function AdminRoutes() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    socket.on("newNotification", () => {
+      dispatch(setHasNewNotification(true));
+    });
+
+    return () => {
+      socket.off("newNotification");
+    };
+  }, [dispatch]);
   return (
     <>
       <Routes>

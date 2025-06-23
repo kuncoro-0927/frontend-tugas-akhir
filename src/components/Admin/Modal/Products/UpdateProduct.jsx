@@ -12,7 +12,8 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
     description: "",
     price: "",
     category: "",
-    size: "",
+    width: "",
+    height: "",
     weight: "",
     stock: "",
     is_limited: false, // default false
@@ -47,7 +48,8 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
         description: product.description || "",
         price: product.price || "",
         category: product.category_id || "",
-        size: product.size || "",
+        width: product.width || "",
+        height: product.height || "",
         weight: product.weight_gram || "",
         stock: product.stock || "",
         is_limited: !!product.is_limited,
@@ -78,7 +80,8 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
         description: "",
         price: "",
         category: "",
-        size: "",
+        width: "",
+        height: "",
         weight: "",
         stock: "",
         is_limited: false,
@@ -226,13 +229,23 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
               />
               <div className="flex gap-5">
                 <FormInput
-                  name="size"
+                  name="width"
                   type="text"
-                  helperText="Ukuran dalam cm, contoh: 40 x 50"
-                  label="Ukuran"
-                  value={formData.size}
+                  helperText="Lebar dalam cm, contoh: 40"
+                  label="Lebar"
+                  value={formData.width}
                   onChange={handleChange}
                 />
+                <FormInput
+                  name="height"
+                  type="text"
+                  helperText="Tinggi dalam cm, contoh: 50"
+                  label="Tinggi"
+                  value={formData.height}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex gap-5">
                 <FormInput
                   name="weight"
                   type="text"

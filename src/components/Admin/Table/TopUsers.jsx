@@ -19,7 +19,7 @@ const TopUsers = () => {
   };
 
   return (
-    <div className="w-full border shadow-md  rounded-lg">
+    <div className="w-full border  rounded-lg">
       <table className="w-full  rounded-lg min-w-max table-auto text-left">
         <thead>
           <tr>
@@ -45,7 +45,7 @@ const TopUsers = () => {
 
                       <p className="text-xs">
                         <span className="underline">
-                          Orders:{user.total_transactions}
+                          Total pesanan: {user.total_transactions}
                         </span>
                       </p>
                     </div>

@@ -78,21 +78,43 @@ const ShippingForm = () => {
     }
   };
 
-  const debouncedSearchCity = debounce(async (keyword) => {
-    if (!keyword) return;
+  // const debouncedSearchCity = debounce(async (keyword) => {
+  //   const trimmed = keyword.trim();
+  //   if (trimmed.length < 3) return; // <= Ini penting
+
+  //   try {
+  //     const res = await instance.get("/cities", {
+  //       params: { search: trimmed },
+  //     });
+  //     setDestinationResults(res.data.data || []);
+  //   } catch (err) {
+  //     console.error("Error fetching cities:", err);
+  //   }
+  // }, 500);
+
+  // useEffect(() => {
+  //   if (formData.city.trim().length >= 3) {
+  //     debouncedSearchCity(formData.city);
+  //   }
+  // }, [formData.city]);
+
+  const handleSearchCity = async (search) => {
+    const keyword = search.trim();
+
+    if (keyword.length < 3) return;
+
     try {
-      const res = await instance.get(`/cities`, {
+      const res = await instance.get("/cities", {
         params: { search: keyword },
       });
-      setDestinationResults(res.data.data || []);
-    } catch (err) {
-      console.error("Gagal cari kota:", err);
-    }
-  }, 500);
 
-  useEffect(() => {
-    debouncedSearchCity(formData.city);
-  }, [formData.city]);
+      setDestinationResults(res.data.data || []);
+      console.log("Hasil pencarian kota:", res.data.data);
+    } catch (error) {
+      console.error("Error fetching cities:", error.message);
+      setDestinationResults([]);
+    }
+  };
 
   const handleSelectCity = (city) => {
     const formattedCity =
@@ -263,6 +285,12 @@ const ShippingForm = () => {
                 name="city"
                 value={formData.city || ""}
                 onChange={handleChange}
+                onBlur={() => handleSearchCity(formData.city)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearchCity(formData.city);
+                  }
+                }}
                 label="Kota/Kabupaten"
                 error={!!formErrors.city}
                 helperText={formErrors.city}

@@ -13,7 +13,8 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
     description: "",
     price: "",
     category: "",
-    size: "",
+    width: "",
+    height: "",
     weight: "",
     stock: "",
     is_limited: false,
@@ -95,7 +96,8 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
         description: "",
         price: "",
         category: "",
-        size: "",
+        width: "",
+        height: "",
         weight: "",
         stock: "",
         is_limited: false,
@@ -210,12 +212,21 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
               />
               <div className="flex gap-5">
                 <FormInput
-                  name="size"
+                  name="width"
                   type="text"
-                  helperText="Ukuran dalam cm, contoh: 40 x 50"
-                  label="Ukuran"
+                  helperText="Lebar dalam cm, contoh: 40"
+                  label="Lebar"
                   onChange={handleChange}
                 />
+                <FormInput
+                  name="height"
+                  type="text"
+                  helperText="Tinggi dalam cm, contoh: 50"
+                  label="Tinggi"
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex gap-5">
                 <FormInput
                   name="weight"
                   type="text"
