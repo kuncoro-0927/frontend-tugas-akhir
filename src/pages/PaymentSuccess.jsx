@@ -1,17 +1,24 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { instance } from "../utils/axios";
+import { useDispatch } from "react-redux";
+import { resetCart } from "../redux/cartSlice";
+
 const PaymentStatus = () => {
   const { order_id } = useParams();
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const dispatch = useDispatch();
   useEffect(() => {
     const fetchPaymentStatus = async () => {
       try {
         const response = await instance.get(`/payment/status/${order_id}`);
         setPaymentStatus(response.data.status.transaction_status);
 
+        if (response.data.status.transaction_status === "settlement") {
+          dispatch(resetCart());
+        }
         setLoading(false);
       } catch (error) {
         console.error("Error fetching payment status:", error);

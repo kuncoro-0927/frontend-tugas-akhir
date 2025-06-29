@@ -15,6 +15,7 @@ import { instance } from "../utils/axios";
 import { clearPromo } from "../redux/checkoutSlice";
 import CardImage from "../components/Card/CardImage";
 import { openDrawer } from "../redux/cartDrawer";
+
 const Payment = () => {
   const navigate = useNavigate();
   const { orderId } = useParams();

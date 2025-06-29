@@ -362,7 +362,7 @@ const Order = () => {
 
                           <div className="mt-2">
                             <Link
-                              to={`/product/details/${ticket.product_id}`}
+                              to={`/product/detail/${ticket.product_id}`}
                               className="bg-black rounded-md text-white px-3 py-1.5 text-xs hover:bg-gray-800"
                             >
                               Pesan Lagi
@@ -396,7 +396,7 @@ const Order = () => {
                           IDR {Number(ticket.price).toLocaleString("id-ID")}
                         </div>
                         <Link
-                          to={`/product/details/${ticket.product_id}`}
+                          to={`/product/detail/${ticket.product_id}`}
                           className="bg-black rounded-md text-white px-3 py-1.5 text-sm hover:bg-gray-800"
                         >
                           Pesan Lagi

@@ -277,7 +277,7 @@ const DataTransactions = () => {
                         colSpan="6"
                         className="text-center py-5 text-gray-500"
                       >
-                        Tidak ada data pengguna.
+                        Tidak ada data transaksi.
                       </td>
                     </tr>
                   )}

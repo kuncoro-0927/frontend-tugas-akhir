@@ -1,7 +1,7 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import PrivateRoute from "./PrivateRoute";
 import Home from "../pages/Home";
 import NavBar from "../components/Navbar";
 import AuthModal from "../pages/auth/AuthModal";
@@ -21,14 +21,14 @@ import PaymentSuccess from "../pages/PaymentSuccess";
 import Cart from "../pages/Cart";
 import FloatingButton from "../components/FloatingButton";
 import ModalSearch from "../components/Modal/ModalSearch";
+import Notfound from "../pages/404";
+
 function UserRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState("login");
-
-  const [isSearchOpen, setIsSearchOpen] = useState(false); // 🔍 modal pencarian
-
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const isCartDrawerOpen = useSelector((state) => state.cart.isDrawerOpen);
 
   const isAuthPage =
@@ -45,10 +45,16 @@ function UserRoutes() {
     location.pathname.startsWith("/checkouts/payment");
 
   const isPaymentSuccess = location.pathname.startsWith("/payment/success");
+  // const isNotFoundPage = location.pathname === "/*";
 
   const shouldShowNavBar = !isAuthPage && !isShippingOrPayment;
   const shouldShowFooter =
-    !isAuthPage && !isAccountPage && !isShippingOrPayment && !isPaymentSuccess;
+    !isAuthPage &&
+    !isAccountPage &&
+    !isShippingOrPayment &&
+    !isPaymentSuccess &&
+    !location.pathname.match(/404|not-found/) &&
+    !location.pathname.match(/\/[^/]+/); // URL aneh
 
   const handleOpenModal = (content) => {
     setModalContent(content);
@@ -61,8 +67,7 @@ function UserRoutes() {
   const handleSearchClose = () => setIsSearchOpen(false);
 
   const handleItemSelect = (item) => {
-    // Jika kamu mau redirect ke detail/daerah di sini
-    navigate(`/product/details/${item.id}`);
+    navigate(`/product/detail/${item.id}`);
     handleSearchClose();
   };
 
@@ -77,7 +82,7 @@ function UserRoutes() {
       {shouldShowNavBar && (
         <NavBar
           handleOpenModal={handleOpenModal}
-          handleSearchOpen={handleSearchOpen} // 🔍 kirim ke NavBar kalau mau pencarian dari sana
+          handleSearchOpen={handleSearchOpen}
         />
       )}
 
@@ -87,7 +92,6 @@ function UserRoutes() {
         initialContent={modalContent}
       />
 
-      {/* 🔍 ModalSearch selalu aktif */}
       <ModalSearch
         isOpen={isSearchOpen}
         handleClose={handleSearchClose}
@@ -100,14 +104,21 @@ function UserRoutes() {
         <Route path="/help/center" element={<Faqs />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/product/detail/:id" element={<ProductDetails />} />
-        <Route path="/account/profile" element={<Profile />} />
-        <Route path="/account/order" element={<Order />} />
-        <Route path="/account/wishlist" element={<Wishlist />} />
-        <Route path="/account/review" element={<Review />} />
-        <Route path="/payment/success/:order_id" element={<PaymentSuccess />} />
-        <Route path="/shipping/form/:orderId" element={<ShippingForm />} />
         <Route path="/tes/ongkir" element={<OngkirChecker />} />
+        <Route path="/shipping/form/:orderId" element={<ShippingForm />} />
         <Route path="/checkouts/payment/:orderId" element={<PaymentPage />} />
+        <Route path="/payment/success/:order_id" element={<PaymentSuccess />} />
+
+        {/* PROTECTED ROUTES */}
+        <Route element={<PrivateRoute />}>
+          <Route path="/account/profile" element={<Profile />} />
+          <Route path="/account/order" element={<Order />} />
+          <Route path="/account/wishlist" element={<Wishlist />} />
+          <Route path="/account/review" element={<Review />} />
+        </Route>
+
+        <Route path="/404/not-found" element={<Notfound />} />
+        <Route path="*" element={<Notfound />} />
       </Routes>
 
       {shouldShowFooter && <Footer />}

@@ -80,6 +80,7 @@ const DetailOrders = ({ open, onClose, orderId }) => {
               <div>
                 <p className="font-bold text-base">#{order.order_code}</p>
                 <p className="text-sm font-semibold">Detail Pesanan</p>
+                <p className="text-sm font-semibold">#{order.order_source}</p>
               </div>
               <IconButton onClick={onClose}>
                 <CloseIcon />
@@ -139,7 +140,9 @@ const DetailOrders = ({ open, onClose, orderId }) => {
                     </div>
                     <p className="text-sm font-bold">
                       IDR{" "}
-                      {Number(item.price).toLocaleString("id-ID", {
+                      {Number(
+                        item.is_custom === 1 ? item.custom_price : item.price
+                      ).toLocaleString("id-ID", {
                         minimumFractionDigits: 2,
                       })}
                     </p>
@@ -308,7 +311,9 @@ const DetailOrders = ({ open, onClose, orderId }) => {
                 <p className="font-normal w-1/2">Nama</p>
                 <div className="w-1/2 break-words">
                   <p className="font-bold">
-                    {order.user_firstname} {order.user_lastname}
+                    {order.user_firstname && order.user_lastname
+                      ? `${order.user_firstname} ${order.user_lastname}`
+                      : order.name}
                   </p>
                 </div>
               </div>
@@ -357,14 +362,14 @@ const DetailOrders = ({ open, onClose, orderId }) => {
               <div className="flex justify-between  py-2 w-full">
                 <p className="font-normal w-1/2">Nomor telepon</p>
                 <div className="w-1/2 break-words">
-                  <p className="font-bold">{order.user_phone}</p>
+                  <p className="font-bold">{order.shipping_phone}</p>
                 </div>
               </div>
 
               <div className="flex justify-between  py-2 w-full">
                 <p className="font-normal w-1/2">Alamat</p>
                 <div className="w-1/2 break-words">
-                  <p className="font-bold">{order.user_address}</p>
+                  <p className="font-bold">{order.shipping_address}</p>
                 </div>
               </div>
 

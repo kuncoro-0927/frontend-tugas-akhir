@@ -5,6 +5,7 @@ import { instanceAdmin } from "../../../utils/axiosAdmin";
 import AddResiModal from "../../../components/Admin/Modal/AddTrackingNumber";
 import { showSnackbar } from "../../../components/CustomSnackbar";
 import ModalCreateOrder from "../../../components/Admin/Modal/Orders/CreateOrder";
+import ModalCreateOrderByAdmin from "../../../components/Admin/Modal/Orders/CreateManualOrder";
 import ModalUpdateOrder from "../../../components/Admin/Modal/Orders/UpdateOrder";
 import ModalDeleteOrder from "../../../components/Admin/Modal/Orders/DeleteOrder";
 import ExportOrdersModal from "../../../components/ExportOrder";
@@ -22,12 +23,15 @@ const DataOrders = () => {
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
   const [showResiModal, setShowResiModal] = useState(false);
   const [createModal, setCreateModal] = useState(false);
+  const [createModalByAdmin, setCreateModalByAdmin] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [activeTab, setActiveTab] = useState("paid");
   const handleOpenCreateModal = () => setCreateModal(true);
+  const handleOpenCreateModalByAdmin = () => setCreateModalByAdmin(true);
   const handleCloseCreateModal = () => setCreateModal(false);
+  const handleCloseCreateModalByAdmin = () => setCreateModalByAdmin(false);
   const handleCloseEditModal = () => setEditModal(false);
   const handleCloseDeleteModal = () => setDeleteModal(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -50,6 +54,12 @@ const DataOrders = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed); // Toggle state
   };
   const handleEditSuccess = () => {
+    fetchOrders();
+  };
+  const handleCreateByAdminSuccess = () => {
+    fetchOrders();
+  };
+  const handleCreateSuccess = () => {
     fetchOrders();
   };
 
@@ -170,6 +180,12 @@ const DataOrders = () => {
       <ModalCreateOrder
         open={createModal}
         handleClose={handleCloseCreateModal}
+        onUpdate={handleCreateSuccess}
+      />
+      <ModalCreateOrderByAdmin
+        open={createModalByAdmin}
+        handleClose={handleCloseCreateModalByAdmin}
+        onUpdate={handleCreateByAdminSuccess}
       />
       <ModalUpdateOrder
         open={editModal}
@@ -216,6 +232,14 @@ const DataOrders = () => {
                 <PiExport className="text-lg" />
                 Export
               </button>
+              <button
+                onClick={handleOpenCreateModalByAdmin}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600/80 duration-200 rounded-md text-white px-4 py-2 font-normal text-base"
+              >
+                <BsCartPlus className="text-lg" />
+                Tambah Pesanan Offline
+              </button>
+
               <button
                 onClick={handleOpenCreateModal}
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600/80 duration-200 rounded-md text-white px-4 py-2 font-normal text-base"
@@ -455,7 +479,7 @@ const DataOrders = () => {
                         colSpan="6"
                         className="text-center py-5 text-gray-500"
                       >
-                        Tidak ada data pengguna.
+                        Tidak ada data pesanan.
                       </td>
                     </tr>
                   )}

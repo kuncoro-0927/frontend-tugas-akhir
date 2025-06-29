@@ -8,6 +8,8 @@ import { Modal, Box, Button } from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";
 const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
   const [roles, setRoles] = useState([]);
+  const [errors, setErrors] = useState({});
+
   const [formData, setFormData] = useState({
     name: "",
     firstname: "",
@@ -19,6 +21,7 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
     city: "",
     province: "",
     role_id: "",
+    postal_code: "",
     isverified: 1,
   });
 
@@ -32,13 +35,28 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Form data sebelum submit:", formData);
+    const newErrors = {};
+    if (!formData.name) newErrors.name = "Nama Lengkap wajib diisi";
+    if (!formData.firstname) newErrors.firstname = "Nama Depan wajib diisi";
+    if (!formData.lastname) newErrors.lastname = "Nama Belakang wajib diisi";
+    if (!formData.email) newErrors.email = "Email wajib diisi";
+    if (!formData.password) newErrors.password = "Password wajib diisi";
+    if (!formData.phone) newErrors.phone = "Nomor telepon wajib diisi";
+    if (!formData.address) newErrors.address = "Alamat wajib diisi";
+    if (!formData.city) newErrors.city = "Kota wajib diisi";
+    if (!formData.province) newErrors.province = "Provinsi wajib diisi";
+    if (!formData.role_id) newErrors.role_id = "Role wajib dipilih";
+    if (!formData.postal_code) newErrors.postal_code = "Kode pos wajib dipilih";
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      showSnackbar("Periksa kembali form Anda", "warning");
+      return;
+    }
 
     try {
       const res = await instanceAdmin.post("/create/users", formData);
-
-      console.log("Response sukses:", res.data);
-
+      console.log(res);
       showSnackbar("Pengguna berhasil ditambahkan", "success");
       handleClose();
       onUpdate();
@@ -79,6 +97,7 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
         city: "",
         province: "",
         role_id: "",
+        postal_code: "",
         isverified: 1,
       });
     }
@@ -147,6 +166,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                   value={formData.name}
                   label="Nama Lengkap"
                   onChange={handleChange}
+                  error={!!errors.name}
+                  helperText={errors.name}
                 />{" "}
               </div>
 
@@ -157,6 +178,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                   value={formData.firstname}
                   label="Nama Depan"
                   onChange={handleChange}
+                  error={!!errors.firstname}
+                  helperText={errors.firstname}
                 />{" "}
                 <FormInput
                   name="lastname"
@@ -164,6 +187,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                   value={formData.lastname}
                   label="Nama Belakang"
                   onChange={handleChange}
+                  error={!!errors.lastname}
+                  helperText={errors.lastname}
                 />{" "}
               </div>
 
@@ -174,6 +199,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                   value={formData.email}
                   label="Email"
                   onChange={handleChange}
+                  error={!!errors.email}
+                  helperText={errors.email}
                 />{" "}
                 <FormInput
                   name="password"
@@ -181,6 +208,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                   value={formData.password}
                   label="Password"
                   onChange={handleChange}
+                  error={!!errors.password}
+                  helperText={errors.password}
                 />{" "}
               </div>
               <MuiTelInput
@@ -191,6 +220,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                 fullWidth
                 label="Nomor Telepon"
                 size="small"
+                error={!!errors.phone}
+                helperText={errors.phone}
                 defaultCountry="ID"
                 InputLabelProps={{
                   sx: {
@@ -251,6 +282,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                 label="Alamat Lengkap"
                 value={formData.address}
                 onChange={handleChange}
+                error={!!errors.address}
+                helperText={errors.address}
               />
               <div className="flex gap-5">
                 <FormInput
@@ -259,6 +292,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                   label="Provinsi"
                   value={formData.province}
                   onChange={handleChange}
+                  error={!!errors.province}
+                  helperText={errors.province}
                 />
                 <FormInput
                   name="city"
@@ -266,6 +301,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                   label="Kota"
                   value={formData.city}
                   onChange={handleChange}
+                  error={!!errors.city}
+                  helperText={errors.city}
                 />
               </div>
               <div className="flex gap-5">
@@ -275,6 +312,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                   label="Kode Pos"
                   value={formData.postal_code}
                   onChange={handleChange}
+                  error={!!errors.postal_code}
+                  helperText={errors.postal_code}
                 />
                 <FormInput
                   name="role_id"
@@ -286,6 +325,8 @@ const ModalCreateUser = ({ open, handleClose, onUpdate }) => {
                     label: cat.name,
                   }))}
                   onChange={handleChange}
+                  error={!!errors.role_id}
+                  helperText={errors.role_id}
                 />
               </div>
             </div>

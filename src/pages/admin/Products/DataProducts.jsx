@@ -233,7 +233,7 @@ const DataProducts = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.slice(0, 10).map((product) => (
+                  {filteredUsers.map((product) => (
                     <tr key={product.id}>
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="flex items-center gap-3">
@@ -369,7 +369,7 @@ const DataProducts = () => {
                         colSpan="6"
                         className="text-center py-5 text-gray-500"
                       >
-                        Tidak ada data pengguna.
+                        Tidak ada data produk.
                       </td>
                     </tr>
                   )}

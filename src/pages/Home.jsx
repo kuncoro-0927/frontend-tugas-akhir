@@ -16,7 +16,7 @@ import { addToCart } from "../redux/cartSlice";
 import { fetchCartItemCount } from "../redux/cartSlice";
 import { FaShippingFast } from "react-icons/fa";
 import { FaLocationDot, FaCircleCheck } from "react-icons/fa6";
-import { Swiper, SwiperSlide } from "swiper/react";
+import AuthModal from "./auth/AuthModal";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -27,6 +27,7 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [loadingProductId, setLoadingProductId] = useState(null);
   const wishlist = useSelector((state) => state.wishlist.wishlist);
+  const [openAuthModal, setOpenAuthModal] = useState(false);
 
   const fetchProducts = async () => {
     try {
@@ -73,7 +74,7 @@ const Home = () => {
   };
   const handleToggleWishlist = (productId) => {
     if (!isLoggedIn) {
-      showSnackbar("Silakan login terlebih dahulu", "warning");
+      setOpenAuthModal(true);
       return;
     }
 
@@ -93,6 +94,13 @@ const Home = () => {
         showSnackbar(err?.message || err || "Gagal mengubah wishlist", "error");
       });
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setOpenAuthModal(false);
+    }
+  }, [isLoggedIn]);
+
   const isProductInWishlist = (productId) => {
     return (
       Array.isArray(wishlist) &&
@@ -102,6 +110,11 @@ const Home = () => {
   return (
     <>
       <section className="mt-16 md:mt-10 mx-7 md:mx-10  lg:mx-14">
+        <AuthModal
+          open={openAuthModal}
+          handleClose={() => setOpenAuthModal(false)}
+          initialContent="login" // Modal mulai dari login
+        />
         <div className="md:flex  md:justify-between md:gap-8 lg:gap-20">
           <div className=" w-full py-5 rounded-2xl">
             <h1 className="font-bold text-5xl md:text-5xl lg:text-6xl max-w-lg">
@@ -353,7 +366,13 @@ const Home = () => {
         : "bg-white text-black hover:bg-gray-100"
     }
   `}
-                    onClick={() => addCart(product, 1)}
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        setOpenAuthModal(true);
+                        return;
+                      }
+                      addCart(product, 1);
+                    }}
                     disabled={
                       loadingProductId === product.id ||
                       product.status === "sold"

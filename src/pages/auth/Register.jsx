@@ -37,6 +37,12 @@ const ModalRegister = ({ handleSwitch, handleClose }) => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${
+      import.meta.env.VITE_BACKEND_URL
+    }/api/v1/auth/google`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoadingVerify(true);
@@ -103,7 +109,10 @@ const ModalRegister = ({ handleSwitch, handleClose }) => {
               </div>
             </div>
             <div className="flex justify-center mx-5 items-center pt-7">
-              <button className="border flex items-center hover:border-hitam2 duration-300 justify-between hover:border-black border-gray-400 rounded-xl px-6 py-4 w-full">
+              <button
+                onClick={handleGoogleLogin}
+                className="border flex items-center hover:border-hitam2 duration-300 justify-between hover:border-black border-gray-400 rounded-xl px-6 py-4 w-full"
+              >
                 Lanjutkan dengan Google
                 <img className="w-[25px]" src="/images/google.svg" alt="" />
               </button>

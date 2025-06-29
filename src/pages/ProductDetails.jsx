@@ -4,10 +4,11 @@ import { GoChevronRight, GoShareAndroid } from "react-icons/go";
 import { instance } from "../utils/axios";
 import Rating from "@mui/material/Rating";
 import CardImage from "../components/Card/CardImage";
-import AccordionProduct from "../components/AccordionProduct";
+import AuthModal from "./auth/AuthModal";
+import { toggleWishlist } from "../redux/wishlistSlice";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useParams, useLocation, Link } from "react-router-dom";
-import { MdKeyboardArrowRight, MdKeyboardArrowDown } from "react-icons/md";
+import { fetchWishlist } from "../redux/wishlistSlice";
 import { addToCart } from "../redux/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { showSnackbar } from "../components/CustomSnackbar";
@@ -17,7 +18,9 @@ const ProductDetails = () => {
   const { id } = useParams(); // ambil id dari URL
   const [product, setProduct] = useState(null);
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.user);
+  const { isLoggedIn, user } = useSelector((state) => state.user);
+  const [openAuthModal, setOpenAuthModal] = useState(false);
+  const wishlist = useSelector((state) => state.wishlist.wishlist);
   const [reviews, setReviews] = useState([]);
   const location = useLocation();
   const from = location.state?.from;
@@ -124,9 +127,9 @@ const ProductDetails = () => {
     }
   };
 
-  const handleAddToCart = () => {
-    addCart(product, 1);
-  };
+  // const handleAddToCart = () => {
+  //   addCart(product, 1);
+  // };
 
   // function formattedPrice(price) {
   //   return price.toLocaleString("id-ID", {
@@ -135,9 +138,49 @@ const ProductDetails = () => {
   //   });
   // }
 
+  const handleToggleWishlist = (productId) => {
+    if (!isLoggedIn) {
+      setOpenAuthModal(true);
+      return;
+    }
+
+    console.log("Toggle wishlist:", { productId, user_id: user.id });
+
+    dispatch(toggleWishlist({ productId, user_id: user.id }))
+      .unwrap()
+      .then((res) => {
+        console.log("Wishlist updated:", res);
+        showSnackbar(res.message || "Berhasil ubah wishlist", "success");
+
+        // ✅ Refresh wishlist lengkap
+        dispatch(fetchWishlist(user.id));
+      })
+      .catch((err) => {
+        console.error("Toggle wishlist error:", err);
+        showSnackbar(err?.message || err || "Gagal mengubah wishlist", "error");
+      });
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setOpenAuthModal(false);
+    }
+  }, [isLoggedIn]);
+
+  const isProductInWishlist = (productId) => {
+    return (
+      Array.isArray(wishlist) &&
+      wishlist.some((item) => item && item.id === productId)
+    );
+  };
   return (
     <>
       <section className="md:mx-[75px] mx-7 mt-10">
+        <AuthModal
+          open={openAuthModal}
+          handleClose={() => setOpenAuthModal(false)}
+          initialContent="login" // Modal mulai dari login
+        />
         <Breadcrumbs
           aria-label="breadcrumb"
           separator={<GoChevronRight style={{ fontSize: "small" }} />}
@@ -311,7 +354,13 @@ const ProductDetails = () => {
 
               <div className="flex mt-10 items-center gap-3">
                 <button
-                  onClick={handleAddToCart}
+                  onClick={() => {
+                    if (!isLoggedIn) {
+                      setOpenAuthModal(true);
+                      return;
+                    }
+                    addCart(product, 1);
+                  }}
                   disabled={product?.status === "sold"}
                   className={`w-full rounded-lg py-2  ${
                     product?.status === "sold"
@@ -322,9 +371,21 @@ const ProductDetails = () => {
                   {product?.status === "sold" ? "Sudah terjual" : "Pesan"}
                 </button>
 
-                <button className="w-full border border-gray-400 py-2 rounded-lg">
-                  Tambah ke favorit
-                </button>
+                {product && (
+                  <button
+                    className={`w-full border border-gray-400 py-2 rounded-lg ${
+                      isProductInWishlist(product.id)
+                        ? "text-black/50 cursor-not-allowed "
+                        : "hover:bg-gray-100"
+                    }`}
+                    disabled={isProductInWishlist(product.id)}
+                    onClick={() => handleToggleWishlist(product.id)}
+                  >
+                    {isProductInWishlist(product.id)
+                      ? "Sudah ditambahkan"
+                      : "Tambah ke favorit"}
+                  </button>
+                )}
               </div>
             </div>
           </div>

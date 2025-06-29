@@ -27,6 +27,14 @@ const ModalCreateOrder = ({ open, handleClose }) => {
   const [formData, setFormData] = useState({});
   const originCityId = 40561; // Pacitan
   const courier = "jne";
+  const [currentCustomProduct, setCurrentCustomProduct] = useState(null);
+
+  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [customFile, setCustomFile] = useState(null);
+  const [customWidth, setCustomWidth] = useState("");
+  const [customHeight, setCustomHeight] = useState("");
+  const [customNotes, setCustomNotes] = useState("");
+  const [customPrice, setCustomPrice] = useState(0);
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
@@ -115,30 +123,170 @@ const ModalCreateOrder = ({ open, handleClose }) => {
       }));
     }
   }, [selectedUserId]);
+  useEffect(() => {
+    if (
+      customWidth &&
+      customHeight &&
+      currentCustomProduct?.width &&
+      currentCustomProduct?.height &&
+      currentCustomProduct?.price
+    ) {
+      const baseWidth = Number(currentCustomProduct.width);
+      const baseHeight = Number(currentCustomProduct.height);
+      const basePrice = Number(currentCustomProduct.price);
+
+      const baseArea = baseWidth * baseHeight;
+      const pricePerCm2 = basePrice / baseArea;
+
+      const customArea = Number(customWidth) * Number(customHeight);
+      const newPriceRaw = pricePerCm2 * customArea;
+
+      // Pembulatan ke 1.000 terdekat
+      const newPrice = Math.round(newPriceRaw / 1000) * 1000;
+
+      setCustomPrice(newPrice);
+    } else if (currentCustomProduct?.price) {
+      setCustomPrice(Number(currentCustomProduct.price));
+    }
+  }, [customWidth, customHeight, currentCustomProduct]);
+
+  // const handleSubmit = async () => {
+  //   const subtotal = calculateSubtotal();
+  //   const shippingCost = parseInt(selectedShippingOption?.cost || 0);
+  //   const orderData = {
+  //     user_id: selectedUserId,
+  //     products: selectedItems.map((item) => ({
+  //       product_id: item.product.id,
+  //       product_name: item.product.name,
+  //       quantity: item.quantity,
+  //       price: item.product.price,
+  //       total: item.quantity * item.product.price,
+  //       custom: item.custom || null, // ← ini
+  //     })),
+  //     address: formData.address,
+  //     city: formData.city,
+  //     postal: formData.postal,
+  //     paymentMethod: formData.paymentMethod,
+  //     paymentStatus: formData.paymentStatus,
+  //     subtotal: subtotal,
+  //     promo_code: promo?.code || null,
+  //     discount_amount: promo?.discount || 0,
+  //     shipping_fee: shippingCost,
+  //     shipping_service: selectedShippingOption?.service,
+  //     shipping_details: {
+  //       shipping_firstname: formData.firstname,
+  //       shipping_lastname: formData.lastname,
+  //       shipping_phone: formData.phone,
+  //       shipping_address: formData.address,
+  //       province: formData.province,
+  //       city: formData.city,
+  //       postal_code: formData.postal,
+  //       courier: selectedShippingOption?.name || "JNE",
+  //       etd: selectedShippingOption?.etd,
+  //       shipping_cost: shippingCost,
+  //     },
+  //   };
+
+  //   try {
+  //     // 1. Buat pesanan dulu
+  //     const orderResponse = await instanceAdmin.post(
+  //       "/create/admin/orders",
+  //       orderData
+  //     );
+
+  //     if (orderResponse.data && orderResponse.data.order_id) {
+  //       // Menyimpan orderResponse ke dalam state
+  //       setOrderResponse(orderResponse.data);
+
+  //       const { order_id, admin_fee } = orderResponse.data;
+  //       // 2. Kirim request ke backend untuk buat transaksi Midtrans
+  //       const paymentPayload = {
+  //         order_id, // Pastikan order_id ada
+  //         formData,
+  //         selectedService: selectedShippingOption,
+  //         admin_fee,
+  //         promoCode: promo?.valid ? promo : null, // hanya jika promo valid
+  //         total_amount:
+  //           subtotal + admin_fee + shippingCost - (promo?.discount || 0),
+  //         shipping_cost: shippingCost,
+  //         customer: {
+  //           firstName: formData.firstname,
+  //           email: formData.email,
+  //           phone: formData.phone,
+  //           cartItems: selectedItems.map((item) => ({
+  //             productId: item.product.id,
+  //             productName: item.product.name,
+  //             price: item.product.price,
+  //             quantity: item.quantity,
+  //           })),
+  //         },
+  //       };
+
+  //       // 2. Kirim request ke backend untuk buat transaksi Midtrans
+  //       const paymentResponse = await instanceAdmin.post(
+  //         "/create/admin/payment",
+  //         paymentPayload
+  //       );
+  //       console.group("📦 Order Payload");
+  //       console.log("Order:", orderData);
+  //       console.groupEnd();
+
+  //       console.group("💳 Payment Payload");
+  //       console.log("Payment:", paymentPayload);
+  //       console.groupEnd();
+
+  //       console.log("✅ Payment response:", paymentResponse.data);
+
+  //       const { redirectUrl } = paymentResponse.data;
+  //       if (!redirectUrl) throw new Error("Redirect URL tidak tersedia");
+
+  //       // 3. Redirect ke Midtrans
+  //       // window.location.href = redirectUrl;
+  //     } else {
+  //       throw new Error("order_id tidak tersedia");
+  //     }
+  //   } catch (error) {
+  //     console.error("❌ Gagal submit dan bayar via Midtrans:", error);
+  //     if (error.response) {
+  //       console.error("🧾 Server response error:", error.response.data);
+  //     }
+  //     showSnackbar(
+  //       "Terjadi kesalahan saat membuat pesanan atau pembayaran",
+  //       "error"
+  //     );
+  //   }
+  // };
 
   const handleSubmit = async () => {
     const subtotal = calculateSubtotal();
     const shippingCost = parseInt(selectedShippingOption?.cost || 0);
+
     const orderData = {
       user_id: selectedUserId,
-      products: selectedItems.map((item) => ({
+      products: selectedItems.map((item, index) => ({
         product_id: item.product.id,
         product_name: item.product.name,
         quantity: item.quantity,
-        price: item.product.price,
-        total: item.quantity * item.product.price,
+        price: item.product.original_price || item.product.price, // ✅ harga asli
+        total: item.quantity * (item.custom?.price || item.product.price), // ✅ total pakai harga custom kalau ada
+
+        custom: {
+          ...item.custom,
+          fileKey: `customFile_${index}`,
+        },
       })),
       address: formData.address,
       city: formData.city,
       postal: formData.postal,
       paymentMethod: formData.paymentMethod,
       paymentStatus: formData.paymentStatus,
-      subtotal: subtotal,
+      subtotal,
       promo_code: promo?.code || null,
       discount_amount: promo?.discount || 0,
       shipping_fee: shippingCost,
       shipping_service: selectedShippingOption?.service,
       shipping_details: {
+        email: formData.email,
         shipping_firstname: formData.firstname,
         shipping_lastname: formData.lastname,
         shipping_phone: formData.phone,
@@ -152,25 +300,40 @@ const ModalCreateOrder = ({ open, handleClose }) => {
       },
     };
 
+    const formPayload = new FormData();
+    formPayload.append("data", JSON.stringify(orderData));
+
+    // Tambahkan file custom jika ada
+    selectedItems.forEach((item, index) => {
+      if (item.customFile) {
+        formPayload.append(`customFile_${index}`, item.customFile); // ✅ fileKey sinkron
+      }
+    });
+
     try {
-      // 1. Buat pesanan dulu
+      // Step 1: Submit order
       const orderResponse = await instanceAdmin.post(
         "/create/admin/orders",
-        orderData
+        formPayload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
       if (orderResponse.data && orderResponse.data.order_id) {
-        // Menyimpan orderResponse ke dalam state
         setOrderResponse(orderResponse.data);
 
         const { order_id, admin_fee } = orderResponse.data;
-        // 2. Kirim request ke backend untuk buat transaksi Midtrans
+
+        // Step 2: Payload untuk Midtrans payment
         const paymentPayload = {
-          order_id, // Pastikan order_id ada
+          order_id,
           formData,
           selectedService: selectedShippingOption,
           admin_fee,
-          promoCode: promo?.valid ? promo : null, // hanya jika promo valid
+          promoCode: promo?.valid ? promo : null,
           total_amount:
             subtotal + admin_fee + shippingCost - (promo?.discount || 0),
           shipping_cost: shippingCost,
@@ -187,28 +350,36 @@ const ModalCreateOrder = ({ open, handleClose }) => {
           },
         };
 
-        console.log("💳 Payload ke /payment:", paymentPayload);
-
-        // 2. Kirim request ke backend untuk buat transaksi Midtrans
+        // Step 3: Request ke backend untuk create payment
         const paymentResponse = await instanceAdmin.post(
           "/create/admin/payment",
           paymentPayload
         );
+
+        console.group("📦 Order Payload");
+        console.log("Order:", orderData);
+        console.groupEnd();
+
+        console.group("💳 Payment Payload");
+        console.log("Payment:", paymentPayload);
+        console.groupEnd();
+
         console.log("✅ Payment response:", paymentResponse.data);
 
         const { redirectUrl } = paymentResponse.data;
         if (!redirectUrl) throw new Error("Redirect URL tidak tersedia");
 
-        // 3. Redirect ke Midtrans
+        // Optional: Redirect ke Midtrans
         window.location.href = redirectUrl;
       } else {
         throw new Error("order_id tidak tersedia");
       }
     } catch (error) {
-      console.error("❌ Gagal submit dan bayar via Midtrans:", error);
+      console.error("❌ Gagal submit order dan bayar:", error);
       if (error.response) {
         console.error("🧾 Server response error:", error.response.data);
       }
+
       showSnackbar(
         "Terjadi kesalahan saat membuat pesanan atau pembayaran",
         "error"
@@ -460,7 +631,7 @@ const ModalCreateOrder = ({ open, handleClose }) => {
               <div className="grid gap-4">
                 <div className="mb-4">
                   <div className="mb-5">
-                    <h1 className="text-lg font-semibold ">Pilih Produk</h1>
+                    <h1 className="text-lg font-semibold">Pilih Produk</h1>
                     <p className="text-sm">
                       Silakan pilih produk yang ingin Anda beli dari daftar
                       berikut.
@@ -480,8 +651,10 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                             p.name
                               .toLowerCase()
                               .includes(searchQuery.toLowerCase()) &&
-                            !selectedItems.some((i) => i.product.id === p.id)
+                            (p.category_id === 5 || // custom product boleh muncul terus
+                              !selectedItems.some((i) => i.product.id === p.id))
                         )
+
                         .map((product) => {
                           const isDisabled =
                             product.stock === 0 || product.status === "sold";
@@ -495,10 +668,33 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                               }`}
                               onClick={() => {
                                 if (!isDisabled) {
-                                  setSelectedItems([
-                                    ...selectedItems,
-                                    { product, quantity: 1 },
-                                  ]);
+                                  if (product.category_id === 5) {
+                                    const customProduct = {
+                                      ...product,
+                                      name: `${product.name} (Custom)`,
+                                      is_custom: true,
+                                    };
+
+                                    setSelectedItems((prev) => [
+                                      ...prev,
+                                      {
+                                        product: customProduct,
+                                        quantity: 1,
+                                      },
+                                    ]);
+
+                                    setCurrentCustomProduct(customProduct); // untuk form
+                                    setShowCustomForm(true); // buka form
+                                  } else {
+                                    setSelectedItems((prev) => [
+                                      ...prev,
+                                      {
+                                        product,
+                                        quantity: 1,
+                                      },
+                                    ]);
+                                  }
+
                                   setSearchQuery("");
                                 }
                               }}
@@ -520,7 +716,7 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                                   />
                                 </div>
                                 <div className="flex-col flex">
-                                  <div className="flex  w-[400px] items-center justify-between">
+                                  <div className="flex w-[400px] items-center justify-between">
                                     <p className="font-semibold">
                                       {product.name}
                                     </p>
@@ -561,7 +757,8 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                           p.name
                             .toLowerCase()
                             .includes(searchQuery.toLowerCase()) &&
-                          !selectedItems.some((i) => i.product.id === p.id)
+                          (p.category_id === 5 || // custom product boleh muncul terus
+                            !selectedItems.some((i) => i.product.id === p.id))
                       ).length === 0 && (
                         <div className="px-3 py-2 text-sm text-gray-500">
                           Tidak ada produk
@@ -579,19 +776,19 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                     {selectedItems.map((item, index) => (
                       <div
                         key={item.product.id}
-                        className="flex mx-4 items-center justify-between border-b pb-4 "
+                        className="flex mx-4 items-center justify-between border-b pb-4"
                       >
-                        <div className="flex  gap-5">
+                        <div className="flex gap-5">
                           <div className="h-[60px] w-[60px]">
                             <CardImage
                               image={`${import.meta.env.VITE_BACKEND_URL}${
                                 item.product.image_url
                               }`}
                               alt={item.product.name}
-                            />{" "}
+                            />
                           </div>
                           <div className="flex-col flex">
-                            <div className="flex  w-[400px] items-center justify-between">
+                            <div className="flex w-[400px] items-center justify-between">
                               <div className="flex gap-2 items-center font-semibold">
                                 <p>{item.product.name}</p>
                                 <span className="flex items-center justify-between">
@@ -620,7 +817,6 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                               {item.product.stock}
                             </span>
                             <div className="flex items-center justify-between">
-                              {" "}
                               <span className="text-xs">
                                 {item.product.size}
                               </span>
@@ -629,25 +825,23 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      setSelectedItems(
-                                        (prev) =>
-                                          prev
-                                            .map((val, i) =>
-                                              i === index
-                                                ? {
-                                                    ...val,
-                                                    quantity: val.quantity - 1,
-                                                  }
-                                                : val
-                                            )
-                                            .filter((item) => item.quantity > 0) // ⬅️ otomatis hapus jika quantity <= 0
+                                      setSelectedItems((prev) =>
+                                        prev
+                                          .map((val, i) =>
+                                            i === index
+                                              ? {
+                                                  ...val,
+                                                  quantity: val.quantity - 1,
+                                                }
+                                              : val
+                                          )
+                                          .filter((item) => item.quantity > 0)
                                       );
                                     }}
                                     className="py-0 px-1 text-xs border border-gray-400 rounded-sm"
                                   >
                                     −
                                   </button>
-
                                   <span className="w-6 text-sm text-center">
                                     {item.quantity}
                                   </span>
@@ -675,12 +869,139 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                                     +
                                   </button>
                                 </div>
+                                {item.custom && (
+                                  <div className="text-xs text-gray-600 mt-1">
+                                    <p>Lebar: {item.custom.width} cm</p>
+                                    <p>Tinggi: {item.custom.height} cm</p>
+                                    <p>Catatan: {item.custom.notes}</p>
+                                    {item.custom.file && (
+                                      <p>File: {item.custom.file.name}</p>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+
+                {/* Tambahan Form Custom */}
+                {showCustomForm && (
+                  <div className="mt-4 space-y-4 border p-4 rounded-lg bg-gray-50">
+                    <h1 className="font-bold text-base">Form Custom</h1>
+                    <span className="text-sm font-medium text-black/60">
+                      Sesuaikan desain bingkai sesuai keinginanmu.
+                    </span>
+
+                    <div>
+                      <label className="block font-semibold mb-1">
+                        Upload Foto
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="fileUploadCustom"
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          setCustomFile(file); // ✅ Simpan langsung ke state, tanpa index
+                        }}
+                        className="hidden"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          document.getElementById("fileUploadCustom").click()
+                        }
+                        className="px-4 py-2 bg-black text-sm text-white rounded hover:bg-black/80"
+                      >
+                        Pilih Gambar
+                      </button>
+
+                      {customFile && (
+                        <p className="mt-2 text-sm text-gray-700">
+                          {customFile.name}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <FormInput
+                        type="number"
+                        label="Lebar"
+                        value={customWidth}
+                        onChange={(e) => setCustomWidth(e.target.value)}
+                      />
+                      <FormInput
+                        type="number"
+                        label="Tinggi"
+                        value={customHeight}
+                        onChange={(e) => setCustomHeight(e.target.value)}
+                      />
+                    </div>
+
+                    <FormInput
+                      type="textarea"
+                      label="Catatan"
+                      value={customNotes}
+                      onChange={(e) => setCustomNotes(e.target.value)}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedItems((prev) => {
+                          const updatedItems = [...prev];
+                          const indexToUpdate = [...prev]
+                            .reverse()
+                            .findIndex(
+                              (item) =>
+                                item.product.id === currentCustomProduct.id &&
+                                item.product.is_custom &&
+                                !item.custom
+                            );
+
+                          if (indexToUpdate !== -1) {
+                            // Karena kita pakai reverse, hitung index asli
+                            const actualIndex = prev.length - 1 - indexToUpdate;
+
+                            updatedItems[actualIndex] = {
+                              ...updatedItems[actualIndex],
+                              product: {
+                                ...currentCustomProduct,
+                                name: `${currentCustomProduct.name} (Custom)`,
+                                price: customPrice,
+                                original_price: currentCustomProduct.price,
+                              },
+                              custom: {
+                                file: customFile,
+                                width: customWidth,
+                                height: customHeight,
+                                notes: customNotes,
+                                price: customPrice,
+                              },
+                              customFile: customFile,
+                            };
+                          }
+
+                          return updatedItems;
+                        });
+
+                        // Reset form
+                        setCustomFile(null);
+                        setCustomWidth("");
+                        setCustomHeight("");
+                        setCustomNotes("");
+                        setCurrentCustomProduct(null);
+                        setShowCustomForm(false);
+                      }}
+                      className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    >
+                      Simpan Custom
+                    </button>
                   </div>
                 )}
               </div>
