@@ -7,6 +7,8 @@ import { IoImageOutline } from "react-icons/io5";
 import { Modal, Box, Button } from "@mui/material";
 
 const ModalCreatePromo = ({ open, handleClose, onUpdate }) => {
+  const [errors, setErrors] = useState({});
+
   const [formData, setFormData] = useState({
     type: "fixed",
     code: "",
@@ -24,12 +26,44 @@ const ModalCreatePromo = ({ open, handleClose, onUpdate }) => {
       [e.target.name]: e.target.value,
     }));
   };
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.code.trim()) newErrors.code = "Kode promo wajib diisi";
+    if (!formData.discount_type)
+      newErrors.discount_type = "Tipe diskon wajib dipilih";
+    if (!formData.discount_value || isNaN(formData.discount_value)) {
+      newErrors.discount_value = "Jumlah diskon harus berupa angka";
+    }
+
+    if (
+      formData.discount_type === "percentage" &&
+      (!formData.max_discount || isNaN(formData.max_discount))
+    ) {
+      newErrors.max_discount = "Max diskon wajib diisi dan harus angka";
+    }
+
+    if (!formData.min_order || isNaN(formData.min_order)) {
+      newErrors.min_order = "Min. pesanan harus angka";
+    }
+
+    if (!formData.expiry_date)
+      newErrors.expiry_date = "Tanggal kadaluarsa wajib diisi";
+
+    return newErrors;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log("Form data sebelum submit:", formData);
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
 
+    if (Object.keys(validationErrors).length > 0) {
+      showSnackbar("Periksa kembali data promo", "warning");
+      return;
+    }
     try {
       const res = await instanceAdmin.post("/create/promo", formData);
 
@@ -55,6 +89,7 @@ const ModalCreatePromo = ({ open, handleClose, onUpdate }) => {
         expiry_date: "",
         is_active: 1,
       });
+      setErrors({});
     }
   }, [open]);
 
@@ -119,6 +154,8 @@ const ModalCreatePromo = ({ open, handleClose, onUpdate }) => {
                   value={formData.code}
                   label="Nama Promo"
                   onChange={handleChange}
+                  error={!!errors.code}
+                  helperText={errors.code}
                 />{" "}
                 <FormInput
                   label="Tipe Diskon"
@@ -130,15 +167,21 @@ const ModalCreatePromo = ({ open, handleClose, onUpdate }) => {
                     { value: "percentage", label: "Persentase" },
                     { value: "fixed", label: "Tetap" },
                   ]}
+                  error={!!errors.discount_type}
+                  helperText={errors.discount_type}
                 />
               </div>
               <div className="flex gap-5">
                 <FormInput
                   name="discount_value"
                   type="text"
-                  helperText="Contoh: Persentase = 10 untuk 10%, Tetap = 10000 untuk IDR 10.000"
                   label="Jumlah diskon"
                   onChange={handleChange}
+                  error={!!errors.discount_value}
+                  helperText={
+                    errors.discount_value ||
+                    "Contoh: Persentase = 10 untuk 10%, Tetap = 10000 untuk IDR 10.000"
+                  }
                 />
               </div>
 
@@ -148,15 +191,21 @@ const ModalCreatePromo = ({ open, handleClose, onUpdate }) => {
                   type="text"
                   label="Max. Diskon"
                   disabled={formData.discount_type === "fixed"}
-                  helperText="Hanya untuk diskon persentase"
                   onChange={handleChange}
+                  error={!!errors.max_discount}
+                  helperText={
+                    errors.max_discount || "Hanya untuk diskon persentase"
+                  }
                 />
                 <FormInput
                   name="min_order"
                   type="text"
-                  helperText="Minimal pesanan untuk diskon"
                   label="Min. Pesanan"
                   onChange={handleChange}
+                  error={!!errors.min_order}
+                  helperText={
+                    errors.min_order || "Minimal pesanan untuk diskon"
+                  }
                 />
               </div>
               <FormInput
@@ -164,6 +213,8 @@ const ModalCreatePromo = ({ open, handleClose, onUpdate }) => {
                 type="date"
                 label="Tanggal kadaluwarsa"
                 onChange={handleChange}
+                error={!!errors.expiry_date}
+                helperText={errors.expiry_date}
               />
             </div>
 

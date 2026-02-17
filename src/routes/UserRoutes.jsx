@@ -22,7 +22,7 @@ import Cart from "../pages/Cart";
 import FloatingButton from "../components/FloatingButton";
 import ModalSearch from "../components/Modal/ModalSearch";
 import Notfound from "../pages/404";
-
+import ResetPassword from "../pages/auth/ResetPassword";
 function UserRoutes() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -108,6 +108,7 @@ function UserRoutes() {
         <Route path="/shipping/form/:orderId" element={<ShippingForm />} />
         <Route path="/checkouts/payment/:orderId" element={<PaymentPage />} />
         <Route path="/payment/success/:order_id" element={<PaymentSuccess />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* PROTECTED ROUTES */}
         <Route element={<PrivateRoute />}>

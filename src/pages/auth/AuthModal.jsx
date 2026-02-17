@@ -2,6 +2,7 @@ import React from "react";
 import ModalLogin from "./Login";
 import ModalRegister from "./Register";
 import ModalVerifyEmail from "./VerifyEmail";
+import ModalForgotPassword from "./ForgotPassword";
 import { useState, useEffect } from "react";
 import { Modal, Box } from "@mui/material";
 const AuthModal = ({ open, handleClose, initialContent }) => {
@@ -56,6 +57,12 @@ const AuthModal = ({ open, handleClose, initialContent }) => {
         {activeContent === "verifyemail" && (
           <ModalVerifyEmail
             otpToken={otpToken}
+            handleSwitch={handleSwitch}
+            handleClose={handleClose}
+          />
+        )}
+        {activeContent === "forgotpassword" && (
+          <ModalForgotPassword
             handleSwitch={handleSwitch}
             handleClose={handleClose}
           />

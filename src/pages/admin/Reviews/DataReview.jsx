@@ -2,22 +2,20 @@ import React, { useEffect, useState, useRef } from "react";
 import AdminNavBar from "../../../components/Admin/AdminNavBar";
 import SidebarAdmin from "../../../components/Admin/SidebarAdmin";
 import { instanceAdmin } from "../../../utils/axiosAdmin";
-import { BiSolidOffer } from "react-icons/bi";
-import ModalCreatePromo from "../../../components/Admin/Modal/PromoCode/CreatePromoCode";
-import ModalUpdatePromo from "../../../components/Admin/Modal/PromoCode/UpdatePromoCode";
-import ModalDeletePromo from "../../../components/Admin/Modal/PromoCode/DeletePromo";
-import DetailPromo from "../../../components/Admin/Modal/PromoCode/DetailPromoCode";
-const DataPromoCodes = () => {
+import Rating from "@mui/material/Rating";
+import CardImage from "../../../components/Card/CardImage";
+import DetailReview from "../../../components/Admin/Modal/Reviews/DetailReview";
+import ModalDeleteReview from "../../../components/Admin/Modal/Reviews/DeleteReviews";
+const DataReview = () => {
   const [promos, setPromos] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]); // Data yang sudah difilter
+  const [filteredReviews, setFilteredUsers] = useState([]); // Data yang sudah difilter
   const [openDropdown, setOpenDropdown] = useState(null);
   const [searchQuery, setSearchQuery] = useState(""); // Query untuk search
   const dropdownRef = useRef(null);
   const [selectedPromoId, setSelectedPromoId] = useState(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Sidebar collapsed by default
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
-  const [createModal, setCreateModal] = useState(false);
-  const [editModal, setEditModal] = useState(false);
+
   const [deleteModal, setDeleteModal] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const handleOpenDrawer = (promoId) => {
@@ -25,27 +23,16 @@ const DataPromoCodes = () => {
     setDrawerOpen(true);
   };
 
-  const handleOpenCreateModal = () => setCreateModal(true);
-  const handleCloseCreateModal = () => setCreateModal(false);
   const handleCloseDeleteModal = () => setDeleteModal(false);
   const handleOpenDeleteModal = (promoId) => {
     setSelectedPromoId(promoId);
     setDeleteModal(true);
   };
-  const handleCloseEditModal = () => setEditModal(false);
-  const handleOpenEditModal = (promoId) => {
-    setSelectedPromoId(promoId);
-    setEditModal(true);
-  };
-  const handleCreateSuccess = () => {
-    fetchPromos();
-  };
+
   const handleDeleteSuccess = () => {
     fetchPromos();
   };
-  const handleEditSuccess = () => {
-    fetchPromos();
-  };
+
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed); // Toggle state
   };
@@ -56,9 +43,9 @@ const DataPromoCodes = () => {
 
   const fetchPromos = async () => {
     try {
-      const response = await instanceAdmin.get("/all/promo");
-      setPromos(response.data);
-      setFilteredUsers(response.data);
+      const response = await instanceAdmin.get("/get/all/reviews");
+      setPromos(response.data.data);
+      setFilteredUsers(response.data.data);
     } catch (error) {
       console.error("Failed to fetch promos:", error);
     }
@@ -104,39 +91,19 @@ const DataPromoCodes = () => {
     };
   }, []);
 
-  const handleToggle = async (id) => {
-    try {
-      await instanceAdmin.put(`/toggle/${id}`);
-      fetchPromos(); // Refresh data setelah toggle
-    } catch (error) {
-      console.error("Gagal toggle status:", error);
-    }
-  };
-
   return (
     <section className="flex gap-10">
-      <DetailPromo
+      <DetailReview
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         promoId={selectedPromoId}
       />
-      <ModalCreatePromo
-        open={createModal}
-        handleClose={handleCloseCreateModal}
-        onUpdate={handleCreateSuccess}
-      />
-      <ModalUpdatePromo
-        open={editModal}
-        handleClose={handleCloseEditModal}
-        promoId={selectedPromoId}
-        onUpdate={handleEditSuccess}
-      />
 
-      <ModalDeletePromo
+      <ModalDeleteReview
         open={deleteModal}
         handleClose={handleCloseDeleteModal}
         promoId={selectedPromoId}
-        onUpdate={handleDeleteSuccess} // ✅ ini akan memicu fetch ulang data
+        onUpdate={handleDeleteSuccess}
       />
       <div
         className={`h-screen  fixed top-0 left-0 z-40 transition-all duration-300 ${
@@ -144,8 +111,8 @@ const DataPromoCodes = () => {
         }`}
       >
         <SidebarAdmin
-          onSidebarHover={handleSidebarHover} // Pass hover handler to SidebarAdmin
-          isSidebarCollapsed={isSidebarCollapsed} // Pass collapsed state to SidebarAdmin
+          onSidebarHover={handleSidebarHover}
+          isSidebarCollapsed={isSidebarCollapsed}
         />
       </div>
       <div
@@ -160,18 +127,11 @@ const DataPromoCodes = () => {
         <AdminNavBar onToggleSidebar={toggleSidebar} />
         <div className="mt-10 px-5 text-xl font-bold">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-extrabold">Data Promo</h1>
-            <button
-              onClick={handleOpenCreateModal}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600/80 duration-200 rounded-md text-white px-4 py-2 font-normal text-base"
-            >
-              <BiSolidOffer className="text-lg" />
-              Tambah
-            </button>
+            <h1 className="text-2xl font-extrabold">Data Ulasan</h1>
           </div>
           <div className="border p-5 mt-10">
             <div className="flex  items-start justify-between">
-              <p className="font-semibold text-sm">Tabel Data Promo</p>
+              <p className="font-semibold text-sm">Tabel Data Ulasan</p>
 
               {/* Search Input */}
               <div className=" mb-4">
@@ -200,7 +160,7 @@ const DataPromoCodes = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       id="search"
-                      placeholder="Cari Kode Promo"
+                      placeholder="Cari Ulasan"
                     />
                   </div>
                 </div>
@@ -211,86 +171,82 @@ const DataPromoCodes = () => {
               <table className=" w-full min-w-max table-auto text-left">
                 <thead>
                   <tr>
-                    {[
-                      "Kode Promo",
-                      "Tipe Diskon",
-                      "Maks. Diskon",
-                      "Kontrol Status",
-                      "Tanggal Expired",
-                      "Aksi",
-                    ].map((header, index) => (
-                      <th
-                        key={index}
-                        className="cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 transition-colors hover:bg-blue-gray-50"
-                      >
-                        <p className="antialiased font-sans text-sm text-blue-gray-900 flex items-center justify-between gap-2 font-normal leading-none opacity-70">
-                          {header}
-                        </p>
-                      </th>
-                    ))}
+                    {["Email", "Produk", "Rating", "Ulasan", "Aksi"].map(
+                      (header, index) => (
+                        <th
+                          key={index}
+                          className="cursor-pointer border-y border-blue-gray-100 bg-blue-gray-50/50 p-4 transition-colors hover:bg-blue-gray-50"
+                        >
+                          <p className="antialiased font-sans text-sm text-blue-gray-900 flex items-center justify-between gap-2 font-normal leading-none opacity-70">
+                            {header}
+                          </p>
+                        </th>
+                      )
+                    )}
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((promo) => (
+                  {filteredReviews.map((promo) => (
                     <tr key={promo.id}>
                       <td className="p-4 border-b border-blue-gray-50">
                         <div className="flex items-center gap-3">
                           <div className="">
                             <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                              {promo.code}
+                              {promo.email}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
-                        <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                          {promo.discount_type === "fixed"
-                            ? "IDR (Potongan Tetap)"
-                            : promo.discount_type === "percentage"
-                            ? "% (Diskon Persen)"
-                            : "Tidak diketahui"}
-                        </p>
+                        <div className="flex items-center gap-3">
+                          <div className="">
+                            <CardImage
+                              image={`${import.meta.env.VITE_BACKEND_URL}${
+                                promo.image_url
+                              }`}
+                              width="w-[70px]"
+                              height="h-[70px]"
+                            />
+                          </div>
+                          {/* <img
+                                               src="https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg"
+                                               alt="John Michael"
+                                               className="inline-block relative object-cover object-center rounded-full w-9 h-9"
+                                             /> */}
+                          <div className="">
+                            <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
+                              {promo.product_name}
+                            </p>
+                          </div>
+                        </div>
                       </td>
 
                       <td className="p-4 border-b border-blue-gray-50">
-                        <div className="flex flex-col">
-                          <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
-                            {promo.discount_value
-                              ? promo.discount_type === "percentage"
-                                ? `${promo.discount_value}%${
-                                    promo.max_discount
-                                      ? ` (max IDR ${promo.max_discount.toLocaleString(
-                                          "id-ID"
-                                        )})`
-                                      : ""
-                                  }`
-                                : `IDR ${promo.discount_value.toLocaleString(
-                                    "id-ID"
-                                  )}`
-                              : "Tidak ada data"}
-                          </p>
+                        <div className="flex items-center gap-3">
+                          <div className="">
+                            <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
+                              <Rating
+                                name="read-only"
+                                value={promo.rating}
+                                size="small"
+                                precision={0.1}
+                                readOnly
+                              />
+                            </p>
+                          </div>
                         </div>
                       </td>
                       <td className="p-4 border-b border-blue-gray-50">
-                        <button
-                          onClick={() => handleToggle(promo.id)}
-                          className={`w-12 h-6 flex items-center rounded-full p-1 duration-300 ease-in-out ${
-                            promo.is_active === 1
-                              ? "bg-green-100 border border-green-400"
-                              : "bg-red-100 border border-red-400"
-                          }`}
-                        >
-                          <div
-                            className={`border  w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${
-                              promo.is_active === 1
-                                ? "translate-x-6 bg-green-200 border-green-400"
-                                : "translate-x-0 bg-red-200 border-red-400"
-                            }`}
-                          ></div>
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <div className="">
+                            <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal">
+                              {promo.comment}
+                            </p>
+                          </div>
+                        </div>
                       </td>
 
-                      <td className="p-4 border-b border-blue-gray-50">
+                      {/* <td className="p-4 border-b border-blue-gray-50">
                         <p className="block antialiased font-sans text-sm leading-normal text-blue-gray-900 font-normal opacity-70">
                           {promo.expiry_date
                             ? new Date(promo.expiry_date).toLocaleDateString(
@@ -303,7 +259,7 @@ const DataPromoCodes = () => {
                               )
                             : "Tidak ada data"}
                         </p>
-                      </td>
+                      </td> */}
 
                       <td className="p-4 border-b border-blue-gray-50 relative">
                         <div
@@ -325,12 +281,6 @@ const DataPromoCodes = () => {
                             <div className="absolute right-0 mt-2 w-36 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
                               <div className="py-1">
                                 <button
-                                  onClick={() => handleOpenEditModal(promo.id)}
-                                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                >
-                                  Edit
-                                </button>
-                                <button
                                   onClick={() => handleOpenDrawer(promo.id)}
                                   className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                 >
@@ -351,13 +301,13 @@ const DataPromoCodes = () => {
                       </td>
                     </tr>
                   ))}
-                  {filteredUsers.length === 0 && (
+                  {filteredReviews.length === 0 && (
                     <tr>
                       <td
                         colSpan="6"
                         className="text-center py-5 text-gray-500"
                       >
-                        Tidak ada data promo.
+                        Tidak ada data ulasan.
                       </td>
                     </tr>
                   )}
@@ -371,4 +321,4 @@ const DataPromoCodes = () => {
   );
 };
 
-export default DataPromoCodes;
+export default DataReview;

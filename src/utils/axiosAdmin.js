@@ -49,7 +49,7 @@ instanceAdmin.interceptors.response.use(
         document.cookie =
           "admin_refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
 
-        alert("Session expired. Please login again.");
+        // alert("Session expired. Please login again.");
 
         return Promise.reject(refreshError);
       } finally {

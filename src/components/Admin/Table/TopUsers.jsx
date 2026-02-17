@@ -55,7 +55,7 @@ const TopUsers = () => {
 
               <td className="p-4 border-y border-blue-gray-50">
                 <p className="block antialiased text-sm leading-normal text-blue-gray-900 font-extrabold">
-                  IDR: {formatNumber(user.total_amount)}
+                  IDR {formatNumber(user.total_amount)}
                 </p>
               </td>
             </tr>

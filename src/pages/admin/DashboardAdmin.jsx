@@ -16,6 +16,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import useSalesData from "./Sales";
 import useTodaySalesData from "./TodaySales";
 import { instanceAdmin } from "../../utils/axiosAdmin";
+
+import { IoIosTrendingDown, IoIosTrendingUp } from "react-icons/io";
 const Dashboard = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Sidebar collapsed by default
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
@@ -32,6 +34,10 @@ const Dashboard = () => {
 
   const [totalAmount, setTotalAmount] = useState(0);
   const [totalProducts, setTotalProdcuts] = useState(0);
+  const [percentageChange, setPercentageChange] = useState(0);
+
+  const [changeLoading, setChangeLoading] = useState(true);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalAgrotourism, setTotalAgrotourism] = useState(null);
@@ -51,6 +57,21 @@ const Dashboard = () => {
   } = useSalesData();
 
   const { totalTodaySales, totalTotalOrders } = useTodaySalesData();
+
+  useEffect(() => {
+    const fetchChange = async () => {
+      try {
+        const response = await instanceAdmin.get("/total/amount/change"); // endpoint sesuai backend
+        setPercentageChange(response.data.percentageChange);
+      } catch (error) {
+        console.error("Gagal mengambil persentase perubahan:", error);
+      } finally {
+        setChangeLoading(false);
+      }
+    };
+
+    fetchChange();
+  }, []);
 
   useEffect(() => {
     const fetchTotalAmount = async () => {
@@ -109,32 +130,80 @@ const Dashboard = () => {
           <AdminNavBar onToggleSidebar={toggleSidebar} />
 
           <div className="mt-5 px-5 ">
-            <div className="border shadow-sm  flex gap-10 items-center justify-between rounded-md py-8 px-5 mb-5">
+            <div className="border shadow-sm  flex gap-10 items-start justify-between rounded-md py-8 px-5 mb-5">
               <div className="w-full ">
-                <div className="flex mb-10 gap-5">
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={["DatePicker"]}>
-                      <DatePicker
-                        label="Start Date"
-                        value={startDate}
-                        onChange={(newDate) => setStartDate(newDate)}
-                      />
-                    </DemoContainer>
-                  </LocalizationProvider>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={["DatePicker"]}>
-                      <DatePicker
-                        label="End Date"
-                        value={endDate}
-                        onChange={(newDate) => setEndDate(newDate)}
-                      />
-                    </DemoContainer>
-                  </LocalizationProvider>
+                <div className="p-4  w-[400px] rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white  shadow-lg relative overflow-hidden">
+                  <div className="absolute w-24 h-24 bg-white/10 rounded-full -top-6 -right-6"></div>
+
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <div className="flex gap-3 mb-2 items-center">
+                        <p className="text-lg">Total Saldo</p>
+                      </div>
+                      <p className="text-4xl mb-1 font-bold">
+                        {" "}
+                        IDR {formatNumber(totalAmount)}
+                      </p>
+                      <p
+                        className={`text-xs mt-1 flex items-center gap-1 ${
+                          changeLoading
+                            ? "text-white"
+                            : percentageChange === null
+                            ? "text-white"
+                            : percentageChange >= 0
+                            ? "text-white"
+                            : "text-white"
+                        }`}
+                      >
+                        {changeLoading ? (
+                          "Memuat perubahan..."
+                        ) : percentageChange === null ? (
+                          "Belum ada data bulan lalu"
+                        ) : (
+                          <>
+                            {percentageChange !== null && (
+                              <div className="w-6 h-6 flex items-center justify-center rounded-md border border-white">
+                                {percentageChange >= 0 ? (
+                                  <IoIosTrendingUp className="text-white w-4 h-4" />
+                                ) : (
+                                  <IoIosTrendingDown className="text-white w-4 h-4" />
+                                )}
+                              </div>
+                            )}
+                            {percentageChange >= 0 ? "+" : ""}
+                            {percentageChange.toFixed(2)}% dibanding bulan lalu
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <p className="font-extrabold text-4xl">
-                  IDR {formatNumber(totalAmount)}
-                </p>
-                <p className="text-xl font-medium">Total saldo</p>
+
+                <div className="flex flex-col mt-10 gap-5">
+                  <h2 className="text-lg font-semibold">
+                    Filter Data Berdasarkan Tanggal
+                  </h2>
+                  <div className="flex gap-5 items-center">
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={["DatePicker"]}>
+                        <DatePicker
+                          label="Start Date"
+                          value={startDate}
+                          onChange={(newDate) => setStartDate(newDate)}
+                        />
+                      </DemoContainer>
+                    </LocalizationProvider>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DemoContainer components={["DatePicker"]}>
+                        <DatePicker
+                          label="End Date"
+                          value={endDate}
+                          onChange={(newDate) => setEndDate(newDate)}
+                        />
+                      </DemoContainer>
+                    </LocalizationProvider>
+                  </div>
+                </div>
               </div>
               <div className="border border-gray-300 w-full rounded-xl  p-4">
                 <h1 className="text-sm font-bold mb-3">Data Status Pesanan</h1>

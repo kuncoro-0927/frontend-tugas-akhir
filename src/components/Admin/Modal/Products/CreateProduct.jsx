@@ -8,6 +8,8 @@ import { Modal, Box, Button } from "@mui/material";
 
 const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
   const [categories, setCategories] = useState([]);
+  const [errors, setErrors] = useState({});
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -34,13 +36,20 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      setImageInfo({
-        name: file.name,
-        size: file.size,
-      });
+    if (!file) return;
+
+    const maxSize = 4 * 1024 * 1024; // 2MB
+
+    if (file.size > maxSize) {
+      showSnackbar("Ukuran gambar maksimal 4MB.", "error");
+      return;
     }
+
+    setImage(file);
+    setImageInfo({
+      name: file.name,
+      size: file.size,
+    });
   };
 
   const handleRemoveImage = () => {
@@ -54,6 +63,26 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const newErrors = {};
+
+    if (!formData.name) newErrors.name = "Nama produk wajib diisi";
+    if (!formData.description)
+      newErrors.description = "Deskripsi produk wajib diisi";
+    if (!formData.price) newErrors.price = "Harga produk wajib diisi";
+    if (!formData.category)
+      newErrors.category = "Kategori produk wajib dipilih";
+    if (!formData.width) newErrors.width = "Lebar bingkai wajib diisi";
+    if (!formData.height) newErrors.height = "Tinggi bingkai wajib diisi";
+    if (!formData.weight) newErrors.weight = "Berat produk wajib diisi";
+    if (!formData.stock) newErrors.stock = "Stok produk wajib diisi";
+    if (!image) newErrors.image = "Gambar produk wajib diunggah.";
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      showSnackbar("Periksa kembali form Anda", "warning");
+      return;
+    }
 
     try {
       const data = new FormData();
@@ -109,6 +138,7 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
         name: "",
         size: 0,
       });
+      setErrors({});
 
       // Kosongkan input file jika masih ada
       const input = document.getElementById("imageUpload");
@@ -176,6 +206,8 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                   type="text"
                   label="Nama Produk"
                   onChange={handleChange}
+                  error={!!errors.name}
+                  helperText={errors.name}
                 />{" "}
                 <FormInput
                   label="Stok"
@@ -183,6 +215,8 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                   type="number"
                   value={formData.stock}
                   onChange={handleChange}
+                  error={!!errors.stock}
+                  helperText={errors.stock}
                 />
               </div>
               <div className="flex gap-5">
@@ -195,13 +229,16 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                     value: cat.id,
                     label: cat.name,
                   }))}
+                  error={!!errors.category}
+                  helperText={errors.category}
                 />
                 <FormInput
                   name="price"
                   type="text"
-                  helperText="Contoh: 100000 untuk Rp100.000"
                   label="Harga"
                   onChange={handleChange}
+                  error={!!errors.price}
+                  helperText={errors.price || "Contoh: 100000 untuk Rp100.000"}
                 />
               </div>
               <FormInput
@@ -209,33 +246,40 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                 type="text"
                 label="Deskripsi"
                 onChange={handleChange}
+                error={!!errors.description}
+                helperText={errors.description}
               />
               <div className="flex gap-5">
                 <FormInput
                   name="width"
                   type="text"
-                  helperText="Lebar dalam cm, contoh: 40"
                   label="Lebar"
                   onChange={handleChange}
+                  error={!!errors.width}
+                  helperText={errors.width || "Lebar dalam cm, contoh: 40"}
                 />
                 <FormInput
                   name="height"
                   type="text"
-                  helperText="Tinggi dalam cm, contoh: 50"
                   label="Tinggi"
                   onChange={handleChange}
+                  error={!!errors.height}
+                  helperText={errors.height || "Tinggi dalam cm, contoh: 50"}
                 />
               </div>
               <div className="flex gap-5">
                 <FormInput
                   name="weight"
                   type="text"
-                  helperText="Berat (gram), contoh: 1000 untuk 1kg"
                   label="Berat / gram"
                   onChange={handleChange}
+                  error={!!errors.weight}
+                  helperText={
+                    errors.weight || "Berat (gram), contoh: 1000 untuk 1kg"
+                  }
                 />
               </div>
-              <div className="">
+              {/* <div className="">
                 <h1 className="font-bold text-lg">
                   Apakah produk ini terbatas?
                 </h1>
@@ -244,8 +288,8 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                   akan diisi ulang. Jika produk tidak terbatas, maka stok
                   tersedia dalam jumlah banyak.
                 </p>
-              </div>
-              <label className="inline-flex w-fit items-center space-x-2 cursor-pointer select-none">
+              </div> */}
+              {/* <label className="inline-flex w-fit items-center space-x-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   className="w-4 h-4 accent-blue-600 rounded focus:ring-0"
@@ -260,7 +304,7 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                 <span className="text-graytext text-sm">
                   Produk terbatas (Limited Edition)
                 </span>
-              </label>
+              </label> */}
 
               <label
                 htmlFor="imageUpload"
@@ -274,7 +318,8 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                   untuk diunggah
                 </p>
                 <span className="text-gray-500 text-xs">
-                  Gambar harus 100 x 100 px - Max 2MB
+                  {" "}
+                  Maksimal ukuran file: 4MB
                 </span>
 
                 {/* Menampilkan nama dan ukuran gambar yang dipilih */}
@@ -300,6 +345,11 @@ const ModalCreateProduct = ({ open, handleClose, onUpdate }) => {
                   )}
                 </div>
               </label>
+
+              {errors.image && (
+                <p className="text-red-500 text-xs mt-1">{errors.image}</p>
+              )}
+
               <input
                 id="imageUpload"
                 type="file"

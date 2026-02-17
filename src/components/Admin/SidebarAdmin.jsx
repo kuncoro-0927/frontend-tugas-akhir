@@ -9,7 +9,7 @@ import {
   BsPerson,
 } from "react-icons/bs";
 import { IoCartOutline, IoWalletOutline } from "react-icons/io5";
-
+import { GoComment } from "react-icons/go";
 import { useEffect, useState } from "react";
 
 const SidebarAdmin = ({ onSidebarHover, isSidebarCollapsed }) => {
@@ -284,6 +284,36 @@ const SidebarAdmin = ({ onSidebarHover, isSidebarCollapsed }) => {
               <BsPercent className="text-xl" />
               {isHovered || !isSidebarCollapsed ? (
                 <span className="flex-1">Kode Promo</span>
+              ) : (
+                <></>
+              )}
+            </NavLink>
+          </li>
+        </ul>
+
+        <ul className="space-y-4">
+          {/* Data Ulasan */}
+          <li className="mt-5">
+            <NavLink
+              to="/admin/data/reviews"
+              className={
+                ({ isActive }) =>
+                  isSidebarCollapsed
+                    ? isHovered
+                      ? isActive
+                        ? "text-blue-500 bg-blue-100/70 px-4 py-2.5 space-x-2 rounded-md font-semibold text-sm w-full flex items-center" // Sidebar collapsed, hover, dan aktif
+                        : "text-hitam hover:bg-gray-200 px-4 py-2.5  text-graytext hover:bg-opacity-40 w-full space-x-2 font-semibold text-sm flex items-center" // Sidebar collapsed, hover, dan tidak aktif
+                      : isActive
+                      ? "text-blue-500 px-4 py-2.5 rounded-md bg-blue-100/70 w-fit font-semibold text-sm flex items-center" // Sidebar collapsed, tidak hover, dan aktif
+                      : "text-hitam px-4 py-2.5 hover:bg-gray-200 text-graytext hover:bg-opacity-40 w-fit font-semibold text-sm flex items-center" // Sidebar collapsed, tidak hover, dan tidak aktif
+                    : isActive
+                    ? "text-blue-500 bg-blue-100/70 space-x-2  px-4 py-2.5 rounded-md font-semibold text-sm flex items-center" // Sidebar normal dan aktif
+                    : "text-hitam hover:bg-gray-200 space-x-2 text-graytext hover:bg-opacity-40 px-4 py-2.5 font-semibold text-sm flex items-center" // Sidebar normal dan tidak aktif
+              }
+            >
+              <GoComment className="text-xl" />
+              {isHovered || !isSidebarCollapsed ? (
+                <span className="flex-1">Ulasan</span>
               ) : (
                 <></>
               )}

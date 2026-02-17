@@ -6,7 +6,7 @@ const OngkirChecker = () => {
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [weight, setWeight] = useState("");
-  const [courier, setCourier] = useState("jne");
+  const [courier, setCourier] = useState("anteraja");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [originCityResults, setOriginCityResults] = useState([]);

@@ -237,7 +237,7 @@ const DataOrders = () => {
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-600/80 duration-200 rounded-md text-white px-4 py-2 font-normal text-base"
               >
                 <BsCartPlus className="text-lg" />
-                Tambah Pesanan Offline
+                Pesanan Offline
               </button>
 
               <button

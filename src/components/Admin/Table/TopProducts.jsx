@@ -57,7 +57,7 @@ const TopProduct = () => {
                         </p>
 
                         <p className="text-xs">
-                          <span className="text-blue-500">Transaksi</span>
+                          <span className="text-blue-500">Terjual</span>
                           <span className=" ml-3 font-medium">
                             #{product.total_transactions}
                           </span>
@@ -69,7 +69,7 @@ const TopProduct = () => {
 
                 <td className="p-4 border-t border-blue-gray-50">
                   <p className="block antialiased text-sm leading-normal text-blue-gray-900 font-extrabold">
-                    IDR: {formatNumber(product.product_price)}
+                    IDR {formatNumber(product.product_price)}
                   </p>
                 </td>
               </tr>

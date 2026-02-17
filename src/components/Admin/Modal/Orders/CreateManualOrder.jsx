@@ -10,6 +10,9 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
+  const [promo, setPromo] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
+  const [promoError, setPromoError] = useState("");
   const [showCustomForm, setShowCustomForm] = useState(false);
   const [customFile, setCustomFile] = useState(null);
   const [customWidth, setCustomWidth] = useState("");
@@ -17,15 +20,116 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
   const [customNotes, setCustomNotes] = useState("");
   const [customPrice, setCustomPrice] = useState(0);
   const [currentCustomProduct, setCurrentCustomProduct] = useState(null);
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const [formData, setFormData] = useState({
     customer_name: "",
     customer_email: "",
     customer_phone: "",
-    promo_code: "",
+    promoCode: "",
     discount_amount: 0,
     subtotal: 0,
   });
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.customer_name.trim()) {
+      newErrors.customer_name = "Nama pelanggan wajib diisi.";
+    }
+
+    if (!formData.customer_email.trim()) {
+      newErrors.customer_email = "Email pelanggan wajib diisi.";
+    } else if (!/\S+@\S+\.\S+/.test(formData.customer_email)) {
+      newErrors.customer_email = "Format email tidak valid.";
+    }
+
+    if (!formData.customer_phone.trim()) {
+      newErrors.customer_phone = "Nomor telepon wajib diisi.";
+    }
+
+    if (formData.subtotal <= 0) {
+      newErrors.subtotal = "Subtotal tidak boleh nol.";
+    }
+
+    // promoCode dan discount_amount boleh kosong, tidak wajib divalidasi
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0; // true jika tidak ada error
+  };
+
+  const handleRemovePromo = () => {
+    setPromo(null);
+    setPromoError("");
+
+    // Hitung ulang subtotal asli (tanpa diskon)
+    const newSubtotal = selectedItems.reduce((acc, item) => {
+      let price = item.product.price;
+
+      if (item.product.is_custom && item.custom?.price) {
+        price = item.custom.price;
+      }
+
+      return acc + price * item.quantity;
+    }, 0);
+
+    setFormData((prev) => ({
+      ...prev,
+      promoCode: "", // ganti promoCode → promo
+      discount_amount: 0,
+      subtotal: newSubtotal, // reset ke subtotal normal
+    }));
+  };
+
+  const handleApplyPromo = async () => {
+    const promoCode = formData.promoCode?.trim();
+
+    if (!promoCode) {
+      setFormErrors((prev) => ({
+        ...prev,
+        promoCode: "Silakan masukkan kode promo",
+      }));
+      setPromoError("");
+      return;
+    }
+
+    // Hitung subtotal dari selectedItems
+    const subtotal = selectedItems.reduce((acc, item) => {
+      let price = item.product.price;
+
+      if (item.product.is_custom && item.custom?.price) {
+        price = item.custom.price;
+      }
+
+      return acc + price * item.quantity;
+    }, 0);
+
+    try {
+      const response = await instanceAdmin.post("/promo/check", {
+        code: promoCode,
+        total: subtotal,
+      });
+
+      const promoData = response.data; // { valid, code, discount, total_after_discount }
+
+      setPromo(promoData);
+      setPromoError("");
+      setFormErrors((prev) => ({ ...prev, promoCode: "" }));
+
+      // Update subtotal dan diskon ke formData
+      setFormData((prev) => ({
+        ...prev,
+        discount_amount: promoData.discount,
+        subtotal,
+      }));
+    } catch (error) {
+      setPromo(null);
+      setPromoError(error.response?.data?.error || "Kode promo tidak valid");
+      setFormErrors((prev) => ({ ...prev, promoCode: "" }));
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -99,6 +203,18 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const isValid = validateForm();
+
+      if (!isValid) {
+        showSnackbar("Periksa kembali form Anda.", "warning");
+        return;
+      }
+      const newErrors = {};
+      if (selectedItems.length === 0) {
+        newErrors.selectedItems = "Pilih minimal satu produk terlebih dahulu.";
+      }
+
+      setErrors(newErrors);
       const formDataToSend = new FormData();
 
       // Bangun objek payload yang akan dikirim sebagai JSON
@@ -106,14 +222,14 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
         customer_name: formData.customer_name,
         customer_email: formData.customer_email,
         customer_phone: formData.customer_phone,
-        promo_code: formData.promo_code,
+        promo_code: formData.promoCode,
         discount_amount: formData.discount_amount,
         shipping_fee: 0, // default jika manual
         subtotal: 0, // kita akan hitung total harga produk
         products: [],
       };
 
-      let subtotal = 0;
+      let subtotal = 0; // deklarasikan ulang subtotal
 
       selectedItems.forEach((item, index) => {
         const product = item.product;
@@ -136,16 +252,14 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
           total,
         };
 
-        // Jika ada custom
         if (product.is_custom) {
           const fileKey = `customFile_${index}`;
-
           productData.custom = {
             price: custom.price,
             width: custom.width,
             height: custom.height,
             notes: custom.notes,
-            fileKey, // untuk dicocokkan di backend
+            fileKey,
           };
 
           if (custom.file) {
@@ -156,7 +270,7 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
         payload.products.push(productData);
       });
 
-      payload.subtotal = subtotal;
+      payload.subtotal = subtotal; // gunakan nilai asli
 
       // Kirim semua data (kecuali file) sebagai JSON di field "data"
       formDataToSend.append("data", JSON.stringify(payload));
@@ -181,6 +295,33 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
     console.log("Selected Items", selectedItems);
   }, [selectedItems]);
 
+  useEffect(() => {
+    if (!open) {
+      // Reset form dan state lainnya saat modal ditutup
+      setFormData({
+        customer_name: "",
+        customer_email: "",
+        customer_phone: "",
+        promoCode: "",
+        discount_amount: 0,
+        subtotal: 0,
+      });
+      setSelectedItems([]);
+      setPromo(null);
+      setPromoError("");
+      setFormErrors({});
+      setCustomFile(null);
+      setCustomWidth("");
+      setCustomHeight("");
+      setCustomNotes("");
+      setCustomPrice(0);
+      setCurrentCustomProduct(null);
+      setShowCustomForm(false);
+      setSearchQuery("");
+      setErrors({});
+    }
+  }, [open]);
+
   return (
     <Modal
       open={open}
@@ -199,7 +340,7 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
           bgcolor: "background.paper",
           boxShadow: 24,
           borderRadius: 5,
-          width: { xs: "360px", sm: "650px" },
+          width: { xs: "350px", sm: "550px" },
           maxHeight: "90vh",
           overflowY: "auto",
           "&::-webkit-scrollbar": {
@@ -230,6 +371,8 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
                 label="Nama"
                 value={formData.customer_name}
                 onChange={handleChange}
+                error={!!errors.customer_name}
+                helperText={errors.customer_name}
               />
               <FormInput
                 name="customer_email"
@@ -237,20 +380,23 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
                 type="email"
                 value={formData.customer_email}
                 onChange={handleChange}
+                error={!!errors.customer_email}
+                helperText={errors.customer_email}
               />
               <FormInput
                 name="customer_phone"
                 label="No. HP"
                 value={formData.customer_phone}
                 onChange={handleChange}
+                error={!!errors.customer_phone}
+                helperText={errors.customer_phone}
               />
             </div>
 
             <h1 className="font-bold text-lg mt-6 mb-3">Produk Dipesan</h1>
-            <div className="grid gap-4">
-              <div className="mb-4">
+            <div className="grid gap-4 ">
+              <div className="mb-4 pr-3">
                 <div className="mb-5">
-                  <h1 className="text-lg font-semibold ">Pilih Produk</h1>
                   <p className="text-sm">
                     Silakan pilih produk yang ingin Anda beli dari daftar
                     berikut.
@@ -287,11 +433,18 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
                             }`}
                             onClick={() => {
                               if (!isDisabled) {
+                                if (errors.selectedItems) {
+                                  setErrors((prev) => ({
+                                    ...prev,
+                                    selectedItems: null,
+                                  }));
+                                }
+
                                 if (product.category_id === 5) {
                                   // Produk custom: langsung masuk ke selectedItems dan buka form
                                   const customProduct = {
                                     ...product,
-                                    name: `${product.name} (Custom)`,
+                                    name: `${product.name}`,
                                     is_custom: true,
                                   };
 
@@ -376,14 +529,18 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
                   </div>
                 )}
               </div>
-
+              {errors.selectedItems && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.selectedItems}
+                </p>
+              )}
               {selectedItems.length > 0 && (
                 <div className="space-y-4 mt-4">
                   <h1 className="text-lg font-semibold">Produk yang dipilih</h1>
                   {selectedItems.map((item, index) => (
                     <div
                       key={item.product.id}
-                      className="flex mx-4 items-center justify-between border-b pb-4 "
+                      className=" mx-4 items-center justify-between border-b pb-4 "
                     >
                       <div className="flex gap-5">
                         <div className="h-[60px] w-[60px]">
@@ -396,7 +553,7 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
                         </div>
 
                         <div className="flex-col flex">
-                          {item.custom && (
+                          {/* {item.custom && (
                             <div className="mt-2 space-y-1 text-xs text-gray-700">
                               <p>
                                 <span className="font-semibold">Ukuran:</span>{" "}
@@ -424,9 +581,9 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
                                 </p>
                               )}
                             </div>
-                          )}
+                          )} */}
                           <div className="flex w-[400px] items-center justify-between">
-                            <div className="flex gap-2 items-center font-semibold">
+                            <div className="flex gap-2 text-sm items-center font-semibold">
                               <p>{item.product.name}</p>
                               <span className="flex items-center justify-between">
                                 <span className="text-xs w-fit">
@@ -444,16 +601,33 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
                             </div>
                             <p className="text-sm font-semibold ml-auto">
                               IDR{" "}
-                              {Number(item.product.price).toLocaleString(
-                                "id-ID"
-                              )}
+                              {(item.product.is_custom && item.custom?.price
+                                ? Number(item.custom.price)
+                                : Number(item.product.price)
+                              ).toLocaleString("id-ID")}
                             </p>
                           </div>
                           <span className="text-xs">
                             <span className="font-bold">Stok barang:</span>{" "}
                             {item.product.stock}
                           </span>
-                          <div className="flex items-center justify-between">
+
+                          {item.custom && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setOpenDropdownIndex(
+                                  openDropdownIndex === index ? null : index
+                                )
+                              }
+                              className="text-xs mt-2 text-blue-600 hover:underline w-fit"
+                            >
+                              {openDropdownIndex === index
+                                ? "Sembunyikan detail custom"
+                                : "Lihat detail custom"}
+                            </button>
+                          )}
+                          <div className="flex  items-center justify-between">
                             <span className="text-xs">{item.product.size}</span>
                             <div className="flex items-center gap-10">
                               <div className="flex items-center gap-2">
@@ -506,13 +680,35 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
                           </div>
                         </div>
                       </div>
+                      {item.custom && openDropdownIndex === index && (
+                        <div className="text-xs text-gray-600 mt-2 space-y-1 border border-gray-200 bg-gray-50 p-2 rounded-md">
+                          <p>
+                            <span className="font-semibold">Lebar:</span>{" "}
+                            {item.custom.width} cm
+                          </p>
+                          <p>
+                            <span className="font-semibold">Tinggi:</span>{" "}
+                            {item.custom.height} cm
+                          </p>
+                          <p>
+                            <span className="font-semibold">Catatan:</span>{" "}
+                            {item.custom.notes}
+                          </p>
+                          {item.custom.file && (
+                            <p>
+                              <span className="font-semibold">File:</span>{" "}
+                              {item.custom.file.name}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               )}
 
               {showCustomForm && (
-                <div className="mt-4 max-w-md space-y-4 border p-4 rounded-lg bg-gray-50">
+                <div className="mt-4  mr-3 space-y-4 border p-4 rounded-lg bg-gray-50">
                   <h1 className="font-bold text-base">Form Custom</h1>
                   <span className="text-sm font-medium text-black/60">
                     Sesuaikan desain bingkai sesuai keinginanmu.
@@ -620,7 +816,7 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
                       setCurrentCustomProduct(null);
                       setShowCustomForm(false);
                     }}
-                    className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                   >
                     Simpan Custom
                   </button>
@@ -628,29 +824,70 @@ const ModalCreateOrderByAdmin = ({ open, handleClose, onUpdate }) => {
               )}
             </div>
 
-            <h1 className="font-bold text-lg mt-6 mb-3">Diskon & Total</h1>
-            <div className="grid gap-4 mb-6">
-              <FormInput
-                name="subtotal"
-                label="Subtotal"
-                value={formData.subtotal}
-                onChange={handleChange}
-                disabled
-              />
-              <FormInput
-                name="promo_code"
-                label="Kode Promo"
-                value={formData.promo_code}
-                onChange={handleChange}
-              />
-              <FormInput
-                name="discount_amount"
-                label="Diskon (angka)"
-                value={formData.discount_amount}
-                onChange={handleChange}
-              />
+            <h1 className="font-bold text-lg mt-6 mb-3">Subtotal & Diskon</h1>
+
+            <div className="flex gap-6">
+              <div className="flex-1">
+                <FormInput
+                  type="text"
+                  label="Kode Promo"
+                  name="promoCode"
+                  value={formData.promoCode || ""}
+                  onChange={handleChange}
+                  error={!!formErrors.promoCode || !!promoError}
+                  helperText={formErrors.promoCode || promoError}
+                />
+              </div>
+              {promo ? (
+                <button
+                  type="button"
+                  onClick={handleRemovePromo}
+                  className="bg-black text-white py-3 px-4 rounded-md hover:bg-black/80 transition"
+                >
+                  Batalkan
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleApplyPromo}
+                  className="bg-black text-white py-3 px-4 rounded-md hover:bg-black/80 transition"
+                >
+                  Klaim
+                </button>
+              )}
             </div>
 
+            {promo && (
+              <p className="text-green-600 text-sm mt-2">
+                Promo <strong>{promo.code}</strong> berhasil! Diskon Rp{" "}
+                {promo.discount.toLocaleString()}
+              </p>
+            )}
+
+            <p className="flex font-semibold text-sm mt-5 justify-between items-center">
+              Subtotal{" "}
+              <span className="font-bold">
+                IDR {(formData.subtotal ?? 0).toLocaleString()}
+              </span>
+            </p>
+            {formData?.discount_amount > 0 && (
+              <p className="flex text-sm font-semibold text-green-600 justify-between items-center">
+                <span className="text-black">Diskon</span>
+                <span className="font-bold">
+                  - Rp {formData.discount_amount.toLocaleString()}
+                </span>
+              </p>
+            )}
+
+            <p className="flex font-semibold text-sm  justify-between items-center">
+              Total Bayar{" "}
+              <span className="font-bold">
+                IDR{" "}
+                {(
+                  (formData.subtotal ?? 0) - (formData.discount_amount ?? 0)
+                ).toLocaleString()}
+              </span>
+            </p>
             <div className="text-right mt-4">
               <button
                 type="submit"

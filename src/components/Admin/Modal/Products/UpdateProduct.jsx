@@ -276,7 +276,7 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
                   ]}
                 />
               </div>
-              <div className="mt-5">
+              {/* <div className="mt-5">
                 <h1 className="font-bold text-lg">
                   Apakah produk ini terbatas?
                 </h1>
@@ -301,7 +301,7 @@ const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
                 <span className="text-graytext">
                   Produk terbatas (Limited Edition)
                 </span>
-              </label>
+              </label> */}
 
               <label
                 htmlFor="imageUpload"

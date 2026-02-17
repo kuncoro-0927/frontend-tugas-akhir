@@ -25,6 +25,8 @@ const steps = [
 const ModalCreateOrder = ({ open, handleClose }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({});
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+
   const originCityId = 40561; // Pacitan
   const courier = "jne";
   const [currentCustomProduct, setCurrentCustomProduct] = useState(null);
@@ -88,24 +90,23 @@ const ModalCreateOrder = ({ open, handleClose }) => {
         ...prev,
         promoCode: "Silakan masukkan kode promo",
       }));
-      setPromoError(""); // clear promoError
+      setPromoError("");
       return;
     }
 
-    // Menghitung subtotal, admin_fee, dan shippingCost
-    const subtotal = calculateSubtotal(); // Menghitung subtotal dari item yang dipilih
-    const shippingCost = parseInt(selectedShippingOption?.cost || 0); // Biaya pengiriman
-    const admin_fee = orderResponse?.data?.admin_fee || 0; // Admin fee yang diambil dari respons order
+    const subtotal = calculateSubtotal();
+    const shippingCost = parseInt(selectedShippingOption?.cost || 0);
+    const admin_fee = orderResponse?.data?.admin_fee || 0;
 
-    const total_amount = subtotal + admin_fee + shippingCost; // Total biaya sebelum diskon
+    const total_amount = subtotal + admin_fee + shippingCost;
 
     try {
       const response = await instanceAdmin.post("/promo/check", {
         code: promoCode,
-        total: total_amount, // Kirim total_amount yang sudah dihitung
+        total: total_amount,
       });
 
-      setPromo(response.data); // { valid, code, discount, total_after_discount }
+      setPromo(response.data);
       setPromoError("");
       setFormErrors((prev) => ({ ...prev, promoCode: "" }));
     } catch (error) {
@@ -149,113 +150,6 @@ const ModalCreateOrder = ({ open, handleClose }) => {
       setCustomPrice(Number(currentCustomProduct.price));
     }
   }, [customWidth, customHeight, currentCustomProduct]);
-
-  // const handleSubmit = async () => {
-  //   const subtotal = calculateSubtotal();
-  //   const shippingCost = parseInt(selectedShippingOption?.cost || 0);
-  //   const orderData = {
-  //     user_id: selectedUserId,
-  //     products: selectedItems.map((item) => ({
-  //       product_id: item.product.id,
-  //       product_name: item.product.name,
-  //       quantity: item.quantity,
-  //       price: item.product.price,
-  //       total: item.quantity * item.product.price,
-  //       custom: item.custom || null, // ← ini
-  //     })),
-  //     address: formData.address,
-  //     city: formData.city,
-  //     postal: formData.postal,
-  //     paymentMethod: formData.paymentMethod,
-  //     paymentStatus: formData.paymentStatus,
-  //     subtotal: subtotal,
-  //     promo_code: promo?.code || null,
-  //     discount_amount: promo?.discount || 0,
-  //     shipping_fee: shippingCost,
-  //     shipping_service: selectedShippingOption?.service,
-  //     shipping_details: {
-  //       shipping_firstname: formData.firstname,
-  //       shipping_lastname: formData.lastname,
-  //       shipping_phone: formData.phone,
-  //       shipping_address: formData.address,
-  //       province: formData.province,
-  //       city: formData.city,
-  //       postal_code: formData.postal,
-  //       courier: selectedShippingOption?.name || "JNE",
-  //       etd: selectedShippingOption?.etd,
-  //       shipping_cost: shippingCost,
-  //     },
-  //   };
-
-  //   try {
-  //     // 1. Buat pesanan dulu
-  //     const orderResponse = await instanceAdmin.post(
-  //       "/create/admin/orders",
-  //       orderData
-  //     );
-
-  //     if (orderResponse.data && orderResponse.data.order_id) {
-  //       // Menyimpan orderResponse ke dalam state
-  //       setOrderResponse(orderResponse.data);
-
-  //       const { order_id, admin_fee } = orderResponse.data;
-  //       // 2. Kirim request ke backend untuk buat transaksi Midtrans
-  //       const paymentPayload = {
-  //         order_id, // Pastikan order_id ada
-  //         formData,
-  //         selectedService: selectedShippingOption,
-  //         admin_fee,
-  //         promoCode: promo?.valid ? promo : null, // hanya jika promo valid
-  //         total_amount:
-  //           subtotal + admin_fee + shippingCost - (promo?.discount || 0),
-  //         shipping_cost: shippingCost,
-  //         customer: {
-  //           firstName: formData.firstname,
-  //           email: formData.email,
-  //           phone: formData.phone,
-  //           cartItems: selectedItems.map((item) => ({
-  //             productId: item.product.id,
-  //             productName: item.product.name,
-  //             price: item.product.price,
-  //             quantity: item.quantity,
-  //           })),
-  //         },
-  //       };
-
-  //       // 2. Kirim request ke backend untuk buat transaksi Midtrans
-  //       const paymentResponse = await instanceAdmin.post(
-  //         "/create/admin/payment",
-  //         paymentPayload
-  //       );
-  //       console.group("📦 Order Payload");
-  //       console.log("Order:", orderData);
-  //       console.groupEnd();
-
-  //       console.group("💳 Payment Payload");
-  //       console.log("Payment:", paymentPayload);
-  //       console.groupEnd();
-
-  //       console.log("✅ Payment response:", paymentResponse.data);
-
-  //       const { redirectUrl } = paymentResponse.data;
-  //       if (!redirectUrl) throw new Error("Redirect URL tidak tersedia");
-
-  //       // 3. Redirect ke Midtrans
-  //       // window.location.href = redirectUrl;
-  //     } else {
-  //       throw new Error("order_id tidak tersedia");
-  //     }
-  //   } catch (error) {
-  //     console.error("❌ Gagal submit dan bayar via Midtrans:", error);
-  //     if (error.response) {
-  //       console.error("🧾 Server response error:", error.response.data);
-  //     }
-  //     showSnackbar(
-  //       "Terjadi kesalahan saat membuat pesanan atau pembayaran",
-  //       "error"
-  //     );
-  //   }
-  // };
 
   const handleSubmit = async () => {
     const subtotal = calculateSubtotal();
@@ -671,7 +565,7 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                                   if (product.category_id === 5) {
                                     const customProduct = {
                                       ...product,
-                                      name: `${product.name} (Custom)`,
+                                      name: `${product.name}`,
                                       is_custom: true,
                                     };
 
@@ -776,9 +670,9 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                     {selectedItems.map((item, index) => (
                       <div
                         key={item.product.id}
-                        className="flex mx-4 items-center justify-between border-b pb-4"
+                        className=" mx-4 items-center justify-between border-b pb-4"
                       >
-                        <div className="flex gap-5">
+                        <div className="flex  gap-5">
                           <div className="h-[60px] w-[60px]">
                             <CardImage
                               image={`${import.meta.env.VITE_BACKEND_URL}${
@@ -789,7 +683,7 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                           </div>
                           <div className="flex-col flex">
                             <div className="flex w-[400px] items-center justify-between">
-                              <div className="flex gap-2 items-center font-semibold">
+                              <div className="flex gap-2 items-center text-sm font-semibold">
                                 <p>{item.product.name}</p>
                                 <span className="flex items-center justify-between">
                                   <span className="text-xs w-fit">
@@ -812,14 +706,33 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                                 )}
                               </p>
                             </div>
+
                             <span className="text-xs">
                               <span className="font-bold">Stok barang:</span>{" "}
                               {item.product.stock}
                             </span>
+
+                            {item.custom && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setOpenDropdownIndex(
+                                    openDropdownIndex === index ? null : index
+                                  )
+                                }
+                                className="text-xs mt-2 text-blue-600 hover:underline w-fit"
+                              >
+                                {openDropdownIndex === index
+                                  ? "Sembunyikan detail custom"
+                                  : "Lihat detail custom"}
+                              </button>
+                            )}
+
                             <div className="flex items-center justify-between">
                               <span className="text-xs">
                                 {item.product.size}
                               </span>
+
                               <div className="flex items-center gap-10">
                                 <div className="flex items-center gap-2">
                                   <button
@@ -869,20 +782,33 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                                     +
                                   </button>
                                 </div>
-                                {item.custom && (
-                                  <div className="text-xs text-gray-600 mt-1">
-                                    <p>Lebar: {item.custom.width} cm</p>
-                                    <p>Tinggi: {item.custom.height} cm</p>
-                                    <p>Catatan: {item.custom.notes}</p>
-                                    {item.custom.file && (
-                                      <p>File: {item.custom.file.name}</p>
-                                    )}
-                                  </div>
-                                )}
                               </div>
                             </div>
                           </div>
                         </div>
+
+                        {item.custom && openDropdownIndex === index && (
+                          <div className="text-xs text-gray-600 mt-2 space-y-1 border border-gray-200 bg-gray-50 p-2 rounded-md">
+                            <p>
+                              <span className="font-semibold">Lebar:</span>{" "}
+                              {item.custom.width} cm
+                            </p>
+                            <p>
+                              <span className="font-semibold">Tinggi:</span>{" "}
+                              {item.custom.height} cm
+                            </p>
+                            <p>
+                              <span className="font-semibold">Catatan:</span>{" "}
+                              {item.custom.notes}
+                            </p>
+                            {item.custom.file && (
+                              <p>
+                                <span className="font-semibold">File:</span>{" "}
+                                {item.custom.file.name}
+                              </p>
+                            )}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -972,7 +898,7 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                               ...updatedItems[actualIndex],
                               product: {
                                 ...currentCustomProduct,
-                                name: `${currentCustomProduct.name} (Custom)`,
+                                name: `${currentCustomProduct.name}`,
                                 price: customPrice,
                                 original_price: currentCustomProduct.price,
                               },
@@ -998,7 +924,7 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                         setCurrentCustomProduct(null);
                         setShowCustomForm(false);
                       }}
-                      className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                     >
                       Simpan Custom
                     </button>
@@ -1277,14 +1203,20 @@ const ModalCreateOrder = ({ open, handleClose }) => {
                   // Step 0: Validasi user dan metode pengiriman
                   if (activeStep === 0) {
                     if (!formData.selectedUserId) {
-                      alert("Silakan pilih penerima terlebih dahulu");
+                      showSnackbar(
+                        "Silakan pilih penerima terlebih dahulu",
+                        "error"
+                      );
                       return;
                     }
                   }
 
                   // Step 1: Validasi produk
                   if (activeStep === 1 && selectedItems.length === 0) {
-                    alert("Silakan pilih produk terlebih dahulu");
+                    showSnackbar(
+                      "Silakan pilih produk terlebih dahulu",
+                      "error"
+                    );
                     return;
                   }
 
@@ -1304,8 +1236,9 @@ const ModalCreateOrder = ({ open, handleClose }) => {
 
                     for (const field of requiredFields) {
                       if (!formData[field]) {
-                        alert(
-                          `Silakan lengkapi field ${field} terlebih dahulu`
+                        showSnackbar(
+                          `Silakan lengkapi field ${field} terlebih dahulu`,
+                          `error`
                         );
                         return;
                       }

@@ -252,7 +252,7 @@ const ModalLogin = ({ handleSwitch, handleClose }) => {
                 )}
                 <div className="flex items-center justify-between">
                   <button
-                    onClick={() => handleSwitch("resetPassword")}
+                    onClick={() => handleSwitch("forgotpassword")}
                     className="text-blue-500 text-sm hover:underline duration-300"
                   >
                     Lupa kata sandi?

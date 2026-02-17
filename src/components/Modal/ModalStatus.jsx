@@ -5,8 +5,14 @@ import { IoClose } from "react-icons/io5";
 import { ImPriceTags } from "react-icons/im";
 import TimelinePengiriman from "../Timeline";
 const StatusModal = ({ open, onClose, data }) => {
-  const { status, totalAmount, orderDate, courierService, estimation } =
-    data || {};
+  const {
+    status,
+    totalAmount,
+    orderDate,
+    courierService,
+    trackingNumber,
+    estimation,
+  } = data || {};
 
   const statusColors = {
     paid: { text: "#16a34a", bg: "#dcfce7" }, // hijau
@@ -89,6 +95,13 @@ const StatusModal = ({ open, onClose, data }) => {
         <div className="px-5 mt-2 flex justify-between">
           <span className="text-gray-950/50 text-xs">Layanan Pengiriman</span>{" "}
           <span className="text-xs">{courierService}</span>
+        </div>
+
+        <div className="px-5 mt-2 flex justify-between">
+          <span className="text-gray-950/50 text-xs">Nomor Resi</span>
+          <span className="text-xs">
+            {trackingNumber ? trackingNumber : "Belum tersedia"}
+          </span>
         </div>
 
         <div className="px-5 mt-2 flex justify-between">

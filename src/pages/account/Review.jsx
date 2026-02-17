@@ -178,7 +178,14 @@ const Review = () => {
             </p>
           ) : (
             reviews.map((review) => (
-              <div key={`review-${review.id}`}>
+              <div
+                key={`review-${review.id}`}
+                className={`${
+                  review.is_deleted
+                    ? "opacity-70 grayscale pointer-events-none select-none"
+                    : ""
+                }`}
+              >
                 <div
                   key={`review-content-${review.id}`}
                   className=" md:h-[150px] lg:h-[200px] lg:max-w-[800px]  h-[120px] mt-10 border flex border-gray-200 w-full rounded-t-lg shadow-sm"
@@ -191,9 +198,16 @@ const Review = () => {
                     />
                   </div>
                   <div className="px-4 py-2 md:p-4 w-full flex flex-col justify-start">
-                    <h1 className="font-bold text-xs text-black/60 md:text-sm">
-                      {review.category_name}
-                    </h1>
+                    <div className="flex items-center justify-between">
+                      <h1 className="font-bold text-xs text-black/60 md:text-sm">
+                        {review.category_name}
+                      </h1>
+                      {review.is_deleted === 1 && (
+                        <h1 className="text-sm bg-red-100 px-3 py-2 text-red-500 rounded-md mb-2">
+                          Ulasan telah dihapus oleh admin
+                        </h1>
+                      )}
+                    </div>
                     <h1 className="font-bold text-sm md:text-xl">
                       {review.product_name}
                     </h1>

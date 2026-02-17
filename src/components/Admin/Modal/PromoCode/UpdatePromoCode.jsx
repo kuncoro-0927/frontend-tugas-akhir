@@ -69,19 +69,16 @@ const ModalUpdatePromo = ({ open, handleClose, onUpdate, promoId }) => {
     console.log("Form data sebelum submit:", formData);
 
     try {
-      const res = await instanceAdmin.post(
-        `/update/promo/${promoId}`,
-        formData
-      );
+      const res = await instanceAdmin.put(`/update/promo/${promoId}`, formData);
 
       console.log("Response sukses:", res.data);
 
-      showSnackbar("Promo berhasil ditambahkan", "success");
+      showSnackbar("Promo berhasil diperbarui", "success");
       handleClose();
       onUpdate();
     } catch (err) {
       console.error("Gagal:", err.response?.data || err.message);
-      showSnackbar("Gagal menambahkan promo", "error");
+      showSnackbar("Gagal memperbarui promo", "error");
     }
   };
 

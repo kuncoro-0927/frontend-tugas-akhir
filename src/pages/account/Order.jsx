@@ -27,6 +27,7 @@ const Order = () => {
     setModalData({
       totalAmount: order.total_amount,
       status: order.status,
+      trackingNumber: order.tracking_number,
       orderDate: formatDate(order.created_at),
       courierService: order.shipping.courier,
       estimation: order.shipping.etd || "Tidak tersedia",
