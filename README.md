@@ -1,12 +1,19 @@
-# React + Vite
+🎨 Faza Frame - Frontend (E-Commerce Figura)
+Sebuah aplikasi web penjualan figura berbasis React.js dengan pendekatan mobile-first dan integrasi sistem pembayaran modern.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🚀 Overview
+Faza Frame Frontend dibangun untuk memberikan pengalaman belanja yang cepat dan intuitif. Proyek ini menangani alur pengguna yang kompleks, mulai dari pemilihan produk, manajemen keranjang menggunakan Redux, hingga proses checkout yang terintegrasi dengan Midtrans.
 
-Currently, two official plugins are available:
+✨ Fitur Utama (Frontend)
+- Responsive UI/UX: Tampilan yang dioptimalkan untuk perangkat mobile dan desktop menggunakan Tailwind CSS.
+- State Management (Redux): Mengelola state global untuk keranjang belanja, sesi user, dan transaksi agar data tetap sinkron di seluruh halaman.
+- Automated Authentication: Menggunakan Axios Interceptors untuk menangani token JWT secara otomatis tanpa mengganggu pengalaman pengguna.
+- Integration with Midtrans: Interface pembayaran yang aman dan responsif.
+-RajaOngkir: Perhitungan biaya pengiriman secara akurat.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+🛠️ Tech Stack
+- Core: React.js
+- Styling: Tailwind CSS / Material UI
+- State Management: Redux (Toolkit/Thunk)
+- Data Fetching: Axios
+- Routing: React Router DOM v6
