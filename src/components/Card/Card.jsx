@@ -8,7 +8,7 @@ export default function Card({
   price,
   average_rating,
   isLoading,
-  status,
+ 
   stock,
 }) {
   return (
@@ -59,7 +59,7 @@ export default function Card({
           </span>
         </div>
         <div className="text-xs md:flex">
-          {status === "sold" ? (
+          {stock === (0) ? (
             <p className="bg-red-100 rounded-full px-3 py-1 text-red-600">
               <span className="">Stok</span> <span>({stock})</span>
             </p>
