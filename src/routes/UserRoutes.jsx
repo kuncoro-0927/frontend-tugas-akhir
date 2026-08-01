@@ -146,10 +146,10 @@ import ShippingForm from "../pages/user/ShippingForm";
 import Payment from "../pages/user/payment";
 import Order from "../pages/user/account/order";
 import Wishlist from "../pages/user/account/wishlist";
-import Review from "../pages/user/account/review"
-import Profile from "../pages/user/account/profile"
+import Review from "../pages/user/account/review";
+import Profile from "../pages/user/account/profile";
 import PaymentStatus from "../pages/user/PaymentStatus";
-import Cart from "../components/cart";
+import Cart from "../components/Cart";
 import Notfound from "../pages/user/404";
 import ResetPassword from "../pages/auth/ResetPassword";
 import AuthModal from "../pages/auth/AuthModal";

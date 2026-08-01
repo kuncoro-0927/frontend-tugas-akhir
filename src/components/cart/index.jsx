@@ -40,7 +40,10 @@ const Cart = () => {
           isOpen ? "translate-x-0" : "translate-x-full"
         } flex flex-col`}
       >
-        <button className="flex justify-end items-center px-6 py-7" onClick={handleCloseDrawer}>
+        <button
+          className="flex justify-end items-center px-6 py-7"
+          onClick={handleCloseDrawer}
+        >
           <TfiClose className="text-lg" />
         </button>
 

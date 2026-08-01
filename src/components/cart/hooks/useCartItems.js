@@ -11,10 +11,9 @@ export function useCartItems(isOpen) {
     const fetchCart = async () => {
       try {
         const res = await instance.get("/get/cart");
-        setCartItems(res.data.data || []); // ← fallback kalau backend balikin null
+        setCartItems(res.data.data);
       } catch (err) {
         console.error("Gagal ambil cart:", err);
-        setCartItems([]); // ← fallback kalau request gagal
       }
     };
     fetchCart();
@@ -28,9 +27,7 @@ export function useCartItems(isOpen) {
     try {
       await instance.patch(`/update/cart/${cartId}`, { quantity: newQuantity });
       setCartItems((prev) =>
-        prev.map((item) =>
-          item.id === cartId ? { ...item, quantity: newQuantity } : item,
-        ),
+        prev.map((item) => (item.id === cartId ? { ...item, quantity: newQuantity } : item)),
       );
     } catch (err) {
       console.error("Gagal update quantity:", err);
@@ -49,17 +46,10 @@ export function useCartItems(isOpen) {
     }
   };
 
-  const subtotal = (cartItems || []).reduce((acc, item) => {
-    const price = item.is_custom
-      ? Number(item.custom_price)
-      : Number(item.price);
+  const subtotal = cartItems.reduce((acc, item) => {
+    const price = item.is_custom ? Number(item.custom_price) : Number(item.price);
     return acc + price * item.quantity;
   }, 0);
 
-  return {
-    cartItems: cartItems || [],
-    updateQuantity,
-    handleRemoveItem,
-    subtotal,
-  };
+  return { cartItems, updateQuantity, handleRemoveItem, subtotal };
 }
