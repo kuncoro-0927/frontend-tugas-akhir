@@ -1,5 +1,5 @@
 🎨 Faza Frame - Frontend (E-Commerce Figura)
-Sebuah aplikasi web penjualan figura berbasis React.js dengan pendekatan mobile-first dan integrasi sistem pembayaran modern.
+Sebuah aplikasi web penjualan figura berbasis React.js dengan integrasi sistem pembayaran modern.
 
 🚀 Overview
 Faza Frame Frontend dibangun untuk memberikan pengalaman belanja yang cepat dan intuitif. Proyek ini menangani alur pengguna yang kompleks, mulai dari pemilihan produk, manajemen keranjang menggunakan Redux, hingga proses checkout yang terintegrasi dengan Midtrans.
