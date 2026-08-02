@@ -15,7 +15,7 @@ const MobileTopBar = ({
   onToggleDrawer,
 }) => {
   return (
-    <div className="flex fixed bg-black w-full top-0 z-0 px-12 md:px-24 py-2 lg:hidden items-center justify-between">
+    <div className="flex fixed bg-black w-full top-0 z-0 px-7 sm:px-12 md:px-24 py-2 lg:hidden items-center justify-between">
       <div className="lg:hidden flex items-center justify-between">
         {scrolling ? (
           <SearchButton onClick={onSearchOpen} variant="mobile" />

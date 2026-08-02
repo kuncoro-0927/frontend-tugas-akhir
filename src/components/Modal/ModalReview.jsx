@@ -6,9 +6,9 @@ import { showSnackbar } from "../CustomSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
 import { CustomSnackbar } from "../CustomSnackbar";
 
-const MAX_REVIEW_LENGTH = 500; // Maksimum 300 karakter
+const MAX_REVIEW_LENGTH = 500;
 
-const ModalReview = ({ open, handleClose, productId }) => {
+const ModalReview = ({ open, handleClose, productId, onSuccess }) => {
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState(5);
   const [loading, setLoading] = useState(false);
@@ -31,6 +31,7 @@ const ModalReview = ({ open, handleClose, productId }) => {
       setReviewText("");
       setRating(0);
       handleClose();
+      onSuccess?.(); // refresh parent's review list so it reflects the new review immediately
     } catch (error) {
       console.error("Gagal mengirim ulasan", error);
       showSnackbar("Gagal mengirim ulasan. Coba lagi.", "error");

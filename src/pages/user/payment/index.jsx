@@ -72,7 +72,7 @@ const Payment = () => {
     <section className="h-screen">
       <PaymentHeader />
 
-      <div className="flex flex-col-reverse lg:flex-row lg:space-x-20 mx-7 md:mx-32 lg:mx-[75px] justify-between">
+      <div className="flex flex-col-reverse lg:flex-row lg:space-x-20 mx-7 sm:mx-12 md:mx-24 lg:mx-14 2xl:mx-32 justify-between">
         <div className="max-w-[700px] mb-10 lg:mt-10 w-full">
           <ShippingCourierSection
             formData={formData}
@@ -98,7 +98,7 @@ const Payment = () => {
           </button>
         </div>
 
-        <div className="lg:border-r border-b my-5 lg:my-0 border-gray-300 lg:h-[130vh] lg:mx-4 lg:self-stretch"></div>
+        <div className="lg:border-r border-b my-5 lg:my-0 border-gray-300 lg:h-screen lg:mx-4 lg:self-stretch"></div>
 
         <OrderSummary
           items={items}

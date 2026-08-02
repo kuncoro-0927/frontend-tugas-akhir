@@ -13,7 +13,7 @@ export default function Card({
 }) {
   return (
     <>
-      <div className=" bg-abu p-5 rounded-lg h-[300px] w-[320px] md:w-auto lg:max-h-[250px] md:max-h-[200px] relative overflow-hidden group flex flex-col">
+      <div className=" bg-abu p-5 rounded-lg h-[300px] w-full sm:w-auto sm:max-w-[300px] xl:w-full xl:max-w-full md:w-auto lg:max-h-[250px] md:max-h-[200px] relative overflow-hidden group flex flex-col">
         <div className="relative justify-center items-center flex w-full   h-full overflow-hidden flex-shrink-0">
           {isLoading ? (
             <Skeleton variant="rectangular" width="100%" height={200} />

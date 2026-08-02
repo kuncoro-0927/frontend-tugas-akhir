@@ -6,7 +6,7 @@ import { openDrawer } from "../../../../redux/cartDrawer";
 const PaymentHeader = () => {
   const dispatch = useDispatch();
   return (
-    <div className="border-b flex items-center justify-between px-7 md:px-32 lg:px-[75px] py-4">
+    <div className="border-b flex items-center justify-between mx-7 sm:mx-12 md:mx-24 lg:mx-14 2xl:mx-32 py-4">
       <Link to="/">
         <img className="w-10" src="/logoindex.svg" alt="" />
       </Link>

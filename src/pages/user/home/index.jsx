@@ -16,7 +16,9 @@ const Home = () => {
   const { isLoggedIn, user } = useSelector((state) => state.user);
   const [openAuthModal, setOpenAuthModal] = useState(false);
 
-  const { products, loadingProductId, addCart } = useHomeProducts();
+  const { products, loadingProductId, addCart } = useHomeProducts({
+    userId: user?.id,
+  });
   const { handleToggleWishlist, isProductInWishlist } = useWishlistToggle({
     isLoggedIn,
     userId: user?.id,

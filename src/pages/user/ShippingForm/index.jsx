@@ -56,7 +56,7 @@ const ShippingForm = () => {
     <section className="h-screen">
       <TopBar />
 
-      <div className="flex flex-col-reverse lg:flex-row mx-7 md:mx-32 lg:mx-[75px] justify-between items-start gap-6">
+      <div className="flex flex-col-reverse lg:flex-row mx-7 sm:mx-12 md:mx-24 lg:mx-14 2xl:mx-32 justify-between items-start gap-6">
         <AddressForm
           formData={formData}
           formErrors={formErrors}
@@ -69,7 +69,7 @@ const ShippingForm = () => {
           onSelectCity={selectCity}
         />
 
-        <div className="lg:border-r border-b my-5 md:my-0 border-gray-300 lg:h-[115vh] lg:mx-4 block self-stretch"></div>
+        <div className="lg:border-r border-b my-5 md:my-0 border-gray-300 lg:h-screen lg:mx-4 block self-stretch"></div>
 
         <OrderSummary
           orderItems={orderItems}

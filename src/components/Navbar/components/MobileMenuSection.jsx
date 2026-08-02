@@ -9,7 +9,7 @@ const itemLinkClass = ({ isActive }) =>
 
 const MobileMenuSection = ({ title, items, onNavigate }) => {
   return (
-    <div className="mx-2 sm:mx-12 md:mx-24 mt-3">
+    <div className="mx-7 sm:mx-12 md:mx-24 mt-3">
       <h1 className="font-bold">{title}</h1>
       <ul className="py-2 text-base text-hitam">
         {items.map(({ to, label, icon: Icon }) => (

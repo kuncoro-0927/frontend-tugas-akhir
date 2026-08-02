@@ -7,25 +7,25 @@ export function useReviewData() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
 
+  const fetchProducts = async () => {
+    try {
+      const response = await instance.get("/product/review/user");
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Gagal memuat produk yang telah dipesan.", error);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const response = await instance.get("/review/user");
+      setReviews(response.data.reviews);
+    } catch (error) {
+      console.error("Gagal memuat ulasan.", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await instance.get("/product/review/user");
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Gagal memuat produk yang telah dipesan.", error);
-      }
-    };
-
-    const fetchReviews = async () => {
-      try {
-        const response = await instance.get("/review/user");
-        setReviews(response.data.reviews);
-      } catch (error) {
-        console.error("Gagal memuat ulasan.", error);
-      }
-    };
-
     fetchProducts();
     fetchReviews();
   }, []);
@@ -51,5 +51,6 @@ export function useReviewData() {
     handleOpenReviewModal,
     handleCloseReviewModal,
     hasReviewedProduct,
+    refetchReviews: fetchReviews, // exposed so ModalReview's onSuccess can refresh this list
   };
 }

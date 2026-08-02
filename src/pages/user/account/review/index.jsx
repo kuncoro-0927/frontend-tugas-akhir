@@ -19,11 +19,17 @@ const Review = () => {
     handleOpenReviewModal,
     handleCloseReviewModal,
     hasReviewedProduct,
+    refetchReviews,
   } = useReviewData();
 
   return (
     <section className="flex min-h-screen mt-16 md:mt-0 2xl:mx-32">
-      <ModalReview open={modalOpen} handleClose={handleCloseReviewModal} productId={selectedProductId} />
+      <ModalReview
+        open={modalOpen}
+        handleClose={handleCloseReviewModal}
+        productId={selectedProductId}
+        onSuccess={refetchReviews}
+      />
 
       <div className="hidden sm:block md:block lg:block">
         <SidebarAccount />

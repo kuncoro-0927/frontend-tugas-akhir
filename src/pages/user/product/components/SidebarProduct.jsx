@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { MdKeyboardArrowRight, MdKeyboardArrowDown } from "react-icons/md";
-import { instance } from "../utils/axios";
+import { instance } from "../../../../utils/axios";
 import {
   Drawer,
   IconButton,
@@ -62,7 +62,7 @@ const SidebarProduct = ({ onFilterChange }) => {
     }).format(value);
 
   return (
-    <div className="text-sm border rounded-lg w-44 md:w-60 lg:w-72 p-4 border-hitam">
+    <div className="text-sm border rounded-lg w-44 md:w-60 lg:w-64 xl:w-72 p-4 border-hitam">
       <h1 className="text-base flex items-center justify-between gap-2 font-bold">
         Filter <IoFilterOutline className="font-bold text-xl" />
       </h1>

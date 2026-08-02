@@ -61,7 +61,7 @@ const ProductDetails = () => {
 
   return (
     <>
-      <section className="md:mx-[75px] mx-7 mt-10">
+      <section className="sm:mx-12 md:mx-24 mt-20 lg:mt-10 lg:mx-14 2xl:mx-32  mx-7">
         <AuthModal
           open={openAuthModal}
           handleClose={() => setOpenAuthModal(false)}
@@ -70,14 +70,14 @@ const ProductDetails = () => {
 
         <ProductBreadcrumb productName={product?.name} from={from} />
 
-        <div className="md:mt-10 mt-5 md:flex md:gap-10 lg:gap-20">
+        <div className="md:mt-10 mt-5 lg:flex md:gap-10 lg:gap-20">
           <ProductGallery
             imageUrl={`${import.meta.env.VITE_BACKEND_URL}${
               product?.image_url
             }`}
           />
 
-          <div className="flex flex-col md:w-1/2">
+          <div className="flex flex-col lg:w-1/2">
             <ProductHeader
               product={product}
               customPrice={customPrice}
@@ -113,7 +113,7 @@ const ProductDetails = () => {
         <div className="border-t mt-10 md:pb-10"></div>
       </section>
 
-      <section className="md:mx-[75px] mx-7 pb-20">
+      <section className="sm:mx-12 md:mx-24 lg:mx-14 2xl:mx-32 mx-7">
         <div className="mt-7">
           <h2 className="text-2xl text-hitam2 font-extrabold">
             Ulasan Pengguna
