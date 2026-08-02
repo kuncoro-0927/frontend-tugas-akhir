@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Modal, Box, TextField, Rating, useTheme } from "@mui/material";
 import { IoClose } from "react-icons/io5";
 import { instance } from "../../utils/axios";
-import { showSnackbar } from "../CustomSnackbar";
+import { showSnackbar } from "../ui/CustomSnackbar";
 import CircularProgress from "@mui/material/CircularProgress";
-import { CustomSnackbar } from "../CustomSnackbar";
+import { CustomSnackbar } from "../ui/CustomSnackbar";
 
 const MAX_REVIEW_LENGTH = 500;
 

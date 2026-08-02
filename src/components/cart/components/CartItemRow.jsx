@@ -1,4 +1,4 @@
-import CardImage from "../../Card/CardImage";
+import CardImage from "../../card/CardImage";
 import QuantitySelector from "./QuantitySelector";
 
 const CartItemRow = ({ item, onIncrease, onDecrease }) => (

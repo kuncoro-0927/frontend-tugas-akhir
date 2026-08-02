@@ -1,9 +1,9 @@
-import CardReview from "./Card/CardReview";
+import CardReview from "../card/CardReview";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { FreeMode, Pagination } from "swiper/modules";
-import { ServiceData } from "../data/DataReview";
+import { ServiceData } from "../../data/DataReview";
 import "../assets/styleswiper.css";
 
 export default function SwiperCardReview() {
