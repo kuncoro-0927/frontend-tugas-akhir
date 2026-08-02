@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import SidebarProduct from "../../../components/SidebarProduct";
-import DrawerProduct from "../../../components/DrawerProduct";
+import DrawerProduct from "./components/DrawerProduct";
 import ProductListHeader from "./components/ProductListHeader";
 import ProductGrid from "./components/ProductGrid";
 import Pagination from "./components/Pagination";

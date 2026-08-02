@@ -1,7 +1,7 @@
 import AccordionTransition from "../components/Accordion";
 
 const WhyChooseUs = () => (
-  <section className="lg:mt-32 md:mt-16 md:flex justify-center mx-7 lg:mx-14 md:mx-10 md:gap-10 lg:gap-32">
+  <section className="py-6 md:py-8 2xl:py-16 md:flex justify-start mx-7 sm:mx-12 lg:mx-14 2xl:mx-32 md:mx-24 md:gap-10 lg:gap-32">
     <div>
       <img
         src="/public/images/bg-4.jpg"

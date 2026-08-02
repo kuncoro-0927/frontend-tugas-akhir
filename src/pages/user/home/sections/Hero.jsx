@@ -5,8 +5,8 @@ import { FaLocationDot, FaCircleCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 
 const Hero = () => (
-  <section className="mt-16 md:mt-10 mx-7 md:mx-10 lg:mx-14">
-    <div className="md:flex md:justify-between md:gap-8 lg:gap-20">
+  <section className="mt-12 md:mt-8 py-6 md:py-8 2xl:py-16 mx-7 sm:mx-12 md:mx-24 lg:mx-14 2xl:mx-32">
+    <div className="lg:flex md:justify-between md:gap-8 lg:gap-20">
       <div className="w-full py-5 rounded-2xl">
         <h1 className="font-bold text-5xl md:text-5xl lg:text-6xl max-w-lg">
           <span>
@@ -32,7 +32,7 @@ const Hero = () => (
           </button>
         </div>
 
-        <div className="flex mt-5 lg:mt-20 lg:px-10 items-start md:items-center justify-between w-full bg-white rounded-md text-sm py-3">
+        <div className="flex mt-5 lg:mt-20 items-start md:items-center justify-between w-full bg-white rounded-md text-sm py-3">
           <div className="pr-2 md:pr-4">
             <p className="font-semibold text-base md:text-sm lg:text-base">Pengiriman</p>
             <p className="flex text-sm md:text-xs items-center gap-2">
@@ -57,7 +57,7 @@ const Hero = () => (
       </div>
 
       <div className="bg-gradient-to-b from-coklat to-birulaut w-full flex justify-center p-14 md:p-14 lg:p-20 rounded-2xl">
-        <img src="/kuda.png" className="md:w-full lg:w-[320px]" alt="" />
+        <img src="/kuda.png" className="md:w-[250px] sm:w-[200px] lg:w-[280px] object-contain" alt="" />
       </div>
     </div>
   </section>

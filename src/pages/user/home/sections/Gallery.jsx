@@ -7,16 +7,16 @@ const Gallery = ({
   onToggleWishlist,
   onAddToCart,
 }) => (
-  <section className="lg:mt-28 mt-20 mx-7 md:mx-10 lg:mx-14">
-    <div className="flex justify-center md:justify-between items-center">
+  <section className="py-6 md:py-8 2xl:py-16 mx-7 sm:mx-12 md:mx-24 lg:mx-14 2xl:mx-32">
+    <div className="flex justify-between items-center">
       <h1 className="font-extrabold text-2xl md:text-3xl">Galeri Kami</h1>
-      <button className="border hidden md:block border-gray-300 py-2 px-5 rounded-full text-sm hover:-translate-y-1 duration-300">
+      <button className="border border-gray-300 py-2 px-5 rounded-full text-sm hover:-translate-y-1 duration-300">
         Lihat semua
       </button>
     </div>
 
     {/* Mobile Carousel */}
-    <div className="flex md:hidden mt-10 pb-16 gap-4 overflow-x-auto scrollbar-hide">
+    <div className="flex md:hidden mt-6 gap-4 overflow-x-auto scrollbar-hide">
       {products.slice(0, 8).map((product) => (
         <ProductCard
           key={product.id}

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Drawer, Slider } from "@mui/material";
-import { instance } from "../utils/axios";
+import { instance } from "../../../../utils/axios";
 import { IoCloseOutline } from "react-icons/io5";
 const DrawerProduct = ({ open, onClose, onFilterChange }) => {
   const [categories, setCategories] = useState([]);

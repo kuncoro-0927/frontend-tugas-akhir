@@ -4,7 +4,7 @@ import { TiSocialFacebook } from "react-icons/ti";
 const Footer = () => {
   return (
     <div>
-      <footer className="mt-20 mx-7 lg:mx-14">
+      <footer className="py-6 2xl:py-16 mx-7 sm:mx-12 lg:mx-14 2xl:mx-32">
         <div className="md:flex space-y-4 md:space-y-0 md:gap-10 lg:gap-24 Justify-start items-start md:mx-10 lg:mx-[14px] text-sm">
           <div className="max-w-sm  w-fit ">
             <h1 className="font-bold text-lg mb-3">Bantuan</h1>

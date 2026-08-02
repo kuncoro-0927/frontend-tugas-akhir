@@ -1,5 +1,5 @@
 import CardImage from "../../Card/CardImage";
-import QuantitySelector from "../../QuantitySelector";
+import QuantitySelector from "./QuantitySelector";
 
 const CartItemRow = ({ item, onIncrease, onDecrease }) => (
   <div className="flex items-start gap-4 mb-10 rounded-lg transition">
@@ -37,7 +37,10 @@ const CartItemRow = ({ item, onIncrease, onDecrease }) => (
           />
         </div>
         <p className="font-medium">
-          IDR {Number(item.is_custom ? item.custom_price : item.price).toLocaleString("id-ID")}
+          IDR{" "}
+          {Number(
+            item.is_custom ? item.custom_price : item.price,
+          ).toLocaleString("id-ID")}
         </p>
       </div>
     </div>

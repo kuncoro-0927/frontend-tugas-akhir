@@ -13,13 +13,13 @@ export const ServiceData = [
   },
   {
     content:
-      "Saya pesan untuk hadiah wisuda, dan hasilnya luar biasa! Packing-nya aman, kualitas figurnya premium, dan sangat cocok untuk hadiah spesial. Recommended banget!",
+      "Saya pesan untuk hadiah wisuda, dan hasilnya luar biasa! Packing-nya aman, kualitas figurnya premium, dan sangat cocok untuk hadiah spesial.",
     name: "Eprison",
     wisata: "Faza Frame Pacitan",
   },
   {
     content:
-      "Produk berkualitas dengan harga terjangkau. Saya suka karena banyak pilihan desain dan bisa request ukuran sendiri. Faza Frame benar-benar solusi untuk dekorasi rumah yang personal.",
+      "Saya suka karena banyak pilihan desain dan bisa request ukuran sendiri. Faza Frame benar-benar solusi untuk dekorasi rumah yang personal.",
     name: "Yudi",
     wisata: "Faza Frame Pacitan",
   },
