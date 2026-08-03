@@ -4,7 +4,7 @@ import {
   toggleWishlist,
   fetchWishlist,
 } from "../../../../../redux/wishlistSlice";
-import { showSnackbar } from "../../../../../components/CustomSnackbar";
+import { showSnackbar } from "../../../../../components/ui/CustomSnackbar";
 import { useAddToCart } from "../../../../../hooks/user/useAddToCart";
 export function useWishlistPage() {
   const dispatch = useDispatch();

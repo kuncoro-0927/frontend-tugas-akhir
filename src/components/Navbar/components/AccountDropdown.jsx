@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { CiUser, CiShoppingTag, CiChat1, CiLogout } from "react-icons/ci";
-import Avatar from "../../Avatar";
+import Avatar from "../../ui/Avatar";
 
 const menuLinkClass = ({ isActive }) =>
   isActive

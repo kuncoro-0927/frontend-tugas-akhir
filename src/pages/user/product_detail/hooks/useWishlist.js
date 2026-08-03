@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleWishlist,fetchWishlist } from "../../../../redux/wishlistSlice";
-import { showSnackbar } from "../../../../components/CustomSnackbar";
+import { showSnackbar } from "../../../../components/ui/CustomSnackbar";
 export default function useWishlist() {
   const dispatch = useDispatch();
   const { isLoggedIn, user } = useSelector((state) => state.user);

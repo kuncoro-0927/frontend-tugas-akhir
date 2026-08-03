@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import { instance } from "../../../../utils/axios";
 import { addToCart } from "../../../../redux/cartSlice";
 import { fetchCartItemCount } from "../../../../redux/cartSlice";
-import { showSnackbar } from "../../../../components/CustomSnackbar";
+import { showSnackbar } from "../../../../components/ui/CustomSnackbar";
 
 export default function useAddToCart(user) {
   const dispatch = useDispatch();

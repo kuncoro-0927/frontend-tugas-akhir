@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { instanceAdmin } from "../../../../utils/axiosAdmin";
-import { showSnackbar } from "../../../CustomSnackbar";
+import { showSnackbar } from "../../../ui/CustomSnackbar";
 import { IoClose } from "react-icons/io5";
-import FormInput from "../../../TextField";
+import FormInput from "../../../ui/TextField";
 import { Modal, Box } from "@mui/material";
 import CardImage from "../../../Card/CardImage";
 

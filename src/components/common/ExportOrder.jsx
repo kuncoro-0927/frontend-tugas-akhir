@@ -6,7 +6,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { format } from "date-fns";
 import { instanceAdmin } from "../../utils/axiosAdmin";
-import { showSnackbar } from "./CustomSnackbar";
+import { showSnackbar } from "../ui/CustomSnackbar";
 import { IoPrintSharp } from "react-icons/io5";
 const blackTheme = createTheme({
   palette: {

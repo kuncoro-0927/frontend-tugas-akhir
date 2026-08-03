@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { loginAdmin } from "../../redux/adminSlice";
-import FormInput from "../../components/TextField";
+import FormInput from "../../components/ui/TextField";
 import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 

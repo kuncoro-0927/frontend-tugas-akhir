@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { instance } from "../../utils/axios";
 import { addToCart, fetchCartItemCount } from "../../redux/cartSlice";
-import { showSnackbar } from "../../components/CustomSnackbar";
+import { showSnackbar } from "../../components/ui/CustomSnackbar";
 export function useAddToCart({ userId }) {
   const dispatch = useDispatch();
   const [loadingProductId, setLoadingProductId] = useState(null);

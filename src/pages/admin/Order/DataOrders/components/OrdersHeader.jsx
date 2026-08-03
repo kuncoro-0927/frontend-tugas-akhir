@@ -1,7 +1,7 @@
 import React from "react";
 import { BsCartPlus } from "react-icons/bs";
 import { PiExport } from "react-icons/pi";
-import ExportOrdersModal from "../../../../../components/ExportOrder";
+import ExportOrdersModal from "../../../../../components/common/ExportOrder";
 
 const OrdersHeader = ({
   onExportClick,

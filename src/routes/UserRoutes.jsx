@@ -22,8 +22,8 @@ import Cart from "../components/Cart";
 import Notfound from "../pages/user/404";
 import ResetPassword from "../pages/auth/ResetPassword";
 import AuthModal from "../pages/auth/AuthModal";
-import FloatingButton from "../components/FloatingButton";
-import ModalSearch from "../components/Modal/ModalSearch";
+import FloatingButton from "../components/ui/FloatingButton";
+import ModalSearch from "../components/modal/ModalSearch";
 
 function UserRoutes() {
   const navigate = useNavigate();

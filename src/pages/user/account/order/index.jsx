@@ -1,7 +1,7 @@
 import { useState } from "react";
-import SidebarAccount from "../../../../components/SidebarforAccount";
-import StatusModal from "../../../../components/Modal/ModalStatus";
-import TrackOrderModal from "../../../../components/Modal/ModalTracking";
+import SidebarAccount from "../../../../components/common/SidebarforAccount";
+import StatusModal from "../../../../components/modal/ModalStatus";
+import TrackOrderModal from "../../../../components/modal/ModalTracking";
 import OrderEmptyState from "./components/OrderEmptyState";
 import OrderCard from "./components/OrderCard";
 import { useOrders } from "./hooks/useOrders";

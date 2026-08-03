@@ -1,4 +1,4 @@
-import SidebarAccount from "../../../../components/SidebarforAccount";
+import SidebarAccount from "../../../../components/common/SidebarforAccount";
 import ProfileFormFields from "./components/ProfileFormFields";
 import { useProfileForm } from "./hooks/useProfileForm";
 

@@ -1,4 +1,4 @@
-import FormInput from "../../../../../components/TextField";
+import FormInput from "../../../../../components/ui/TextField";
 
 const TEXT_FIELDS = [
   {

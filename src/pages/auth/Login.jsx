@@ -8,7 +8,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../../redux/userSlice";
 import CircularProgress from "@mui/material/CircularProgress";
-import { showSnackbar } from "../../components/CustomSnackbar";
+import { showSnackbar } from "../../components/ui/CustomSnackbar";
 import { setCartItems } from "../../redux/cartSlice";
 const ModalLogin = ({ handleSwitch, handleClose }) => {
   const [step, setStep] = useState(1);

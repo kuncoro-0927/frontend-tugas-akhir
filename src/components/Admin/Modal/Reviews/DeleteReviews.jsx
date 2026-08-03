@@ -1,7 +1,7 @@
 import { Modal, Box, Button } from "@mui/material";
 import { IoClose, IoWarningOutline } from "react-icons/io5";
 import { instanceAdmin } from "../../../../utils/axiosAdmin";
-import { showSnackbar } from "../../../CustomSnackbar";
+import { showSnackbar } from "../../../ui/CustomSnackbar";
 import { TiWarningOutline } from "react-icons/ti";
 const ModalDeleteReview = ({ open, handleClose, promoId, onUpdate }) => {
   const handleDelete = async (e) => {

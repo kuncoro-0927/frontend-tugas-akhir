@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { toggleWishlist, fetchWishlist } from "../../../../redux/wishlistSlice";
-import { showSnackbar } from "../../../../components/CustomSnackbar";
+import { showSnackbar } from "../../../../components/ui/CustomSnackbar";
 
 export function useWishlistToggle({ isLoggedIn, userId, onRequireAuth }) {
   const dispatch = useDispatch();

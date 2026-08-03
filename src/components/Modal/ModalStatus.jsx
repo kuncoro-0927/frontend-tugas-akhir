@@ -3,7 +3,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { IoClose } from "react-icons/io5";
 import { ImPriceTags } from "react-icons/im";
-import TimelinePengiriman from "../Timeline";
+import TimelinePengiriman from "../common/Timeline";
 const StatusModal = ({ open, onClose, data }) => {
   const {
     status,

@@ -9,7 +9,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { instance } from "../../utils/axios"; // sesuaikan path axios kamu
 
-import { showSnackbar } from "../../components/CustomSnackbar";
+import { showSnackbar } from "../../components/ui/CustomSnackbar";
 const ResetPassword = () => {
   const location = useLocation();
   const navigate = useNavigate();

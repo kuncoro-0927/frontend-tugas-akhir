@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import PropTypes from "prop-types";
 import { Box } from "@mui/system";
-import { showSnackbar } from "../../components/CustomSnackbar";
+import { showSnackbar } from "../../components/ui/CustomSnackbar";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { instance } from "../../utils/axios";

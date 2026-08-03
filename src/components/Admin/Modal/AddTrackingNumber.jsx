@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Modal, TextField, Button } from "@mui/material";
 import { IoClose } from "react-icons/io5";
-import FormInput from "../../TextField";
+import FormInput from "../../ui/TextField";
 const AddResiModal = ({ orderId, onClose, onSubmit }) => {
   const [trackingNumber, setTrackingNumber] = useState("");
 

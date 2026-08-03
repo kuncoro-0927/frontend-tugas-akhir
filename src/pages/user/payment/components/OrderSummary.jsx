@@ -1,4 +1,4 @@
-import FormInput from "../../../../components/TextField";
+import FormInput from "../../../../components/ui/TextField";
 import CardImage from "../../../../components/Card/CardImage";
 
 const formatIDR = (value) =>

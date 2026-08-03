@@ -5,7 +5,7 @@ import { MdOutlineEmail } from "react-icons/md";
 import CircularProgress from "@mui/material/CircularProgress";
 import { TextField } from "@mui/material";
 
-import { showSnackbar } from "../../components/CustomSnackbar";
+import { showSnackbar } from "../../components/ui/CustomSnackbar";
 import { instance } from "../../utils/axios";
 
 const ModalForgotPassword = ({ handleClose, handleSwitch }) => {

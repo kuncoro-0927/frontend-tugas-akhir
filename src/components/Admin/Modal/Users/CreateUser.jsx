@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { instanceAdmin } from "../../../../utils/axiosAdmin";
-import { showSnackbar } from "../../../CustomSnackbar";
+import { showSnackbar } from "../../../ui/CustomSnackbar";
 import { IoClose } from "react-icons/io5";
-import FormInput from "../../../TextField";
+import FormInput from "../../../ui/TextField";
 import { IoImageOutline } from "react-icons/io5";
 import { Modal, Box, Button } from "@mui/material";
 import { MuiTelInput } from "mui-tel-input";

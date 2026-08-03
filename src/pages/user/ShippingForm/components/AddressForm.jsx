@@ -1,5 +1,5 @@
 import React from "react";
-import FormInput from "../../../../components/TextField";
+import FormInput from "../../../../components/ui/TextField";
 import CityAutocomplete from "./CityAutocomplete";
 import PhoneField from "./PhoneField";
 

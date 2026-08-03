@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { instanceAdmin } from "../../../../../utils/axiosAdmin";
-import { showSnackbar } from "../../../../../components/CustomSnackbar";
+import { showSnackbar } from "../../../../../components/ui/CustomSnackbar";
 
 const useOrderModals = (onDataChanged) => {
   const [selectedOrderId, setSelectedOrderId] = useState(null);

@@ -1,4 +1,4 @@
-import FormInput from "../../../../components/TextField";
+import FormInput from "../../../../components/ui/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 
 const ContactForm = ({ form, loading, feedbackMsg, onChange, onSubmit }) => (

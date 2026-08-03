@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate from react
 import { TextField } from "@mui/material";
 import CardImage from "../Card/CardImage";
 import { HiArrowRight } from "react-icons/hi2";
-import FormInput from "../TextField";
+import FormInput from "../ui/TextField";
+
 export default function ModalSearch({ isOpen, handleClose, onSelect }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [productsList, setProductsList] = useState([]);

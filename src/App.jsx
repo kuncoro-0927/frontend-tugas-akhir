@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { CustomSnackbar } from "./components/CustomSnackbar";
+import { CustomSnackbar } from "./components/ui/CustomSnackbar";
 import UserRoutes from "./routes/UserRoutes";
 import { fetchUser } from "./redux/userSlice";
 import { fetchAdmin } from "./redux/adminSlice";
 import { useDispatch } from "react-redux";
 import AdminRoutes from "./routes/AdminRoutes";
-import FloatingButton from "./components/FloatingButton";
+import FloatingButton from "./components/ui/FloatingButton";
 import Cart from "./components/cart";
 function App() {
   const dispatch = useDispatch();

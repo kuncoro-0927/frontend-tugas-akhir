@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
-import FormInput from "../../../TextField";
+import FormInput from "../../../ui/TextField";
 import { Modal, Box, FormControlLabel, Checkbox } from "@mui/material";
 import { instanceAdmin } from "../../../../utils/axiosAdmin";
-import { showSnackbar } from "../../../CustomSnackbar";
+import { showSnackbar } from "../../../ui/CustomSnackbar";
 import { IoImageOutline } from "react-icons/io5";
 const ModalEditProduct = ({ open, handleClose, productId, onUpdate }) => {
   const [formData, setFormData] = useState({

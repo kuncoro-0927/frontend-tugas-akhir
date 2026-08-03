@@ -1,4 +1,4 @@
-import SidebarAccount from "../../../../components/SidebarforAccount";
+import SidebarAccount from "../../../../components/common/SidebarforAccount";
 import ProductCard from "../../../../components/Card/ProductCard";
 import WishlistEmptyState from "./components/WishlistEmptyState";
 import { useWishlistPage } from "./hooks/useWishlistPage";

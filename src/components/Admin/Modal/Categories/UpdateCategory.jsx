@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import FormInput from "../../../TextField";
-import { showSnackbar } from "../../../CustomSnackbar";
+import FormInput from "../../../ui/TextField";
+import { showSnackbar } from "../../../ui/CustomSnackbar";
 import { instanceAdmin } from "../../../../utils/axiosAdmin";
 import { IoClose } from "react-icons/io5";
 import { Modal, Box } from "@mui/material";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { instance } from "../../../../utils/axios";
-import { showSnackbar } from "../../../../components/CustomSnackbar";
+import { showSnackbar } from "../../../../components/ui/CustomSnackbar";
 
 const INITIAL_FORM = { name: "", email: "", phone: "", message: "" };
 

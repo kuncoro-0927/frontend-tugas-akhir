@@ -2,7 +2,7 @@ import { useState } from "react";
 import { instance } from "../../utils/axios";
 import { Modal, Box } from "@mui/material";
 import { IoClose } from "react-icons/io5";
-import FormInput from "../TextField";
+import FormInput from "../ui/TextField";
 
 const TrackOrderModal = ({ open, onClose }) => {
   const [orderCode, setOrderCode] = useState("");

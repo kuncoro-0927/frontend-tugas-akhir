@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import AccordionFaqs from "../../components/AccordionFaqs";
+import AccordionFaqs from "../../components/common/AccordionFaqs";
 import { faqData } from "../../data/faqData";
 
 const Faqs = () => (

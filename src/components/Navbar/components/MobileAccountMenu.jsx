@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { IoIosArrowForward } from "react-icons/io";
 import { CiUser, CiShoppingTag, CiHeart, CiChat1, CiLogout } from "react-icons/ci";
-import Avatar from "../../Avatar";
+import Avatar from "../../ui/Avatar";
 
 const itemLinkClass = ({ isActive }) =>
   isActive

@@ -1,4 +1,4 @@
-import { showSnackbar } from "../../../../components/CustomSnackbar";
+import { showSnackbar } from "../../../../components/ui/CustomSnackbar";
 import { instance } from "../../../../utils/axios";
 
 export function usePayment({ orderId, formData, admin, promo, promocode, finalTotal, items }) {

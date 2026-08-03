@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { instance } from "../../../utils/axios";
-import { showSnackbar } from "../../CustomSnackbar";
+import { showSnackbar } from "../../ui/CustomSnackbar";
 
 export function useCheckout({ cartItems, onSuccess }) {
   const [loadingCheckout, setLoadingCheckout] = useState(false);
